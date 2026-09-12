@@ -8,8 +8,8 @@
 </head>
 <body>
   <main class="page">
-    <section class="verify-card">
-      <header class="hero">
+    <section class="verify">
+      <header class="top">
         <div>
           <p class="brand">DeepTruck Verify</p>
           <h1 id="carrier-name">Carrier verification</h1>
@@ -17,60 +17,67 @@
         <span id="status-pill" class="status">Loading</span>
       </header>
 
-      <dl class="carrier-meta">
-        <div><dt>USDOT</dt><dd id="dot">-</dd></div>
-        <div><dt>MC</dt><dd id="mc">-</dd></div>
-        <div><dt>Email</dt><dd id="email">-</dd></div>
-        <div><dt>Phone</dt><dd id="phone">-</dd></div>
-      </dl>
-
-      <div class="track">
-        <div id="email-check" class="check"><span></span>Email</div>
-        <div id="phone-check" class="check"><span></span>SMS</div>
-        <div id="license-check" class="check"><span></span>License</div>
+      <div class="meta">
+        <p><span>USDOT</span> <b id="dot">-</b> <i></i> <span>MC</span> <b id="mc">-</b></p>
+        <p><span>Email</span> <b id="email">-</b></p>
+        <p><span>Phone</span> <b id="phone">-</b></p>
       </div>
 
       <div class="flow">
-        <section class="task">
-          <div class="task-copy">
-            <span class="step">01</span>
-            <div>
-              <h2>Email</h2>
-              <p>Confirm this request.</p>
+        <section class="item">
+          <div id="email-check" class="marker check"><span></span></div>
+          <div class="content">
+            <div class="line">
+              <div>
+                <h2>Email</h2>
+                <p>Confirm request receipt.</p>
+              </div>
+              <button id="verify-email">Confirm</button>
             </div>
           </div>
-          <button id="verify-email">Confirm</button>
         </section>
 
-        <section class="task">
-          <div class="task-copy">
-            <span class="step">02</span>
-            <div>
-              <h2>SMS</h2>
-              <p id="phone-help">Enter the code sent to the carrier phone.</p>
-              <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="8">
-              <div id="phone-msg" class="message"></div>
+        <section class="item">
+          <div id="phone-check" class="marker check"><span></span></div>
+          <div class="content">
+            <div class="line">
+              <div>
+                <h2>SMS code</h2>
+                <p id="phone-help">Enter the code sent to the carrier phone.</p>
+              </div>
+              <div class="control">
+                <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="8">
+                <button id="verify-phone">Verify</button>
+              </div>
             </div>
+            <div id="phone-msg" class="message"></div>
           </div>
-          <button id="verify-phone">Confirm</button>
         </section>
 
-        <section class="task">
-          <div class="task-copy">
-            <span class="step">03</span>
-            <div>
-              <h2>License</h2>
-              <p>Upload the driver's license.</p>
-              <label class="file-select">
-                <input id="license" type="file" accept="image/*,.pdf">
-                <span>Select file</span>
-              </label>
-              <div id="license-msg" class="message"></div>
+        <section class="item">
+          <div id="license-check" class="marker check"><span></span></div>
+          <div class="content">
+            <div class="line">
+              <div>
+                <h2>Driver license</h2>
+                <p>PDF, JPG or PNG.</p>
+              </div>
+              <div class="control">
+                <label class="file">
+                  <input id="license" type="file" accept="image/*,.pdf">
+                  <span>Choose</span>
+                </label>
+                <button id="upload-license">Upload</button>
+              </div>
             </div>
+            <div id="license-msg" class="message"></div>
           </div>
-          <button id="upload-license">Upload</button>
         </section>
       </div>
+
+      <footer>
+        Verification is required before load assignment.
+      </footer>
     </section>
   </main>
   <script src="verify.js"></script>
