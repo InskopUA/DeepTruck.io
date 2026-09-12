@@ -56,6 +56,11 @@ els.uploadButton.addEventListener("click", async () => {
   await load();
 });
 
+els.license.addEventListener("change", () => {
+  const fileName = els.license.files[0]?.name || "";
+  if (fileName) els.licenseMsg.textContent = fileName;
+});
+
 async function load() {
   const record = await request(`${API_BASE_URL}/verification-requests/${id}`);
   render(record);

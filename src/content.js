@@ -74,17 +74,11 @@ async function onClick(event) {
   }
 
   if (action === "start" && state.carrier) {
-    state.loading = true;
-    state.error = "";
-    update();
-    try {
-      state.verification = await send("verification.create", { carrier: state.carrier });
-    } catch (error) {
-      state.error = error.message || String(error);
-    } finally {
-      state.loading = false;
-      update();
-    }
+    await createVerification();
+  }
+
+  if (action === "new" && state.carrier) {
+    await createVerification();
   }
 
   if (action === "poll" && state.verification?.id) {
@@ -99,6 +93,20 @@ async function onClick(event) {
       state.loading = false;
       update();
     }
+  }
+}
+
+async function createVerification() {
+  state.loading = true;
+  state.error = "";
+  update();
+  try {
+    state.verification = await send("verification.create", { carrier: state.carrier });
+  } catch (error) {
+    state.error = error.message || String(error);
+  } finally {
+    state.loading = false;
+    update();
   }
 }
 
@@ -170,7 +178,8 @@ function renderVerification(carrier, verification, verified) {
     </div>
     <div class="cv-actions">
       <button data-cv-action="poll">${verified ? "Refresh verified status" : "Check status"}</button>
-      ${verification.verificationUrl ? `<a target="_blank" rel="noreferrer" href="${escapeAttribute(verification.verificationUrl)}">Open link</a>` : ""}
+      <button class="cv-secondary" data-cv-action="new">New request</button>
+      ${verification.verificationUrl ? `<a target="_blank" rel="noreferrer" href="${escapeAttribute(normalizeVerificationUrl(verification.verificationUrl, verification.id))}">Open link</a>` : ""}
     </div>
     ${verification.demoMode ? `<div class="cv-note">Demo mode: connect your backend in extension options to send real email/SMS and receive license uploads.</div>` : ""}
   `;
@@ -234,6 +243,13 @@ function formatPhone(value) {
   const digits = String(value || "").replace(/\D/g, "");
   if (digits.length === 10) return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
   return value || "";
+}
+
+function normalizeVerificationUrl(url, id) {
+  if (url.includes("/functions/v1/carrier-verify/verify/")) {
+    return `https://carrierverify.skopetskyi-serhii-us.chatgpt.site/verify.html?id=${encodeURIComponent(id)}`;
+  }
+  return url;
 }
 
 function money(value) {

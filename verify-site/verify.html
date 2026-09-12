@@ -7,63 +7,82 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <section class="panel">
-      <div class="topline">
-        <div>
-          <p class="eyebrow">DeepTruck Verify</p>
-          <h1 id="carrier-name">Carrier verification</h1>
+  <main class="shell">
+    <header class="appbar">
+      <div>
+        <p class="eyebrow">DeepTruck Verify</p>
+        <h1>Carrier identity check</h1>
+      </div>
+      <span id="status-pill" class="pill">Loading</span>
+    </header>
+
+    <section class="layout">
+      <aside class="summary">
+        <div class="summary-head">
+          <span class="node-dot"></span>
+          <div>
+            <p class="label">Verification target</p>
+            <h2 id="carrier-name">Carrier verification</h2>
+          </div>
         </div>
-        <span id="status-pill" class="pill">Loading</span>
-      </div>
 
-      <p class="copy">Verify the carrier email, confirm the SMS code, and upload the driver's license before accepting the load.</p>
-
-      <div class="details">
-        <div><span>USDOT</span><b id="dot">-</b></div>
-        <div><span>MC</span><b id="mc">-</b></div>
-        <div><span>Email</span><b id="email">-</b></div>
-        <div><span>Phone</span><b id="phone">-</b></div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Status</h2>
-      <div class="checks">
-        <div id="email-check" class="check"><span></span>Email verified</div>
-        <div id="phone-check" class="check"><span></span>SMS code verified</div>
-        <div id="license-check" class="check"><span></span>Driver license uploaded</div>
-      </div>
-    </section>
-
-    <section class="panel steps">
-      <div class="step">
-        <div>
-          <h2>Email</h2>
-          <p>Confirm that you received this verification request at the listed carrier email.</p>
+        <div class="identity-grid">
+          <div><span>USDOT</span><b id="dot">-</b></div>
+          <div><span>MC</span><b id="mc">-</b></div>
+          <div class="wide"><span>Email</span><b id="email">-</b></div>
+          <div class="wide"><span>Phone</span><b id="phone">-</b></div>
         </div>
-        <button id="verify-email">Verify email</button>
-      </div>
 
-      <div class="step">
-        <div>
-          <h2>Phone</h2>
-          <p id="phone-help">Enter the six-digit SMS code sent to the carrier phone.</p>
-          <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="SMS code">
-          <div id="phone-msg" class="message"></div>
+        <div class="status-stack">
+          <div id="email-check" class="check"><span></span>Email verified</div>
+          <div id="phone-check" class="check"><span></span>SMS code verified</div>
+          <div id="license-check" class="check"><span></span>Driver license uploaded</div>
         </div>
-        <button id="verify-phone">Verify phone</button>
-      </div>
+      </aside>
 
-      <div class="step">
-        <div>
-          <h2>Driver license</h2>
-          <p>Upload the driver's license for the person transporting the vehicle.</p>
-          <input id="license" type="file" accept="image/*,.pdf">
-          <div id="license-msg" class="message"></div>
+      <section class="console">
+        <div class="console-head">
+          <div>
+            <p class="label">Secure workflow</p>
+            <h2>Complete verification</h2>
+          </div>
+          <code>request.active</code>
         </div>
-        <button id="upload-license">Upload license</button>
-      </div>
+
+        <div class="step">
+          <div class="step-index">01</div>
+          <div class="step-body">
+            <h3>Email</h3>
+            <p>Confirm receipt of this request at the listed carrier email.</p>
+          </div>
+          <button id="verify-email">Verify email</button>
+        </div>
+
+        <div class="step">
+          <div class="step-index">02</div>
+          <div class="step-body">
+            <h3>Phone</h3>
+            <p id="phone-help">Enter the six-digit SMS code sent to the carrier phone.</p>
+            <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="8">
+            <div id="phone-msg" class="message"></div>
+          </div>
+          <button id="verify-phone">Verify phone</button>
+        </div>
+
+        <div class="step">
+          <div class="step-index">03</div>
+          <div class="step-body">
+            <h3>Driver license</h3>
+            <p>Upload the license for the driver transporting the vehicle.</p>
+            <label class="filebox">
+              <input id="license" type="file" accept="image/*,.pdf">
+              <span>Select license file</span>
+            </label>
+            <div id="license-msg" class="message"></div>
+          </div>
+          <button id="upload-license">Upload license</button>
+        </div>
+      </section>
     </section>
   </main>
   <script src="verify.js"></script>
