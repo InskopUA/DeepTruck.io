@@ -1,0 +1,7 @@
+.env
+.env.*
+.DS_Store
+supabase/functions/.env
+supabase/functions/.env.*
+!.env.example
+!supabase/functions/.env.example

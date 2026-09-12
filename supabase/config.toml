@@ -1,0 +1,4 @@
+project_id = "yqpeebgmqtqoxumzfrsq"
+
+[functions.carrier-verify]
+verify_jwt = false

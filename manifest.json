@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "CarrierVerify",
+  "version": "0.1.0",
+  "description": "Verify carrier email, phone, and driver license before assigning a load.",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "https://app.centraldispatch.com/*",
+    "https://motus.dot.gov/*",
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://app.centraldispatch.com/*"],
+      "js": ["src/content.js"],
+      "css": ["src/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "CarrierVerify",
+    "default_popup": "src/popup.html"
+  },
+  "options_page": "src/options.html"
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CarrierVerify Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>CarrierVerify Settings</h1>
+      <p>The production backend is already configured. Use this page only to override it during development.</p>
+    </header>
+
+    <form id="settings-form">
+      <label>
+        Verification API base URL
+        <input id="apiBaseUrl" placeholder="https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify">
+      </label>
+      <label>
+        API key
+        <input id="apiKey" type="password" placeholder="Optional bearer token">
+      </label>
+      <button>Save settings</button>
+      <span id="status"></span>
+    </form>
+
+    <section>
+      <h2>Expected endpoints</h2>
+      <code>POST /verification-requests</code>
+      <code>GET /verification-requests/:id</code>
+    </section>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>
