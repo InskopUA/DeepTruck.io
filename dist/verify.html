@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Carrier Verification</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main>
+    <section class="panel">
+      <div class="topline">
+        <div>
+          <p class="eyebrow">DeepTruck Verify</p>
+          <h1 id="carrier-name">Carrier verification</h1>
+        </div>
+        <span id="status-pill" class="pill">Loading</span>
+      </div>
+
+      <p class="copy">Verify the carrier email, confirm the SMS code, and upload the driver's license before accepting the load.</p>
+
+      <div class="details">
+        <div><span>USDOT</span><b id="dot">-</b></div>
+        <div><span>MC</span><b id="mc">-</b></div>
+        <div><span>Email</span><b id="email">-</b></div>
+        <div><span>Phone</span><b id="phone">-</b></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Status</h2>
+      <div class="checks">
+        <div id="email-check" class="check"><span></span>Email verified</div>
+        <div id="phone-check" class="check"><span></span>SMS code verified</div>
+        <div id="license-check" class="check"><span></span>Driver license uploaded</div>
+      </div>
+    </section>
+
+    <section class="panel steps">
+      <div class="step">
+        <div>
+          <h2>Email</h2>
+          <p>Confirm that you received this verification request at the listed carrier email.</p>
+        </div>
+        <button id="verify-email">Verify email</button>
+      </div>
+
+      <div class="step">
+        <div>
+          <h2>Phone</h2>
+          <p>Enter the six-digit SMS code sent to the carrier phone.</p>
+          <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="SMS code">
+          <div id="phone-msg" class="message"></div>
+        </div>
+        <button id="verify-phone">Verify phone</button>
+      </div>
+
+      <div class="step">
+        <div>
+          <h2>Driver license</h2>
+          <p>Upload the driver's license for the person transporting the vehicle.</p>
+          <input id="license" type="file" accept="image/*,.pdf">
+          <div id="license-msg" class="message"></div>
+        </div>
+        <button id="upload-license">Upload license</button>
+      </div>
+    </section>
+  </main>
+  <script src="verify.js"></script>
+</body>
+</html>
