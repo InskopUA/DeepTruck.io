@@ -74,7 +74,7 @@ supabase secrets set \
   TWILIO_TRIAL_TEMPLATE_MODE=true \
   OTP_HASH_SECRET="$(openssl rand -hex 32)" \
   PUBLIC_BASE_URL="https://PROJECT_REF.supabase.co/functions/v1/carrier-verify"
-  VERIFY_APP_URL="https://carrierverify.nutty-maple-8613.chatgpt.site"
+  VERIFY_APP_URL="https://carrierverify.skopetskyi-serhii-us.chatgpt.site"
 ```
 
 Deploy the function:
