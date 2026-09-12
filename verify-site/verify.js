@@ -19,6 +19,7 @@ const els = {
   code: document.getElementById("code"),
   phoneMsg: document.getElementById("phone-msg"),
   license: document.getElementById("license"),
+  licenseLabel: document.getElementById("license-label"),
   licenseMsg: document.getElementById("license-msg")
 };
 
@@ -58,7 +59,13 @@ els.uploadButton.addEventListener("click", async () => {
 
 els.license.addEventListener("change", () => {
   const fileName = els.license.files[0]?.name || "";
-  if (fileName) els.licenseMsg.textContent = fileName;
+  els.uploadButton.disabled = !fileName;
+  if (fileName) {
+    els.licenseLabel.textContent = fileName;
+    els.licenseMsg.textContent = "";
+  } else {
+    els.licenseLabel.textContent = "Choose license";
+  }
 });
 
 async function load() {
@@ -99,6 +106,7 @@ function render(record) {
   setButton(els.emailButton, record.emailVerified, "Email verified", "Verify email");
   setButton(els.phoneButton, record.phoneVerified, "Phone verified", "Verify phone");
   setButton(els.uploadButton, record.licenseUploaded, "License uploaded", "Upload license");
+  els.uploadButton.disabled = !record.licenseUploaded && !els.license.files[0];
   const trialMode = record.smsTrialMode === true;
   els.phoneHelp.textContent = trialMode
     ? "Confirm that the test SMS was received. Trial Twilio SMS uses its own template code until the account is upgraded."
