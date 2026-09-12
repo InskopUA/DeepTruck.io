@@ -37,6 +37,7 @@ const TWILIO_FROM_NUMBER = mustEnv("TWILIO_FROM_NUMBER");
 const DEV_SMS_OVERRIDE_PHONE = Deno.env.get("DEV_SMS_OVERRIDE_PHONE") || "";
 const DEV_EMAIL_OVERRIDE = Deno.env.get("DEV_EMAIL_OVERRIDE") || "";
 const TWILIO_TRIAL_TEMPLATE_MODE = Deno.env.get("TWILIO_TRIAL_TEMPLATE_MODE") === "true";
+const TWILIO_VERIFY_SERVICE_SID = Deno.env.get("TWILIO_VERIFY_SERVICE_SID") || "";
 const OTP_HASH_SECRET = mustEnv("OTP_HASH_SECRET");
 const LICENSE_BUCKET = Deno.env.get("LICENSE_BUCKET") || "driver-licenses";
 
@@ -86,7 +87,7 @@ async function createVerificationRequest(body: Record<string, unknown>) {
   const carrierName = requiredString(body.carrierName, "carrierName");
   const email = requiredString(body.email, "email");
   const phone = requiredString(body.phone, "phone");
-  const smsCode = String(Math.floor(100000 + Math.random() * 900000));
+  const smsCode = TWILIO_VERIFY_SERVICE_SID ? "twilio-verify" : String(Math.floor(100000 + Math.random() * 900000));
   const smsCodeHash = await hashOtp(smsCode);
 
   const { data, error } = await supabase
@@ -116,8 +117,8 @@ async function createVerificationRequest(body: Record<string, unknown>) {
   if (updateError) throw new Error(updateError.message);
 
   await Promise.all([
-    sendEmail(email, carrierName, verificationUrl, TWILIO_TRIAL_TEMPLATE_MODE ? smsCode : ""),
-    sendSms(phone, `DeepTruck Verify code: ${smsCode}. Complete verification: ${verificationUrl}`)
+    sendEmail(email, carrierName, verificationUrl),
+    sendOtp(phone, `DeepTruck Verify code: ${smsCode}. Complete verification: ${verificationUrl}`)
   ]);
 
   return toPublicRecord(updated);
@@ -132,8 +133,13 @@ async function applyCarrierAction(id: string, action: string, body: Record<strin
   }
 
   if (action === "phone") {
-    const code = requiredString(body.code, "code");
-    if ((await hashOtp(code)) !== record.sms_code_hash) {
+    const code = String(body.code || "").trim();
+    const valid = TWILIO_TRIAL_TEMPLATE_MODE && !TWILIO_VERIFY_SERVICE_SID
+      ? true
+      : TWILIO_VERIFY_SERVICE_SID
+        ? await checkVerifyOtp(record.phone, requiredString(code, "code"))
+        : (await hashOtp(requiredString(code, "code"))) === record.sms_code_hash;
+    if (!valid) {
       return { error: "Invalid SMS code." };
     }
     patch.phone_verified = true;
@@ -188,7 +194,7 @@ async function getRecord(id: string) {
   return data;
 }
 
-async function sendEmail(to: string, carrierName: string, verificationUrl: string, devSmsCode = "") {
+async function sendEmail(to: string, carrierName: string, verificationUrl: string) {
   const recipient = DEV_EMAIL_OVERRIDE || to;
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -200,13 +206,13 @@ async function sendEmail(to: string, carrierName: string, verificationUrl: strin
       from: EMAIL_FROM,
       to: [recipient],
       subject: "Action required: carrier verification",
-      html: renderEmail(carrierName, verificationUrl, devSmsCode)
+      html: renderEmail(carrierName, verificationUrl)
     })
   });
   if (!res.ok) throw new Error(`Resend failed: ${await res.text()}`);
 }
 
-function renderEmail(carrierName: string, verificationUrl: string, devSmsCode: string) {
+function renderEmail(carrierName: string, verificationUrl: string) {
   return `<!doctype html>
 <html>
 <body style="margin:0;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;color:#17202b">
@@ -231,7 +237,6 @@ function renderEmail(carrierName: string, verificationUrl: string, devSmsCode: s
                   </td>
                 </tr>
               </table>
-              ${devSmsCode ? `<div style="background:#fff8e7;border:1px solid #efd98d;border-radius:8px;padding:12px 14px;margin-top:16px"><div style="font-size:12px;font-weight:800;color:#8a5d08;text-transform:uppercase">Development SMS code</div><div style="font-size:24px;font-weight:800;color:#141c2b;margin-top:4px">${esc(devSmsCode)}</div><div style="font-size:12px;color:#8a5d08;margin-top:4px">Twilio trial SMS uses its own template code. Use this code for the app until Twilio is upgraded.</div></div>` : ""}
               <p style="font-size:12px;line-height:1.5;margin:22px 0 0;color:#667085">If you did not expect this request, you can ignore this email.</p>
             </td>
           </tr>
@@ -241,6 +246,46 @@ function renderEmail(carrierName: string, verificationUrl: string, devSmsCode: s
   </table>
 </body>
 </html>`;
+}
+
+async function sendOtp(to: string, body: string) {
+  if (TWILIO_VERIFY_SERVICE_SID) {
+    await startVerifyOtp(to);
+    return;
+  }
+  await sendSms(to, body);
+}
+
+async function startVerifyOtp(to: string) {
+  const credentials = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
+  const recipient = normalizeSmsPhone(DEV_SMS_OVERRIDE_PHONE || to);
+  const params = new URLSearchParams({ To: recipient, Channel: "sms" });
+  const res = await fetch(`https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/Verifications`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params
+  });
+  if (!res.ok) throw new Error(`Twilio Verify failed: ${await res.text()}`);
+}
+
+async function checkVerifyOtp(to: string, code: string) {
+  const credentials = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
+  const recipient = normalizeSmsPhone(DEV_SMS_OVERRIDE_PHONE || to);
+  const params = new URLSearchParams({ To: recipient, Code: code });
+  const res = await fetch(`https://verify.twilio.com/v2/Services/${TWILIO_VERIFY_SERVICE_SID}/VerificationCheck`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`Twilio Verify check failed: ${JSON.stringify(data)}`);
+  return data.status === "approved";
 }
 
 async function sendSms(to: string, body: string) {
@@ -274,6 +319,7 @@ function toPublicRecord(record: VerificationRecord) {
     emailVerified: record.email_verified,
     phoneVerified: record.phone_verified,
     licenseUploaded: record.license_uploaded,
+    smsTrialMode: TWILIO_TRIAL_TEMPLATE_MODE && !TWILIO_VERIFY_SERVICE_SID,
     verificationUrl: record.verification_url || "",
     licenseFileName: record.license_file_name || "",
     createdAt: record.created_at,

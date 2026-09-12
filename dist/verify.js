@@ -14,6 +14,7 @@ const els = {
   licenseCheck: document.getElementById("license-check"),
   emailButton: document.getElementById("verify-email"),
   phoneButton: document.getElementById("verify-phone"),
+  phoneHelp: document.getElementById("phone-help"),
   uploadButton: document.getElementById("upload-license"),
   code: document.getElementById("code"),
   phoneMsg: document.getElementById("phone-msg"),
@@ -93,6 +94,12 @@ function render(record) {
   setButton(els.emailButton, record.emailVerified, "Email verified", "Verify email");
   setButton(els.phoneButton, record.phoneVerified, "Phone verified", "Verify phone");
   setButton(els.uploadButton, record.licenseUploaded, "License uploaded", "Upload license");
+  const trialMode = record.smsTrialMode === true;
+  els.phoneHelp.textContent = trialMode
+    ? "Confirm that the test SMS was received. Trial Twilio SMS uses its own template code until the account is upgraded."
+    : "Enter the six-digit SMS code sent to the carrier phone.";
+  els.code.style.display = trialMode ? "none" : "block";
+  if (trialMode && !record.phoneVerified) els.phoneButton.textContent = "Confirm SMS received";
   els.licenseMsg.textContent = record.licenseFileName || "";
 }
 
