@@ -58,6 +58,10 @@ Deno.serve(async (req) => {
       return json(await createVerificationRequest(await req.json()));
     }
 
+    if (req.method === "GET" && path === "/verification-requests") {
+      return json(await listVerificationRequests(url));
+    }
+
     const statusMatch = path.match(/^\/verification-requests\/([^/]+)$/);
     if (req.method === "GET" && statusMatch) {
       return json(toPublicRecord(await getRecord(statusMatch[1])));
@@ -192,6 +196,21 @@ async function getRecord(id: string) {
     throw notFound;
   }
   return data;
+}
+
+async function listVerificationRequests(url: URL) {
+  const limit = Math.min(Number(url.searchParams.get("limit") || "50"), 100);
+  const { data, error } = await supabase
+    .from("carrier_verification_requests")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return {
+    items: (data || []).map(toPublicRecord),
+    count: data?.length || 0
+  };
 }
 
 async function sendEmail(to: string, carrierName: string, verificationUrl: string) {
