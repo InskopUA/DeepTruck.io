@@ -9,12 +9,11 @@
 <body>
   <main>
     <header>
-      <h1>CarrierVerify Settings</h1>
+      <h1>CarrierVerify Account</h1>
       <p>Sign in with the same account you use in the DeepTruck shipper console.</p>
     </header>
 
     <section>
-      <h2>Account</h2>
       <form id="login-form">
         <label>
           Email
@@ -29,27 +28,7 @@
         <span id="auth-status"></span>
       </form>
     </section>
-
-    <form id="settings-form">
-      <h2>Developer settings</h2>
-      <label>
-        Verification API base URL
-        <input id="apiBaseUrl" placeholder="https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify">
-      </label>
-      <label>
-        API key override
-        <input id="apiKey" type="password" placeholder="Optional bearer token">
-      </label>
-      <button>Save settings</button>
-      <span id="status"></span>
-    </form>
-
-    <section>
-      <h2>Expected endpoints</h2>
-      <code>POST /verification-requests</code>
-      <code>GET /verification-requests/:id</code>
-    </section>
   </main>
-  <script src="options.js"></script>
+  <script src="account.js"></script>
 </body>
 </html>

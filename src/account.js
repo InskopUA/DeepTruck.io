@@ -1,13 +1,9 @@
-const form = document.getElementById("settings-form");
 const loginForm = document.getElementById("login-form");
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
 const loginButton = document.getElementById("login-button");
 const logoutButton = document.getElementById("logout-button");
 const authStatus = document.getElementById("auth-status");
-const apiBaseUrl = document.getElementById("apiBaseUrl");
-const apiKey = document.getElementById("apiKey");
-const status = document.getElementById("status");
 
 load();
 
@@ -31,33 +27,13 @@ loginForm.addEventListener("submit", async (event) => {
 
 logoutButton.addEventListener("click", async () => {
   authStatus.textContent = "Logging out...";
+  logoutButton.disabled = true;
   await send("auth.logout");
   renderAccount(null);
 });
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const response = await send("settings.save", {
-    settings: {
-      apiBaseUrl: apiBaseUrl.value,
-      apiKey: apiKey.value
-    }
-  });
-  apiBaseUrl.value = response.apiBaseUrl;
-  apiKey.value = response.apiKey;
-  status.textContent = "Saved";
-  setTimeout(() => {
-    status.textContent = "";
-  }, 1800);
-});
-
 async function load() {
-  const [settings, auth] = await Promise.all([
-    send("settings.get"),
-    send("auth.get")
-  ]);
-  apiBaseUrl.value = settings.apiBaseUrl;
-  apiKey.value = settings.apiKey;
+  const auth = await send("auth.get");
   renderAccount(auth.user);
 }
 
@@ -65,10 +41,12 @@ function renderAccount(user) {
   if (user?.email) {
     loginEmail.value = user.email;
     authStatus.textContent = `Signed in as ${user.email}`;
+    loginButton.textContent = "Switch account";
     logoutButton.disabled = false;
     return;
   }
   authStatus.textContent = "Not signed in";
+  loginButton.textContent = "Login";
   logoutButton.disabled = true;
 }
 

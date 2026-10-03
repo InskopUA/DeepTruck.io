@@ -8,9 +8,25 @@
 </head>
 <body>
   <main>
-    <h1>CarrierVerify</h1>
-    <p>Sign in once, then open a Central Dispatch carrier profile. The verification panel appears when a USDOT number is found.</p>
-    <a href="options.html" target="_blank">Account settings</a>
+    <header>
+      <h1>CarrierVerify</h1>
+      <p>Sign in once, then open a Central Dispatch carrier profile.</p>
+    </header>
+
+    <form id="login-form">
+      <label>
+        Email
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com">
+      </label>
+      <label>
+        Password
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+      </label>
+      <button id="login-button" type="submit">Login</button>
+      <button id="logout-button" class="secondary" type="button">Logout</button>
+      <span id="auth-status"></span>
+    </form>
   </main>
+  <script src="account.js"></script>
 </body>
 </html>

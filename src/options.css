@@ -138,13 +138,3 @@ button.secondary {
   font: 800 10px "SFMono-Regular", Consolas, monospace;
   margin-top: 10px;
 }
-
-code {
-  background: #fbfcfd;
-  border: 1px solid #edf0f3;
-  border-radius: 7px;
-  display: block;
-  font: 11px "SFMono-Regular", Consolas, monospace;
-  margin-top: 8px;
-  padding: 10px;
-}
