@@ -1,6 +1,7 @@
 .env
 .env.*
 .DS_Store
+public/
 supabase/functions/.env
 supabase/functions/.env.*
 !.env.example
