@@ -409,7 +409,7 @@ function renderTable() {
       <td class="carrier"><b>${escapeHtml(item.carrierName)}</b><span>${escapeHtml(item.id.slice(0, 8))}</span></td>
       <td><b>${escapeHtml(item.dot)}</b><div class="sub">${escapeHtml(item.mc || "-")}</div></td>
       <td>${escapeHtml(item.email)}<div class="sub">${formatPhone(item.phone)}</div></td>
-      <td><span class="badge ${item.status === "verified" ? "verified" : "pending"}">${escapeHtml(item.status)}</span></td>
+      <td><span class="badge ${item.status === "verified" ? "verified" : "pending"}"><i></i>${escapeHtml(item.status)}</span></td>
       <td>${formatDate(item.createdAt)}</td>
     </tr>
   `).join("");
@@ -501,11 +501,11 @@ function renderManualChecks(verification) {
 }
 
 function renderManualLoading(message) {
-  return `<section class="panel empty-panel"><h2>Loading carrier</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+  return `<section class="panel empty-panel"><p class="eyebrow">Lookup in progress</p><h2>Loading carrier</h2><p class="muted">${escapeHtml(message)}</p></section>`;
 }
 
 function renderManualEmpty(titleText, message) {
-  return `<section class="panel empty-panel"><h2>${escapeHtml(titleText)}</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+  return `<section class="panel empty-panel"><p class="eyebrow">Verification cockpit</p><h2>${escapeHtml(titleText)}</h2><p class="muted">${escapeHtml(message)}</p></section>`;
 }
 
 function riskCard(label, value, tone = "neutral") {
@@ -529,7 +529,7 @@ function openDetails(id) {
         <h2>${escapeHtml(item.carrierName)}</h2>
         <span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span>
       </div>
-      <b class="badge ${complete ? "verified" : "pending"}">${complete ? "verified" : "pending"}</b>
+      <b class="badge ${complete ? "verified" : "pending"}"><i></i>${complete ? "verified" : "pending"}</b>
     </header>
 
     <div class="detail-grid">
@@ -555,6 +555,19 @@ function openDetails(id) {
 
     <section class="detail-section">
       <div class="detail-section-title">
+        <h3>Activity timeline</h3>
+        <span>request audit trail</span>
+      </div>
+      <div class="activity-feed">
+        <div><span></span><b>Request created</b><em>${formatDate(item.createdAt)}</em></div>
+        <div class="${item.emailVerified ? "done" : ""}"><span></span><b>Email verification</b><em>${item.emailVerified ? "confirmed" : "pending"}</em></div>
+        <div class="${item.phoneVerified ? "done" : ""}"><span></span><b>SMS verification</b><em>${item.phoneVerified ? "confirmed" : "pending"}</em></div>
+        <div class="${complete ? "done" : ""}"><span></span><b>Final review</b><em>${complete ? "ready" : "waiting"}</em></div>
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-title">
         <h3>Documents</h3>
         <span>uploaded by carrier</span>
       </div>
@@ -574,7 +587,7 @@ function infoCard(label, value) {
 }
 
 function checkRow(label, done) {
-  return `<div>${escapeHtml(label)} <b class="${done ? "done" : ""}">${done ? "Done" : "Pending"}</b></div>`;
+  return `<div><span>${escapeHtml(label)}</span> <b class="${done ? "done" : ""}">${done ? "Done" : "Pending"}</b></div>`;
 }
 
 function documentCard(label, document, uploaded, fallbackFileName) {

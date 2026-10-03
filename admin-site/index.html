@@ -92,6 +92,7 @@
       <header class="topbar">
         <div>
           <h1 id="page-title">Verifications</h1>
+          <p>Carrier lookup, verification requests, documents, and account-separated history.</p>
         </div>
         <form id="dot-form" class="topbar-search" onsubmit="window.searchCarrierFromDot && window.searchCarrierFromDot(event)">
           <input id="dot-input" inputmode="numeric" placeholder="USDOT number">
@@ -101,6 +102,12 @@
 
       <section id="verifications" class="view active">
         <div id="verify-message" class="inline-message top-message"></div>
+
+        <div class="ops-strip">
+          <article><span>Lookup source</span><b>USDOT profile</b><small>carrier identity</small></article>
+          <article><span>Verification path</span><b>Email + SMS</b><small>listed contacts</small></article>
+          <article><span>Required documents</span><b>License / W-9 / COI</b><small>carrier upload</small></article>
+        </div>
 
         <div id="manual-result" class="manual-result">
           <section class="panel empty-panel">
@@ -132,7 +139,12 @@
               <h2>Verification history</h2>
               <p>Carrier checks started from Central Dispatch or manual DOT lookup.</p>
             </div>
-            <input id="search" placeholder="Search carrier, DOT, MC">
+            <div class="table-tools">
+              <button type="button" class="filter-chip active">All</button>
+              <button type="button" class="filter-chip">Verified</button>
+              <button type="button" class="filter-chip">Pending</button>
+              <input id="search" placeholder="Search carrier, DOT, MC">
+            </div>
           </div>
           <div class="table-wrap">
             <table>
