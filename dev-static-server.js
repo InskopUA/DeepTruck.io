@@ -2,7 +2,9 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-const root = path.join(__dirname, "dist");
+const publicRoot = path.join(__dirname, "public");
+const fallbackRoot = path.join(__dirname, "dist");
+const root = fs.existsSync(publicRoot) ? publicRoot : fallbackRoot;
 const port = Number(process.env.PORT || 5173);
 const types = {
   ".html": "text/html; charset=utf-8",
@@ -12,7 +14,9 @@ const types = {
 
 http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${port}`);
-  const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
+  let pathname = url.pathname === "/" ? "/index.html" : url.pathname;
+  if (pathname === "/admin" || pathname === "/admin/") pathname = "/admin/index.html";
+  if (pathname === "/verify") pathname = "/verify.html";
   const filePath = path.normalize(path.join(root, pathname));
 
   if (!filePath.startsWith(root)) {

@@ -31,7 +31,7 @@ function replaceInFile(file, replacements) {
 }
 
 resetDir(publicDir);
-copyDir(path.join(root, "dist"), publicDir);
+copyDir(path.join(root, "verify-site"), publicDir);
 copyDir(path.join(root, "admin-site"), path.join(publicDir, "admin"));
 
 replaceInFile(path.join(publicDir, "index.html"), [

@@ -96,6 +96,40 @@ Then set the extension API base URL to:
 https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
 ```
 
+## Vercel deploy
+
+Vercel should host only the public web UI:
+
+- `/` public landing page
+- `/admin` dealer admin console
+- `/verify.html?id=...` carrier verification page
+- `/verify?id=...` same verification page through a clean URL rewrite
+
+Use these Vercel project settings:
+
+```text
+Framework preset: Other
+Build command: npm run build
+Output directory: public
+Install command: npm install
+```
+
+The build copies `verify-site/` into `public/` and `admin-site/` into `public/admin/`. The Chrome extension is not deployed to Vercel; it stays as the unpacked extension package using `manifest.json` and `src/`.
+
+After the Vercel domain is live, update the Supabase function secret so verification links in emails/SMS open the Vercel page instead of localhost:
+
+```sh
+supabase secrets set \
+  VERIFY_APP_URL="https://www.deeptruck.io" \
+  --project-ref yqpeebgmqtqoxumzfrsq
+```
+
+Keep `PUBLIC_BASE_URL` pointed at the Supabase Edge Function:
+
+```text
+https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
+```
+
 ## Backend contract
 
 Configure the backend URL in the extension options page.
