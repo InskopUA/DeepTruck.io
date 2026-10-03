@@ -17,7 +17,8 @@
         </div>
       </div>
       <nav>
-        <button class="active" data-view="dashboard">Verifications</button>
+        <button class="active" data-view="verifications">Verifications</button>
+        <button data-view="history">History</button>
         <button data-view="billing">Billing</button>
         <button data-view="settings">Settings</button>
       </nav>
@@ -26,31 +27,38 @@
     <main>
       <header class="topbar">
         <div>
-          <p>Workspace</p>
           <h1 id="page-title">Verifications</h1>
         </div>
-        <div class="account">
-          <span></span>
-          <div>
-            <b>Maria</b>
-            <small>Dealer account</small>
-          </div>
-        </div>
+        <form id="dot-form" class="topbar-search" onsubmit="window.searchCarrierFromDot && window.searchCarrierFromDot(event)">
+          <input id="dot-input" inputmode="numeric" placeholder="USDOT number">
+          <button id="dot-search-button" class="primary" type="submit" onclick="window.searchCarrierFromDot && window.searchCarrierFromDot(event)">Search</button>
+        </form>
       </header>
 
-      <section id="dashboard" class="view active">
+      <section id="verifications" class="view active">
+        <div id="verify-message" class="inline-message top-message"></div>
+
+        <div id="manual-result" class="manual-result">
+          <section class="panel empty-panel">
+            <h2>Carrier preview</h2>
+            <p class="muted">Search a USDOT number to load carrier identity, insurance, authority, and contact details.</p>
+          </section>
+        </div>
+      </section>
+
+      <section id="history" class="view">
         <div class="metrics">
           <article><span>Total</span><b id="metric-total">-</b><small>all requests</small></article>
           <article><span>Verified</span><b id="metric-verified">-</b><small>completed checks</small></article>
           <article><span>Pending</span><b id="metric-pending">-</b><small>waiting on carrier</small></article>
-          <article><span>Credits</span><b>42</b><small>$1.50 per request</small></article>
+          <article><span>Overage</span><b>$0.50</b><small>per extra request</small></article>
         </div>
 
         <section class="panel">
           <div class="panel-head">
             <div>
               <h2>Verification history</h2>
-              <p>Carrier checks started from Central Dispatch.</p>
+              <p>Carrier checks started from Central Dispatch or manual DOT lookup.</p>
             </div>
             <input id="search" placeholder="Search carrier, DOT, MC">
           </div>
@@ -77,11 +85,11 @@
         <div class="split">
           <section class="panel">
             <h2>Billing</h2>
-            <p class="muted">Credits are charged when a verification request is sent.</p>
+            <p class="muted">Monthly plans include a fixed number of verification requests. Extra requests are billed after the monthly limit.</p>
             <div class="billing-card">
-              <span>Current balance</span>
-              <b>42 credits</b>
-              <small>Estimated value: $63.00</small>
+              <span>Current plan</span>
+              <b>Dealer</b>
+              <small>$49/mo includes 50 requests</small>
             </div>
             <button class="primary">Add payment method</button>
           </section>
@@ -89,11 +97,15 @@
             <h2>Plan</h2>
             <div class="plan">
               <b>Starter</b>
-              <span>$49/mo includes 50 verifications</span>
+              <span>$19/mo includes 5 requests</span>
+            </div>
+            <div class="plan">
+              <b>Dealer</b>
+              <span>$49/mo includes 50 requests</span>
             </div>
             <div class="plan muted-plan">
-              <b>Pro</b>
-              <span>$149/mo includes 200 verifications</span>
+              <b>Scale</b>
+              <span>$79/mo includes 100 requests</span>
             </div>
           </section>
         </div>
@@ -105,7 +117,7 @@
             <h2>Account settings</h2>
             <label>Dealership name<input value="Maria Logistics"></label>
             <label>Notification email<input value="maria@example.com"></label>
-            <label>Default verification price<input value="$1.50"></label>
+            <label>Extra request price<input value="$0.50"></label>
             <button class="primary">Save changes</button>
           </section>
           <section class="panel">
@@ -117,10 +129,12 @@
       </section>
     </main>
 
-    <aside id="details" class="details">
-      <button id="close-details">Close</button>
-      <div id="details-content"></div>
-    </aside>
+    <div id="details" class="details" aria-hidden="true">
+      <section class="details-modal" role="dialog" aria-modal="true" aria-label="Verification details">
+        <button id="close-details" class="close-details">Close</button>
+        <div id="details-content"></div>
+      </section>
+    </div>
   </div>
   <script src="app.js"></script>
 </body>

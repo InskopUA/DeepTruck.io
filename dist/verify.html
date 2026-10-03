@@ -28,10 +28,10 @@
         <div class="step">
           <div id="email-check" class="dot check"><span></span></div>
           <div class="copy">
-            <h2>Email</h2>
-            <p>Confirm this request.</p>
+            <h2>Email confirmation</h2>
+            <p>Confirmed automatically when this page opens.</p>
           </div>
-          <button id="verify-email">Confirm</button>
+          <button id="verify-email" type="button">Verified</button>
         </div>
 
         <div class="step">
@@ -55,11 +55,40 @@
             <div id="license-msg" class="message"></div>
           </div>
           <div class="action license-action">
-            <label class="file-control">
+            <label id="upload-license" class="file-control">
               <input id="license" type="file" accept="image/*,.pdf">
-              <span id="license-label">Choose license</span>
+              <span id="license-label">Upload license</span>
             </label>
-            <button id="upload-license" disabled>Upload</button>
+          </div>
+        </div>
+
+        <div class="step">
+          <div id="w9-check" class="dot check"><span></span></div>
+          <div class="copy">
+            <h2>W-9</h2>
+            <p>Signed W-9 document.</p>
+            <div id="w9-msg" class="message"></div>
+          </div>
+          <div class="action document-action">
+            <label id="upload-w9" class="file-control">
+              <input id="w9" type="file" accept="image/*,.pdf">
+              <span id="w9-label">Upload W-9</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="step">
+          <div id="coi-check" class="dot check"><span></span></div>
+          <div class="copy">
+            <h2>COI</h2>
+            <p>Certificate of insurance.</p>
+            <div id="coi-msg" class="message"></div>
+          </div>
+          <div class="action document-action">
+            <label id="upload-coi" class="file-control">
+              <input id="coi" type="file" accept="image/*,.pdf">
+              <span id="coi-label">Upload COI</span>
+            </label>
           </div>
         </div>
       </section>

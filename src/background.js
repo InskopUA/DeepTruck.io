@@ -97,6 +97,8 @@ function normalizeCarrier(dot, carrier, authority, authorityView, minimumInsuran
     authorityStatus: authority?.operatingAuthorityStatus?.operatingAuthorityStatusName || "",
     authorityType: authority?.operatingAuthorityType?.operatingAuthorityType || "",
     outOfService: Boolean(carrier?.outOfService),
+    activeSince: carrier?.createDate || carrier?.entityDotNumber?.createDate || pageContact.yearEstablished || null,
+    fmcsaUpdatedAt: detail.mcs150Date || carrier?.updateDate || detail.updateDate || pageContact.lastUpdated || null,
     email: cleanEmail(getPrimaryEmail(carrier)) || cleanEmail(pageContact.email),
     phone: cleanPhone(getPrimaryPhone(carrier)) || cleanPhone(pageContact.phone),
     address: [address.addressLine1, address.addressLine2, address.city, address.state, address.zipCode]
@@ -208,6 +210,8 @@ async function createVerification(carrier) {
     emailVerified: false,
     phoneVerified: false,
     licenseUploaded: false,
+    w9Uploaded: false,
+    coiUploaded: false,
     verificationUrl: `https://carrierverify.local/verify/demo-${carrier.dot}`,
     demoMode: true,
     createdAt: new Date().toISOString()
@@ -251,6 +255,12 @@ async function persistVerification(record) {
     emailVerified: Boolean(record.emailVerified),
     phoneVerified: Boolean(record.phoneVerified),
     licenseUploaded: Boolean(record.licenseUploaded),
+    w9Uploaded: Boolean(record.w9Uploaded),
+    coiUploaded: Boolean(record.coiUploaded),
+    licenseFileName: record.licenseFileName || "",
+    w9FileName: record.w9FileName || "",
+    coiFileName: record.coiFileName || "",
+    documents: record.documents || {},
     verificationUrl: record.verificationUrl || "",
     demoMode: Boolean(record.demoMode),
     createdAt: record.createdAt || new Date().toISOString(),
@@ -298,7 +308,13 @@ function advanceDemoVerification(record) {
     return { ...record, phoneVerified: true, status: "phone_verified" };
   }
   if (!record.licenseUploaded) {
-    return { ...record, licenseUploaded: true, status: "verified" };
+    return { ...record, licenseUploaded: true, licenseFileName: "driver-license.pdf", status: "license_uploaded" };
+  }
+  if (!record.w9Uploaded) {
+    return { ...record, w9Uploaded: true, w9FileName: "w9.pdf", status: "w9_uploaded" };
+  }
+  if (!record.coiUploaded) {
+    return { ...record, coiUploaded: true, coiFileName: "coi.pdf", status: "verified" };
   }
   return { ...record, status: "verified" };
 }

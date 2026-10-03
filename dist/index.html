@@ -3,16 +3,213 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CarrierVerify</title>
+  <title>DeepTruck Verify</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main>
-    <section class="panel">
-      <p class="eyebrow">CarrierVerify</p>
-      <h1>Verification link required</h1>
-      <p class="copy">Open the verification link from your email so we can load the correct carrier request.</p>
+<body class="landing">
+  <header class="sitebar">
+    <div class="sitebar-inner">
+      <a class="site-logo" href="/">DeepTruck Verify</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="#workflow">Workflow</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="site-actions">
+        <a class="ghost-link" href="http://localhost:5174/index.html">Login</a>
+        <a class="soft-link" href="http://localhost:5174/index.html#signup">Create account</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="landing-page">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Carrier identity checks for vehicle loads</p>
+        <h1>Stop sending loads to unverified carriers.</h1>
+        <p class="hero-text">DeepTruck Verify gives dealers a fast pre-load identity check: confirm the FMCSA-listed email, verify the listed phone by SMS, and collect the driver's license before shipment details are released.</p>
+        <div class="hero-actions">
+          <a class="primary-link" href="http://localhost:5174/index.html#signup">Create account</a>
+          <a class="secondary-link" href="chrome://extensions/">Install extension</a>
+        </div>
+        <div class="trust-row">
+          <span>Central Dispatch workflow</span>
+          <span>Email + SMS check</span>
+          <span>Driver license upload</span>
+        </div>
+      </div>
+
+      <aside class="product-card" aria-label="Verification preview">
+        <div class="product-head">
+          <div>
+            <span class="mono">LIVE CHECK</span>
+            <b>OMAX LLC</b>
+          </div>
+          <span class="status">Pending</span>
+        </div>
+        <div class="product-grid">
+          <span>USDOT <b>4345567</b></span>
+          <span>MC <b>MC1698436</b></span>
+          <span>Email <b>info@omaxllc.net</b></span>
+          <span>Phone <b>(307) 441-5452</b></span>
+        </div>
+        <div class="product-steps">
+          <div class="done"><span></span>Email confirmed</div>
+          <div class="done"><span></span>SMS code verified</div>
+          <div><span></span>Driver license uploaded</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section proof-strip" aria-label="Why dealers use DeepTruck Verify">
+      <div><span>Before dispatch</span><b>Verify identity before sharing load details</b></div>
+      <div><span>Carrier contact</span><b>Use listed email and phone from the carrier profile</b></div>
+      <div><span>Dealer record</span><b>Keep a timestamped verification history</b></div>
+    </section>
+
+    <section id="workflow" class="section">
+      <div class="section-title">
+        <div>
+          <h2>How it works</h2>
+          <p>Three steps before the carrier receives sensitive load details.</p>
+        </div>
+        <span>built for Central Dispatch workflow</span>
+      </div>
+      <div class="feature-grid">
+        <article>
+          <span class="num">01</span>
+          <h3>Read carrier profile</h3>
+          <p>The Chrome extension detects the USDOT on the Central Dispatch carrier profile and pulls carrier contact data into the panel.</p>
+        </article>
+        <article>
+          <span class="num">02</span>
+          <h3>Send verification</h3>
+          <p>The carrier receives a verification link by email and an SMS code on the listed phone number.</p>
+        </article>
+        <article>
+          <span class="num">03</span>
+          <h3>Approve with confidence</h3>
+          <p>The dealer sees email, phone, and driver license status before sharing load details.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="pricing" class="section">
+      <div class="section-title">
+        <div>
+          <h2>Pricing</h2>
+          <p>Start small, then scale verification volume as your dispatch team adopts the workflow.</p>
+        </div>
+        <span>monthly dealer plans</span>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card">
+          <div>
+            <span class="plan-label">Starter</span>
+            <h3>$19<span>/mo</span></h3>
+            <p>For small dealers that want a simple safety layer.</p>
+          </div>
+          <b>5 requests included</b>
+          <a class="secondary-link" href="http://localhost:5174/index.html#signup">Start</a>
+        </article>
+        <article class="price-card featured">
+          <div>
+            <span class="plan-label">Dealer</span>
+            <h3>$49<span>/mo</span></h3>
+            <p>Best fit for active dealers sending regular loads.</p>
+          </div>
+          <b>50 requests included</b>
+          <a class="primary-link" href="http://localhost:5174/index.html#signup">Create account</a>
+        </article>
+        <article class="price-card">
+          <div>
+            <span class="plan-label">Scale</span>
+            <h3>$79<span>/mo</span></h3>
+            <p>For teams that need more checks across multiple dispatchers.</p>
+          </div>
+          <b>100 requests included</b>
+          <a class="secondary-link" href="http://localhost:5174/index.html#signup">Upgrade</a>
+        </article>
+      </div>
+      <p class="pricing-note">Additional verification requests are billed at $0.50/request after the monthly limit. SMS and email verification included.</p>
+    </section>
+
+    <section id="reviews" class="section">
+      <div class="section-title">
+        <div>
+          <h2>Dealer feedback</h2>
+          <p>Designed around the moment when a dispatcher is deciding whether to trust a carrier.</p>
+        </div>
+        <span>real workflow signals</span>
+      </div>
+      <div class="review-grid">
+        <article>
+          <p>"The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record."</p>
+          <div><b>Independent dealer</b><span>Used before assigning a pickup</span></div>
+        </article>
+        <article>
+          <p>"We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is exactly the checkpoint we needed."</p>
+          <div><b>Auto transport desk</b><span>Multi-dispatcher workflow</span></div>
+        </article>
+        <article>
+          <p>"The extension fits where the decision already happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails."</p>
+          <div><b>Operations manager</b><span>Central Dispatch workflow</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="section-title">
+        <div>
+          <h2>FAQ</h2>
+          <p>What dealers usually ask before adding verification to their load workflow.</p>
+        </div>
+        <span>common questions</span>
+      </div>
+      <div class="faq-list">
+        <details open>
+          <summary>What does DeepTruck Verify check?</summary>
+          <p>It verifies the carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</p>
+        </details>
+        <details>
+          <summary>How often are vehicles stolen in the U.S.?</summary>
+          <p>Vehicle theft is still a large market risk: NICB reported 1,020,729 stolen vehicles in 2023, 850,708 in 2024, and 659,880 in 2025. Even after the decline, that is hundreds of thousands of stolen vehicles per year, which is why pre-load identity checks matter before releasing inventory.</p>
+          <a class="source-link" target="_blank" rel="noreferrer" href="https://www.nicb.org/news/news-releases/vehicle-thefts-united-states-fell-17-2024">NICB 2024 theft report</a>
+        </details>
+        <details>
+          <summary>Why not trust Central Dispatch alone?</summary>
+          <p>Central Dispatch is the workflow dealers already use, but a marketplace profile does not prove the person replying today is the legitimate carrier or driver. Central Dispatch warns users about phishing and credential harvesting, and the FBI has investigated schemes involving fake or compromised Central Dispatch accounts. DeepTruck adds a separate verification layer before load details are released.</p>
+          <a class="source-link" target="_blank" rel="noreferrer" href="https://www.centraldispatch.com/resource-topic/security">Central Dispatch security guidance</a>
+        </details>
+        <details>
+          <summary>Does it replace FMCSA or Central Dispatch?</summary>
+          <p>No. It works on top of the existing carrier profile and creates a dealer-side verification record for the specific carrier request.</p>
+        </details>
+        <details>
+          <summary>Can my team see verification history?</summary>
+          <p>Yes. The dealer console keeps request history, status, timestamps, and uploaded documents for review.</p>
+        </details>
+        <details>
+          <summary>What happens after the monthly limit?</summary>
+          <p>Extra verification requests are billed at $0.50 per request after the included monthly volume.</p>
+        </details>
+      </div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <div>
+      <a class="site-logo" href="/">DeepTruck Verify</a>
+      <p>Pre-load carrier identity checks for auto dealers.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="#pricing">Pricing</a>
+      <a href="chrome://extensions/">Install extension</a>
+      <a href="/privacy.html">Privacy policy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="mailto:verify@deeptruck.io">Contact</a>
+    </nav>
+  </footer>
 </body>
 </html>

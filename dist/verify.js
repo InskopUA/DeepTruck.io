@@ -1,6 +1,7 @@
 const API_BASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify";
 const params = new URLSearchParams(location.search);
 const id = params.get("id") || "";
+let emailAutoVerified = false;
 
 const els = {
   carrierName: document.getElementById("carrier-name"),
@@ -12,29 +13,40 @@ const els = {
   emailCheck: document.getElementById("email-check"),
   phoneCheck: document.getElementById("phone-check"),
   licenseCheck: document.getElementById("license-check"),
+  w9Check: document.getElementById("w9-check"),
+  coiCheck: document.getElementById("coi-check"),
   emailButton: document.getElementById("verify-email"),
   phoneButton: document.getElementById("verify-phone"),
   phoneHelp: document.getElementById("phone-help"),
   uploadButton: document.getElementById("upload-license"),
+  w9UploadButton: document.getElementById("upload-w9"),
+  coiUploadButton: document.getElementById("upload-coi"),
   code: document.getElementById("code"),
   phoneMsg: document.getElementById("phone-msg"),
   license: document.getElementById("license"),
   licenseLabel: document.getElementById("license-label"),
-  licenseMsg: document.getElementById("license-msg")
+  licenseMsg: document.getElementById("license-msg"),
+  w9: document.getElementById("w9"),
+  w9Label: document.getElementById("w9-label"),
+  w9Msg: document.getElementById("w9-msg"),
+  coi: document.getElementById("coi"),
+  coiLabel: document.getElementById("coi-label"),
+  coiMsg: document.getElementById("coi-msg")
 };
 
 if (!id) {
   showError("Verification id is missing.");
 } else {
-  load();
+  load().catch((error) => showError(error.message));
 }
 
 els.emailButton.addEventListener("click", async () => {
-  await post("email", {});
-  await load();
+  if (els.emailButton.classList.contains("done")) return;
+  await verifyEmail().catch((error) => showError(error.message));
 });
 
 els.phoneButton.addEventListener("click", async () => {
+  if (els.phoneButton.classList.contains("done")) return;
   els.phoneMsg.textContent = "";
   try {
     await post("phone", { code: els.code.value });
@@ -44,45 +56,37 @@ els.phoneButton.addEventListener("click", async () => {
   }
 });
 
-els.uploadButton.addEventListener("click", async () => {
-  els.licenseMsg.textContent = "";
-  const file = els.license.files[0];
-  if (!file) {
-    els.licenseMsg.textContent = "Choose a file first.";
-    return;
-  }
-
-  const fileData = await readFile(file);
-  await post("license", { fileName: file.name, fileData });
-  await load();
-});
-
-els.license.addEventListener("change", () => {
-  const fileName = els.license.files[0]?.name || "";
-  els.uploadButton.disabled = !fileName;
-  if (fileName) {
-    els.licenseLabel.textContent = fileName;
-    els.licenseMsg.textContent = "";
-  } else {
-    els.licenseLabel.textContent = "Choose license";
-  }
-});
+els.license.addEventListener("change", () => uploadSelectedDocument("license"));
+els.w9.addEventListener("change", () => uploadSelectedDocument("w9"));
+els.coi.addEventListener("change", () => uploadSelectedDocument("coi"));
 
 async function load() {
   const record = await request(`${API_BASE_URL}/verification-requests/${id}`);
+  if (!record.emailVerified && !emailAutoVerified) {
+    emailAutoVerified = true;
+    await verifyEmail();
+    return;
+  }
   render(record);
 }
 
 async function post(action, body) {
   return request(`${API_BASE_URL}/verify/${id}/${action}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+    credentials: "omit",
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
     body: JSON.stringify(body)
   });
 }
 
 async function request(url, options) {
-  const response = await fetch(url, options);
+  let response;
+  try {
+    response = await fetch(url, options);
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Network request failed.");
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data.error) {
     throw new Error(data.error || "Request failed.");
@@ -91,7 +95,7 @@ async function request(url, options) {
 }
 
 function render(record) {
-  const done = record.emailVerified && record.phoneVerified && record.licenseUploaded;
+  const done = record.emailVerified && record.phoneVerified && record.licenseUploaded && record.w9Uploaded && record.coiUploaded;
   els.carrierName.textContent = record.carrierName || "Carrier verification";
   els.statusPill.textContent = done ? "Verified" : "Pending";
   els.statusPill.classList.toggle("done", done);
@@ -103,17 +107,25 @@ function render(record) {
   setDone(els.emailCheck, record.emailVerified);
   setDone(els.phoneCheck, record.phoneVerified);
   setDone(els.licenseCheck, record.licenseUploaded);
-  setButton(els.emailButton, record.emailVerified, "Email verified", "Verify email");
+  setDone(els.w9Check, record.w9Uploaded);
+  setDone(els.coiCheck, record.coiUploaded);
+  setButton(els.emailButton, record.emailVerified, "Email verified", "Verifying...");
+  els.emailButton.disabled = true;
   setButton(els.phoneButton, record.phoneVerified, "Phone verified", "Verify phone");
-  setButton(els.uploadButton, record.licenseUploaded, "License uploaded", "Upload license");
-  els.uploadButton.disabled = !record.licenseUploaded && !els.license.files[0];
+  els.phoneButton.disabled = Boolean(record.phoneVerified);
+  if (record.phoneVerified) els.phoneMsg.textContent = "";
+  setFileControl(els.uploadButton, els.licenseLabel, record.licenseUploaded, record.licenseFileName, "Upload license");
+  setFileControl(els.w9UploadButton, els.w9Label, record.w9Uploaded, record.w9FileName, "Upload W-9");
+  setFileControl(els.coiUploadButton, els.coiLabel, record.coiUploaded, record.coiFileName, "Upload COI");
   const trialMode = record.smsTrialMode === true;
   els.phoneHelp.textContent = trialMode
     ? "Confirm that the test SMS was received. Trial Twilio SMS uses its own template code until the account is upgraded."
     : "Enter the six-digit SMS code sent to the carrier phone.";
-  els.code.style.display = trialMode ? "none" : "block";
+  els.code.style.display = trialMode || record.phoneVerified ? "none" : "block";
   if (trialMode && !record.phoneVerified) els.phoneButton.textContent = "Confirm SMS received";
-  els.licenseMsg.textContent = record.licenseFileName || "";
+  els.licenseMsg.textContent = record.licenseUploaded ? record.licenseFileName || "" : "";
+  els.w9Msg.textContent = record.w9Uploaded ? record.w9FileName || "" : "";
+  els.coiMsg.textContent = record.coiUploaded ? record.coiFileName || "" : "";
 }
 
 function setDone(node, done) {
@@ -123,6 +135,63 @@ function setDone(node, done) {
 function setButton(button, done, doneText, pendingText) {
   button.classList.toggle("done", Boolean(done));
   button.textContent = done ? doneText : pendingText;
+}
+
+function setFileControl(control, label, done, fileName, pendingText) {
+  control.classList.toggle("done", Boolean(done));
+  label.textContent = done ? fileName || "Uploaded" : pendingText;
+}
+
+async function verifyEmail() {
+  await post("email", {});
+  await load();
+}
+
+async function uploadSelectedDocument(type) {
+  const config = {
+    license: {
+      input: els.license,
+      label: els.licenseLabel,
+      control: els.uploadButton,
+      message: els.licenseMsg,
+      pendingText: "Upload license"
+    },
+    w9: {
+      input: els.w9,
+      label: els.w9Label,
+      control: els.w9UploadButton,
+      message: els.w9Msg,
+      pendingText: "Upload W-9"
+    },
+    coi: {
+      input: els.coi,
+      label: els.coiLabel,
+      control: els.coiUploadButton,
+      message: els.coiMsg,
+      pendingText: "Upload COI"
+    }
+  }[type];
+
+  config.message.textContent = "";
+  const file = config.input.files[0];
+  if (!file) {
+    config.label.textContent = config.pendingText;
+    return;
+  }
+
+  config.label.textContent = "Uploading...";
+  config.control.classList.add("is-busy");
+  try {
+    const fileData = await readFile(file);
+    await post(type, { fileName: file.name, fileData });
+    config.label.textContent = file.name;
+    await load();
+  } catch (error) {
+    config.label.textContent = config.pendingText;
+    config.message.textContent = error.message;
+  } finally {
+    config.control.classList.remove("is-busy");
+  }
 }
 
 function showError(message) {

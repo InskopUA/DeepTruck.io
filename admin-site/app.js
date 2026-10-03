@@ -1,5 +1,6 @@
 const API_BASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify";
-const state = { items: [], query: "" };
+const POLL_INTERVAL_MS = 5000;
+const state = { items: [], query: "", manualCarrier: null, manualVerification: null, manualMessage: "", pollTimer: 0, isLookupLoading: false };
 
 const views = document.querySelectorAll(".view");
 const navButtons = document.querySelectorAll("nav button");
@@ -7,6 +8,11 @@ const title = document.getElementById("page-title");
 const tbody = document.getElementById("history-body");
 const details = document.getElementById("details");
 const detailsContent = document.getElementById("details-content");
+const dotForm = document.getElementById("dot-form");
+const dotInput = document.getElementById("dot-input");
+const dotSearchButton = document.getElementById("dot-search-button");
+const manualResult = document.getElementById("manual-result");
+const verifyMessage = document.getElementById("verify-message");
 
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -17,13 +23,44 @@ navButtons.forEach((button) => {
   });
 });
 
-document.getElementById("search").addEventListener("input", (event) => {
+window.searchCarrierFromDot = async (event) => {
+  event?.preventDefault();
+  await lookupManualCarrier(dotInput?.value);
+};
+
+document.getElementById("search")?.addEventListener("input", (event) => {
   state.query = event.target.value.toLowerCase();
   renderTable();
 });
 
-document.getElementById("close-details").addEventListener("click", () => {
+dotForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await lookupManualCarrier(dotInput.value);
+});
+
+dotSearchButton?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  await lookupManualCarrier(dotInput.value);
+});
+
+manualResult?.addEventListener("click", async (event) => {
+  const action = event.target?.closest("[data-action]")?.dataset.action;
+  if (!action) return;
+  if (action === "send-verification") await createManualVerification();
+  if (action === "refresh-verification") await refreshManualVerification(true);
+  if (action === "new-search") resetManualVerification();
+});
+
+document.getElementById("close-details")?.addEventListener("click", () => {
   details.classList.remove("open");
+  details.setAttribute("aria-hidden", "true");
+});
+
+details?.addEventListener("click", (event) => {
+  if (event.target === details) {
+    details.classList.remove("open");
+    details.setAttribute("aria-hidden", "true");
+  }
 });
 
 load();
@@ -39,6 +76,125 @@ async function load() {
   } catch (error) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(error.message)}</td></tr>`;
   }
+}
+
+async function lookupManualCarrier(dot) {
+  if (state.isLookupLoading) return;
+  const cleanDot = String(dot || "").replace(/\D/g, "");
+  if (!/^\d{5,8}$/.test(cleanDot)) {
+    setManualMessage("Enter a valid USDOT number.", true);
+    return;
+  }
+
+  state.isLookupLoading = true;
+  renderSearchButton();
+  setManualMessage("Searching carrier...");
+  manualResult.innerHTML = renderManualLoading("Reading MOTUS/FMCSA carrier profile...");
+  state.manualCarrier = null;
+  state.manualVerification = null;
+  stopPolling();
+
+  try {
+    state.manualCarrier = await lookupCarrier(cleanDot);
+    await load();
+    state.manualVerification = findLatestVerification(cleanDot, "verified");
+    setManualMessage(state.manualVerification ? `Carrier was verified ${relativeAge(state.manualVerification.updatedAt || state.manualVerification.createdAt)}.` : "");
+    renderManualResult();
+  } catch (error) {
+    const message = formatLookupError(error);
+    setManualMessage(message, true);
+    manualResult.innerHTML = renderManualEmpty("Carrier lookup failed", message);
+  } finally {
+    state.isLookupLoading = false;
+    renderSearchButton();
+  }
+}
+
+function renderSearchButton() {
+  dotSearchButton.disabled = state.isLookupLoading;
+  dotSearchButton.textContent = state.isLookupLoading ? "Searching..." : "Search";
+}
+
+async function createManualVerification() {
+  const carrier = state.manualCarrier;
+  if (!carrier) return;
+  if (!carrier.email || !carrier.phone) {
+    setManualMessage("Carrier must have both email and phone before verification can be sent.", true);
+    return;
+  }
+
+  setManualMessage("Sending verification request...");
+  renderManualResult(true);
+  try {
+    const response = await fetch(`${API_BASE_URL}/verification-requests`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        dot: carrier.dot,
+        carrierName: carrier.name,
+        email: carrier.email,
+        phone: carrier.phone,
+        mc: carrier.mc,
+        createdAt: new Date().toISOString()
+      })
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.error) throw new Error(data.error || "Verification API request failed.");
+    state.manualVerification = data;
+    setManualMessage("Verification request sent.");
+    renderManualResult();
+    startPolling();
+    await load();
+  } catch (error) {
+    setManualMessage(error.message || String(error), true);
+    renderManualResult();
+  }
+}
+
+async function refreshManualVerification(showMessage = false) {
+  if (!state.manualVerification?.id) return;
+  if (showMessage) setManualMessage("Refreshing verification status...");
+  try {
+    const response = await fetch(`${API_BASE_URL}/verification-requests/${state.manualVerification.id}`);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || data.error) throw new Error(data.error || "Verification status request failed.");
+    state.manualVerification = data;
+    if (showMessage) setManualMessage("Status updated.");
+    renderManualResult();
+    updatePolling();
+    await load();
+  } catch (error) {
+    setManualMessage(error.message || String(error), true);
+  }
+}
+
+function resetManualVerification() {
+  state.manualCarrier = null;
+  state.manualVerification = null;
+  setManualMessage("");
+  stopPolling();
+  manualResult.innerHTML = renderManualEmpty("Carrier preview", "Search a USDOT number to load carrier identity, insurance, authority, and contact details.");
+}
+
+function startPolling() {
+  if (state.pollTimer) return;
+  state.pollTimer = window.setInterval(() => refreshManualVerification(false), POLL_INTERVAL_MS);
+}
+
+function stopPolling() {
+  if (!state.pollTimer) return;
+  window.clearInterval(state.pollTimer);
+  state.pollTimer = 0;
+}
+
+function updatePolling() {
+  const verification = state.manualVerification;
+  const complete = verification && isVerificationComplete(verification);
+  if (verification?.id && !complete) {
+    startPolling();
+    return;
+  }
+  stopPolling();
 }
 
 function renderMetrics() {
@@ -75,31 +231,244 @@ function renderTable() {
   });
 }
 
+function renderManualResult(isBusy = false) {
+  const carrier = state.manualCarrier;
+  const verification = state.manualVerification;
+  if (!carrier) return;
+  const complete = verification && isVerificationComplete(verification);
+  const canSend = carrier.email && carrier.phone && !isBusy;
+  const badgeText = complete
+    ? `verified · ${relativeAge(verification.updatedAt || verification.createdAt)}`
+    : verification
+      ? "pending"
+      : "ready";
+  const requestState = complete
+    ? `completed ${relativeAge(verification.updatedAt || verification.createdAt)}`
+    : verification
+      ? "waiting on carrier"
+      : "ready to send";
+
+  manualResult.innerHTML = `
+    <section class="carrier-shell">
+      <header class="manual-hero">
+        <div>
+          <p class="eyebrow">Carrier lookup</p>
+          <h2>${escapeHtml(carrier.name)}</h2>
+          <span>USDOT ${escapeHtml(carrier.dot)} · ${escapeHtml(carrier.mc || "No MC")}</span>
+        </div>
+        <b class="badge ${complete ? "verified" : verification ? "pending" : "pending"}">${escapeHtml(badgeText)}</b>
+      </header>
+
+      <div class="manual-grid">
+        ${infoCard("USDOT", carrier.dot)}
+        ${infoCard("MC", carrier.mc || "-")}
+        ${infoCard("Email", carrier.email || "Not listed")}
+        ${infoCard("Phone", formatPhone(carrier.phone))}
+        ${infoCard("Authority", carrier.authorityStatus || carrier.dotStatus || "-")}
+        ${infoCard("Fleet", `${carrier.fleet.powerUnits ?? "-"} units / ${carrier.fleet.drivers ?? "-"} drivers`)}
+      </div>
+
+      <div class="risk-grid">
+        ${riskCard("Safety", carrier.outOfService ? "Out of service" : "Not out of service", carrier.outOfService ? "bad" : "good")}
+        ${riskCard("Insurance", getInsuranceLabel(carrier), getInsuranceTone(carrier))}
+        ${riskCard("BOC-3", carrier.insurance.bocFiled ? "Filed" : "Not found", carrier.insurance.bocFiled ? "neutral" : "warn")}
+        ${riskCard("Coverage", carrier.insurance.minimumBipdAmount ? money(carrier.insurance.minimumBipdAmount) + " min BIPD" : "No min BIPD", carrier.insurance.minimumBipdAmount ? "neutral" : "warn")}
+      </div>
+
+      <section class="manual-flow">
+        <div class="detail-section-title">
+          <h3>Verification request</h3>
+          <span>${escapeHtml(requestState)}</span>
+        </div>
+        ${verification ? renderManualChecks(verification) : `<p class="muted">Send a request to verify the FMCSA-listed email, phone, driver license, W-9, and COI.</p>`}
+        <div class="manual-actions">
+          ${verification && !complete ? `<button class="primary" data-action="refresh-verification">Refresh status</button>` : ""}
+          ${!verification ? `<button class="primary" data-action="send-verification" ${canSend ? "" : "disabled"}>${isBusy ? "Sending..." : "Verify carrier"}</button>` : ""}
+          <button class="primary quiet" data-action="new-search">New search</button>
+          ${verification?.verificationUrl ? `<a class="primary quiet" target="_blank" rel="noreferrer" href="${escapeAttribute(verification.verificationUrl)}">Open carrier link</a>` : ""}
+        </div>
+        ${canSend || verification ? "" : `<p class="inline-message error">This carrier is missing email or phone.</p>`}
+      </section>
+    </section>
+  `;
+}
+
+function findLatestVerification(dot, status = "") {
+  const matches = state.items
+    .filter((item) => item.dot === dot && (!status || item.status === status))
+    .sort((left, right) => new Date(right.updatedAt || right.createdAt) - new Date(left.updatedAt || left.createdAt));
+  return matches[0] || null;
+}
+
+function renderManualChecks(verification) {
+  return `
+    <div class="checks manual-checks">
+      ${checkRow("Email verified", verification.emailVerified)}
+      ${checkRow("SMS code verified", verification.phoneVerified)}
+      ${checkRow("Driver license uploaded", verification.licenseUploaded)}
+      ${checkRow("W-9 uploaded", verification.w9Uploaded)}
+      ${checkRow("COI uploaded", verification.coiUploaded)}
+    </div>
+  `;
+}
+
+function renderManualLoading(message) {
+  return `<section class="panel empty-panel"><h2>Loading carrier</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+}
+
+function renderManualEmpty(titleText, message) {
+  return `<section class="panel empty-panel"><h2>${escapeHtml(titleText)}</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+}
+
+function riskCard(label, value, tone = "neutral") {
+  return `<div class="risk-card ${escapeAttribute(tone)}"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`;
+}
+
+function setManualMessage(message, isError = false) {
+  state.manualMessage = message || "";
+  verifyMessage.textContent = state.manualMessage;
+  verifyMessage.classList.toggle("error", Boolean(isError));
+}
+
 function openDetails(id) {
   const item = state.items.find((entry) => entry.id === id);
   if (!item) return;
+  const complete = item.emailVerified && item.phoneVerified && item.licenseUploaded && item.w9Uploaded && item.coiUploaded;
   detailsContent.innerHTML = `
-    <div class="detail-title">
-      <h2>${escapeHtml(item.carrierName)}</h2>
-      <p class="muted">USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</p>
+    <header class="detail-hero">
+      <div>
+        <p class="eyebrow">Carrier verification</p>
+        <h2>${escapeHtml(item.carrierName)}</h2>
+        <span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span>
+      </div>
+      <b class="badge ${complete ? "verified" : "pending"}">${complete ? "verified" : "pending"}</b>
+    </header>
+
+    <div class="detail-grid">
+      ${infoCard("Email", item.email)}
+      ${infoCard("Phone", formatPhone(item.phone))}
+      ${infoCard("Started", formatDate(item.createdAt))}
+      ${infoCard("Last update", formatDate(item.updatedAt))}
     </div>
-    <div class="checks">
-      <div>Email verified <b class="${item.emailVerified ? "done" : ""}">${item.emailVerified ? "Done" : "Pending"}</b></div>
-      <div>SMS verified <b class="${item.phoneVerified ? "done" : ""}">${item.phoneVerified ? "Done" : "Pending"}</b></div>
-      <div>License uploaded <b class="${item.licenseUploaded ? "done" : ""}">${item.licenseUploaded ? "Done" : "Pending"}</b></div>
-    </div>
-    <div class="detail-title">
-      <p class="muted">Email</p><h2>${escapeHtml(item.email)}</h2>
-      <p class="muted" style="margin-top:12px">Phone</p><h2>${formatPhone(item.phone)}</h2>
-      <p class="muted" style="margin-top:12px">Started</p><h2>${formatDate(item.createdAt)}</h2>
-    </div>
+
+    <section class="detail-section">
+      <div class="detail-section-title">
+        <h3>Verification checks</h3>
+        <span>${complete ? "ready for dealer review" : "waiting on carrier"}</span>
+      </div>
+      <div class="checks">
+        ${checkRow("Email verified", item.emailVerified)}
+        ${checkRow("SMS code verified", item.phoneVerified)}
+        ${checkRow("Driver license uploaded", item.licenseUploaded)}
+        ${checkRow("W-9 uploaded", item.w9Uploaded)}
+        ${checkRow("COI uploaded", item.coiUploaded)}
+      </div>
+    </section>
+
+    <section class="detail-section">
+      <div class="detail-section-title">
+        <h3>Documents</h3>
+        <span>uploaded by carrier</span>
+      </div>
+      <div class="document-grid">
+        ${documentCard("Driver license", item.documents?.license, item.licenseUploaded, item.licenseFileName)}
+        ${documentCard("W-9", item.documents?.w9, item.w9Uploaded, item.w9FileName)}
+        ${documentCard("COI", item.documents?.coi, item.coiUploaded, item.coiFileName)}
+      </div>
+    </section>
   `;
   details.classList.add("open");
+  details.setAttribute("aria-hidden", "false");
+}
+
+function infoCard(label, value) {
+  return `<div class="info-card"><span>${escapeHtml(label)}</span><b>${escapeHtml(value || "-")}</b></div>`;
+}
+
+function checkRow(label, done) {
+  return `<div>${escapeHtml(label)} <b class="${done ? "done" : ""}">${done ? "Done" : "Pending"}</b></div>`;
+}
+
+function documentCard(label, document, uploaded, fallbackFileName) {
+  const fileName = document?.fileName || fallbackFileName || "";
+  const url = document?.url || "";
+  return `
+    <article class="document-card ${uploaded ? "uploaded" : ""}">
+      <div>
+        <span>${escapeHtml(label)}</span>
+        <b>${uploaded ? escapeHtml(fileName || "Uploaded") : "Pending upload"}</b>
+      </div>
+      ${uploaded && url ? `<a target="_blank" rel="noreferrer" href="${escapeAttribute(url)}">Open</a>` : `<em>${uploaded ? "Stored" : "Missing"}</em>`}
+    </article>
+  `;
+}
+
+async function lookupCarrier(dot) {
+  const response = await fetch(`${API_BASE_URL}/carrier-lookup/${dot}`);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || data.error) throw new Error(data.error || "Carrier lookup failed.");
+  return data;
+}
+
+function isVerificationComplete(verification) {
+  return Boolean(verification.emailVerified && verification.phoneVerified && verification.licenseUploaded && verification.w9Uploaded && verification.coiUploaded);
+}
+
+function getInsuranceLabel(carrier) {
+  const filings = carrier.insurance?.currentFilings || [];
+  const dates = filings.map((filing) => parseDate(filing.cancellationDate)).filter(Boolean).sort((left, right) => left - right);
+  if (!dates.length) return "No end date listed";
+  const today = startOfDay(new Date());
+  const target = dates.find((date) => startOfDay(date) >= today) || dates[dates.length - 1];
+  const days = Math.ceil((startOfDay(target) - today) / 86400000);
+  const dateLabel = target.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  if (days < 0) return `Expired ${dateLabel}`;
+  if (days === 0) return `Expires today`;
+  return `${dateLabel} · ${days}d left`;
+}
+
+function getInsuranceTone(carrier) {
+  const label = getInsuranceLabel(carrier);
+  if (label.startsWith("Expired")) return "bad";
+  if (label.includes("today") || label.match(/· ([1-9]|1[0-4])d left/)) return "warn";
+  return "good";
+}
+
+function parseDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function money(value) {
+  return `$${Number(value).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+}
+
+function formatLookupError(error) {
+  const message = error?.message || String(error);
+  if (/failed to fetch|network/i.test(message)) {
+    return "Carrier lookup could not reach the verification API. Check the local server and Supabase function deployment.";
+  }
+  return message;
 }
 
 function formatDate(value) {
   if (!value) return "-";
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(value));
+}
+
+function relativeAge(value) {
+  if (!value) return "recently";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "recently";
+  const days = Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000));
+  if (days === 0) return "today";
+  if (days === 1) return "1 day ago";
+  return `${days} days ago`;
 }
 
 function formatPhone(value) {
@@ -116,4 +485,8 @@ function escapeHtml(value) {
     '"': "&quot;",
     "'": "&#39;"
   })[char]);
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replace(/`/g, "&#96;");
 }

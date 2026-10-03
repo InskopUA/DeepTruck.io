@@ -11,7 +11,17 @@ type VerificationRecord = {
   email_verified: boolean;
   phone_verified: boolean;
   license_uploaded: boolean;
+  w9_uploaded: boolean;
+  coi_uploaded: boolean;
+  license_bucket: string | null;
+  license_path: string | null;
   license_file_name: string | null;
+  w9_bucket: string | null;
+  w9_path: string | null;
+  w9_file_name: string | null;
+  coi_bucket: string | null;
+  coi_path: string | null;
+  coi_file_name: string | null;
   verification_url: string | null;
   created_at: string;
   updated_at: string;
@@ -31,6 +41,7 @@ const PUBLIC_BASE_URL = Deno.env.get("PUBLIC_BASE_URL") || `${SUPABASE_URL}/func
 const RESEND_API_KEY = mustEnv("RESEND_API_KEY");
 const EMAIL_FROM = Deno.env.get("EMAIL_FROM") || "CarrierVerify <verify@yourdomain.com>";
 const VERIFY_APP_URL = Deno.env.get("VERIFY_APP_URL") || "http://localhost:5173";
+const MOTUS_BASE_URL = Deno.env.get("MOTUS_BASE_URL") || "https://motus.dot.gov/api";
 const TWILIO_ACCOUNT_SID = mustEnv("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = mustEnv("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = mustEnv("TWILIO_FROM_NUMBER");
@@ -48,7 +59,7 @@ if (!SUPABASE_SERVICE_ROLE_KEY) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return response("", 204);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders });
 
   try {
     const url = new URL(req.url);
@@ -62,17 +73,22 @@ Deno.serve(async (req) => {
       return json(await listVerificationRequests(url));
     }
 
+    const carrierLookupMatch = path.match(/^\/carrier-lookup\/(\d+)$/);
+    if (req.method === "GET" && carrierLookupMatch) {
+      return json(await lookupCarrier(carrierLookupMatch[1]));
+    }
+
     const statusMatch = path.match(/^\/verification-requests\/([^/]+)$/);
     if (req.method === "GET" && statusMatch) {
-      return json(toPublicRecord(await getRecord(statusMatch[1])));
+      return json(await toPublicRecord(await getRecord(statusMatch[1]), true));
     }
 
     const verifyMatch = path.match(/^\/verify\/([^/]+)$/);
     if (req.method === "GET" && verifyMatch) {
-      return html(renderVerifyPage(await getRecord(verifyMatch[1])));
+      return html(await renderVerifyPage(await getRecord(verifyMatch[1])));
     }
 
-    const actionMatch = path.match(/^\/verify\/([^/]+)\/(email|phone|license)$/);
+    const actionMatch = path.match(/^\/verify\/([^/]+)\/(email|phone|license|w9|coi)$/);
     if (req.method === "POST" && actionMatch) {
       const [, id, action] = actionMatch;
       const body = await req.json().catch(() => ({}));
@@ -125,7 +141,7 @@ async function createVerificationRequest(body: Record<string, unknown>) {
     sendOtp(phone, `DeepTruck Verify code: ${smsCode}. Complete verification: ${verificationUrl}`)
   ]);
 
-  return toPublicRecord(updated);
+  return await toPublicRecord(updated);
 }
 
 async function applyCarrierAction(id: string, action: string, body: Record<string, unknown>) {
@@ -149,28 +165,24 @@ async function applyCarrierAction(id: string, action: string, body: Record<strin
     patch.phone_verified = true;
   }
 
-  if (action === "license") {
-    const fileName = requiredString(body.fileName, "fileName");
-    const fileData = requiredString(body.fileData, "fileData");
-    const upload = parseDataUrl(fileData);
-    const path = `${id}/${Date.now()}-${safeFileName(fileName)}`;
-    const { error } = await supabase.storage.from(LICENSE_BUCKET).upload(path, upload.bytes, {
-      contentType: upload.contentType,
-      upsert: true
-    });
-    if (error) throw new Error(error.message);
-    patch.license_uploaded = true;
-    patch.license_bucket = LICENSE_BUCKET;
-    patch.license_path = path;
-    patch.license_file_name = fileName;
+  if (["license", "w9", "coi"].includes(action)) {
+    const uploaded = await uploadDocument(id, action, body);
+    patch[`${action}_uploaded`] = true;
+    patch[`${action}_bucket`] = uploaded.bucket;
+    patch[`${action}_path`] = uploaded.path;
+    patch[`${action}_file_name`] = uploaded.fileName;
   }
 
   const next = {
     email_verified: Boolean(action === "email" ? true : record.email_verified),
     phone_verified: Boolean(action === "phone" ? true : record.phone_verified),
-    license_uploaded: Boolean(action === "license" ? true : record.license_uploaded)
+    license_uploaded: Boolean(action === "license" ? true : record.license_uploaded),
+    w9_uploaded: Boolean(action === "w9" ? true : record.w9_uploaded),
+    coi_uploaded: Boolean(action === "coi" ? true : record.coi_uploaded)
   };
-  patch.status = next.email_verified && next.phone_verified && next.license_uploaded ? "verified" : "pending";
+  patch.status = next.email_verified && next.phone_verified && next.license_uploaded && next.w9_uploaded && next.coi_uploaded
+    ? "verified"
+    : "pending";
 
   const { data, error } = await supabase
     .from("carrier_verification_requests")
@@ -180,7 +192,7 @@ async function applyCarrierAction(id: string, action: string, body: Record<strin
     .single();
 
   if (error) throw new Error(error.message);
-  return toPublicRecord(data);
+  return await toPublicRecord(data);
 }
 
 async function getRecord(id: string) {
@@ -208,7 +220,7 @@ async function listVerificationRequests(url: URL) {
 
   if (error) throw new Error(error.message);
   return {
-    items: (data || []).map(toPublicRecord),
+    items: await Promise.all((data || []).map((record) => toPublicRecord(record, true))),
     count: data?.length || 0
   };
 }
@@ -234,29 +246,57 @@ async function sendEmail(to: string, carrierName: string, verificationUrl: strin
 function renderEmail(carrierName: string, verificationUrl: string) {
   return `<!doctype html>
 <html>
-<body style="margin:0;background:#f5f7fb;font-family:Arial,Helvetica,sans-serif;color:#17202b">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f7fb;padding:28px 12px">
+<body style="margin:0;background:#f7f8fa;font-family:Inter,Arial,Helvetica,sans-serif;color:#161a20">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f7f8fa;padding:28px 12px">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #dbe2eb;border-radius:10px;overflow:hidden">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e3e7ec;border-radius:12px;overflow:hidden;box-shadow:0 16px 40px rgba(31,42,56,.08)">
           <tr>
-            <td style="padding:22px 24px;border-bottom:1px solid #edf1f6">
-              <div style="font-size:12px;font-weight:800;color:#195bd7;text-transform:uppercase;letter-spacing:.04em">DeepTruck Verify</div>
-              <div style="font-size:24px;font-weight:800;margin-top:5px;color:#141c2b">Carrier verification required</div>
+            <td style="height:3px;background:linear-gradient(90deg,#18202b,#315efb,#b7c6ff);font-size:0;line-height:0">&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="padding:22px 24px 18px;border-bottom:1px solid #e3e7ec">
+              <div style="font-family:Consolas,Menlo,monospace;font-size:11px;font-weight:800;color:#315efb;text-transform:uppercase;letter-spacing:.08em">&gt;_ DeepTruck Verify</div>
+              <div style="font-size:26px;line-height:1.08;font-weight:850;margin-top:8px;color:#161a20">Carrier verification required</div>
+              <div style="display:inline-block;margin-top:12px;border:1px solid #d6e0ff;background:#eef3ff;color:#315efb;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800">Pre-load identity check</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:24px">
-              <p style="font-size:16px;line-height:1.55;margin:0 0 14px">Hi ${esc(carrierName)},</p>
-              <p style="font-size:15px;line-height:1.6;margin:0 0 18px;color:#475467">A dealer has requested verification before assigning a vehicle load. Please confirm your email, enter the SMS code, and upload the driver's license for the driver transporting the vehicle.</p>
-              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:22px 0">
+            <td style="padding:22px 24px 24px">
+              <p style="font-size:16px;line-height:1.5;margin:0 0 10px;color:#161a20">Hi ${esc(carrierName)},</p>
+              <p style="font-size:14px;line-height:1.65;margin:0 0 18px;color:#68717d">A dealer needs to verify your carrier identity before assigning a vehicle load. Please complete the checklist below.</p>
+
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #edf0f3;border-radius:9px;overflow:hidden;margin:0 0 20px;background:#fbfcfd">
+                <tr>
+                  <td style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-size:13px;font-weight:800;color:#161a20">Email confirmation</td>
+                  <td align="right" style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-family:Consolas,Menlo,monospace;font-size:10px;color:#315efb;font-weight:800">AUTO</td>
+                </tr>
+                <tr>
+                  <td style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-size:13px;font-weight:800;color:#161a20">SMS code verification</td>
+                  <td align="right" style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-family:Consolas,Menlo,monospace;font-size:10px;color:#8b650e;font-weight:800">REQUIRED</td>
+                </tr>
+                <tr>
+                  <td style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-size:13px;font-weight:800;color:#161a20">Driver license upload</td>
+                  <td align="right" style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-family:Consolas,Menlo,monospace;font-size:10px;color:#8b650e;font-weight:800">REQUIRED</td>
+                </tr>
+                <tr>
+                  <td style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-size:13px;font-weight:800;color:#161a20">W-9 upload</td>
+                  <td align="right" style="padding:11px 12px;border-bottom:1px solid #edf0f3;font-family:Consolas,Menlo,monospace;font-size:10px;color:#8b650e;font-weight:800">REQUIRED</td>
+                </tr>
+                <tr>
+                  <td style="padding:11px 12px;font-size:13px;font-weight:800;color:#161a20">COI upload</td>
+                  <td align="right" style="padding:11px 12px;font-family:Consolas,Menlo,monospace;font-size:10px;color:#8b650e;font-weight:800">REQUIRED</td>
+                </tr>
+              </table>
+
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 0 18px">
                 <tr>
                   <td>
-                    <a href="${esc(verificationUrl)}" style="display:inline-block;background:#141c2b;color:#ffffff;text-decoration:none;font-size:15px;font-weight:800;border-radius:8px;padding:13px 18px">Open verification</a>
+                    <a href="${esc(verificationUrl)}" style="display:inline-block;background:#18202b;color:#ffffff;text-decoration:none;font-size:13px;font-weight:850;border-radius:7px;padding:12px 15px">Open verification</a>
                   </td>
                 </tr>
               </table>
-              <p style="font-size:12px;line-height:1.5;margin:22px 0 0;color:#667085">If you did not expect this request, you can ignore this email.</p>
+              <p style="font-size:11px;line-height:1.5;margin:0;color:#68717d">This request is required before the dealer releases load details. If you did not expect this request, you can ignore this email.</p>
             </td>
           </tr>
         </table>
@@ -326,7 +366,14 @@ async function sendSms(to: string, body: string) {
   if (!res.ok) throw new Error(`Twilio failed: ${await res.text()}`);
 }
 
-function toPublicRecord(record: VerificationRecord) {
+async function toPublicRecord(record: VerificationRecord, includeDocumentUrls = false) {
+  const complete = Boolean(record.email_verified && record.phone_verified && record.license_uploaded && record.w9_uploaded && record.coi_uploaded);
+  const documents = {
+    license: await toDocument("Driver license", record.license_uploaded, record.license_bucket, record.license_path, record.license_file_name, includeDocumentUrls),
+    w9: await toDocument("W-9", record.w9_uploaded, record.w9_bucket, record.w9_path, record.w9_file_name, includeDocumentUrls),
+    coi: await toDocument("COI", record.coi_uploaded, record.coi_bucket, record.coi_path, record.coi_file_name, includeDocumentUrls)
+  };
+
   return {
     id: record.id,
     dot: record.dot,
@@ -334,20 +381,39 @@ function toPublicRecord(record: VerificationRecord) {
     email: record.email,
     phone: record.phone,
     mc: record.mc || "",
-    status: record.status,
+    status: complete ? "verified" : "pending",
     emailVerified: record.email_verified,
     phoneVerified: record.phone_verified,
     licenseUploaded: record.license_uploaded,
+    w9Uploaded: record.w9_uploaded,
+    coiUploaded: record.coi_uploaded,
     smsTrialMode: TWILIO_TRIAL_TEMPLATE_MODE && !TWILIO_VERIFY_SERVICE_SID,
     verificationUrl: record.verification_url || "",
     licenseFileName: record.license_file_name || "",
+    w9FileName: record.w9_file_name || "",
+    coiFileName: record.coi_file_name || "",
+    documents,
     createdAt: record.created_at,
     updatedAt: record.updated_at
   };
 }
 
-function renderVerifyPage(record: VerificationRecord) {
-  const status = toPublicRecord(record);
+async function toDocument(label: string, uploaded: boolean, bucket: string | null, path: string | null, fileName: string | null, includeUrl: boolean) {
+  let url = "";
+  if (includeUrl && uploaded && bucket && path) {
+    const { data } = await supabase.storage.from(bucket).createSignedUrl(path, 60 * 60);
+    url = data?.signedUrl || "";
+  }
+  return {
+    label,
+    uploaded: Boolean(uploaded),
+    fileName: fileName || "",
+    url
+  };
+}
+
+async function renderVerifyPage(record: VerificationRecord) {
+  const status = await toPublicRecord(record);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -366,17 +432,22 @@ input{border:1px solid #cbd5e1;border-radius:7px;font:inherit;min-height:38px;pa
 </head>
 <body><main>
 <section><h1>Carrier verification</h1><p>${esc(status.carrierName)} · USDOT ${esc(status.dot)}</p><div class="grid"><div class="box"><span>Email</span><b>${esc(status.email)}</b></div><div class="box"><span>Phone</span><b>${esc(status.phone)}</b></div></div></section>
-<section><h2>Status</h2><div class="checks"><div class="check ${status.emailVerified ? "done" : ""}">${status.emailVerified ? "Done" : "Pending"}: email verified</div><div class="check ${status.phoneVerified ? "done" : ""}">${status.phoneVerified ? "Done" : "Pending"}: SMS code verified</div><div class="check ${status.licenseUploaded ? "done" : ""}">${status.licenseUploaded ? "Done" : "Pending"}: driver license uploaded</div></div></section>
+<section><h2>Status</h2><div class="checks"><div class="check ${status.emailVerified ? "done" : ""}">${status.emailVerified ? "Done" : "Pending"}: email verified</div><div class="check ${status.phoneVerified ? "done" : ""}">${status.phoneVerified ? "Done" : "Pending"}: SMS code verified</div><div class="check ${status.licenseUploaded ? "done" : ""}">${status.licenseUploaded ? "Done" : "Pending"}: driver license uploaded</div><div class="check ${status.w9Uploaded ? "done" : ""}">${status.w9Uploaded ? "Done" : "Pending"}: W-9 uploaded</div><div class="check ${status.coiUploaded ? "done" : ""}">${status.coiUploaded ? "Done" : "Pending"}: COI uploaded</div></div></section>
 <section><h2>Email</h2><button id="email" class="${status.emailVerified ? "done" : ""}">${status.emailVerified ? "Email verified" : "Verify email"}</button></section>
 <section><h2>Phone</h2><div class="row"><input id="code" placeholder="SMS code"><button id="phone" class="${status.phoneVerified ? "done" : ""}">${status.phoneVerified ? "Phone verified" : "Verify phone"}</button></div><div id="phone-msg" class="msg"></div></section>
 <section><h2>Driver license</h2><div class="row"><input id="license" type="file" accept="image/*,.pdf"><button id="upload" class="${status.licenseUploaded ? "done" : ""}">${status.licenseUploaded ? "License uploaded" : "Upload license"}</button></div><div id="license-msg" class="msg">${esc(status.licenseFileName || "")}</div></section>
+<section><h2>W-9</h2><div class="row"><input id="w9" type="file" accept="image/*,.pdf"><button id="upload-w9" class="${status.w9Uploaded ? "done" : ""}">${status.w9Uploaded ? "W-9 uploaded" : "Upload W-9"}</button></div><div id="w9-msg" class="msg">${esc(status.w9FileName || "")}</div></section>
+<section><h2>COI</h2><div class="row"><input id="coi" type="file" accept="image/*,.pdf"><button id="upload-coi" class="${status.coiUploaded ? "done" : ""}">${status.coiUploaded ? "COI uploaded" : "Upload COI"}</button></div><div id="coi-msg" class="msg">${esc(status.coiFileName || "")}</div></section>
 </main>
 <script>
 const id=${JSON.stringify(status.id)};
 const post=(action,body)=>fetch(location.pathname+"/"+action,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json();if(!r.ok||d.error)throw new Error(d.error||"Request failed");return d});
 document.getElementById("email").onclick=async()=>{await post("email");location.reload()};
 document.getElementById("phone").onclick=async()=>{try{await post("phone",{code:document.getElementById("code").value});location.reload()}catch(e){document.getElementById("phone-msg").textContent=e.message}};
-document.getElementById("upload").onclick=async()=>{const file=document.getElementById("license").files[0];if(!file){document.getElementById("license-msg").textContent="Choose a file first.";return}const reader=new FileReader();reader.onload=async()=>{await post("license",{fileName:file.name,fileData:reader.result});location.reload()};reader.readAsDataURL(file)};
+const upload=(action,inputId,msgId)=>{const file=document.getElementById(inputId).files[0];if(!file){document.getElementById(msgId).textContent="Choose a file first.";return}const reader=new FileReader();reader.onload=async()=>{await post(action,{fileName:file.name,fileData:reader.result});location.reload()};reader.readAsDataURL(file)};
+document.getElementById("upload").onclick=async()=>upload("license","license","license-msg");
+document.getElementById("upload-w9").onclick=async()=>upload("w9","w9","w9-msg");
+document.getElementById("upload-coi").onclick=async()=>upload("coi","coi","coi-msg");
 </script>
 </body></html>`;
 }
@@ -401,6 +472,23 @@ function requiredString(value: unknown, name: string) {
   const out = String(value || "").trim();
   if (!out) throw new Error(`${name} is required.`);
   return out;
+}
+
+async function uploadDocument(id: string, type: string, body: Record<string, unknown>) {
+  const fileName = requiredString(body.fileName, "fileName");
+  const fileData = requiredString(body.fileData, "fileData");
+  const upload = parseDataUrl(fileData);
+  const path = `${id}/${type}/${Date.now()}-${safeFileName(fileName)}`;
+  const { error } = await supabase.storage.from(LICENSE_BUCKET).upload(path, upload.bytes, {
+    contentType: upload.contentType,
+    upsert: true
+  });
+  if (error) throw new Error(error.message);
+  return {
+    bucket: LICENSE_BUCKET,
+    path,
+    fileName
+  };
 }
 
 function mustEnv(name: string) {
@@ -434,6 +522,132 @@ function normalizeSmsPhone(phone: string) {
   if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
   if (phone.trim().startsWith("+")) return phone.trim();
   return phone;
+}
+
+async function lookupCarrier(dot: string) {
+  if (!/^\d{5,8}$/.test(dot)) {
+    const error = new Error("Enter a valid USDOT number.") as Error & { statusCode?: number };
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const carrier = await getMotusJson(`${MOTUS_BASE_URL}/carriers/${dot}`);
+  const auth = getAuthorities(carrier)[0] || null;
+  let authorityView = null;
+  let minimumInsurance = null;
+
+  if (auth?.entityOperatingAuthorityId) {
+    const authorityId = auth.entityOperatingAuthorityId;
+    const [oaResult, minResult] = await Promise.allSettled([
+      getMotusJson(`${MOTUS_BASE_URL}/regulatedEntity/oa/${authorityId}/getOAPublicView`),
+      getMotusJson(`${MOTUS_BASE_URL}/filings/minimum-bipd/${authorityId}`)
+    ]);
+    authorityView = oaResult.status === "fulfilled" ? oaResult.value : null;
+    minimumInsurance = minResult.status === "fulfilled" ? minResult.value : null;
+  }
+
+  return normalizeCarrier(dot, carrier, auth, authorityView, minimumInsurance);
+}
+
+async function getMotusJson(url: string) {
+  const response = await fetch(url, { headers: { Accept: "application/json" } });
+  const text = await response.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("MOTUS returned a non-JSON response.");
+  }
+  if (!response.ok) {
+    const error = new Error(`MOTUS lookup failed: ${response.status} ${response.statusText}`) as Error & { statusCode?: number };
+    error.statusCode = response.status === 404 ? 404 : 502;
+    throw error;
+  }
+  return data;
+}
+
+function normalizeCarrier(
+  dot: string,
+  carrier: Record<string, any>,
+  authority: Record<string, any> | null,
+  authorityView: Record<string, any> | null,
+  minimumInsurance: Record<string, any> | null
+) {
+  const detail = carrier?.carrierEntityDetail || {};
+  const filings = authorityView?.insuranceFilings || [];
+  const boc = authorityView?.blanketFilings || authority?.blanketFilings || [];
+  const statusName =
+    carrier?.entityDotNumber?.dotNumberStatus?.dotNumberStatusName ||
+    carrier?.entityDotNumber?.dotNumberStatus?.dotNumberStatus ||
+    (carrier?.outOfService ? "Out of service" : "Active");
+
+  return {
+    dot,
+    name: getCarrierName(carrier),
+    mc: authority?.docketNumber || "",
+    dotStatus: statusName,
+    authorityStatus: authority?.operatingAuthorityStatus?.operatingAuthorityStatusName || "",
+    outOfService: Boolean(carrier?.outOfService),
+    email: cleanEmail(getPrimaryEmail(carrier)),
+    phone: cleanPhone(getPrimaryPhone(carrier)),
+    fleet: {
+      powerUnits: detail.powerUnitTotal ?? detail.powerUnitsTotal ?? detail.powerUnits ?? null,
+      drivers: detail.driverTotal ?? null
+    },
+    insurance: {
+      minimumBipdAmount: minimumInsurance?.minimumBipdAmount ?? minimumInsurance?.bipdAmount ?? null,
+      currentFilings: filings.map((filing: Record<string, any>) => ({
+        cancellationDate: filing.cancellationDate || null,
+        effectiveDate: filing.effectiveDate || null,
+        status: filing.status?.filingStatusDesc || filing.status?.filingStatus || ""
+      })),
+      bocFiled: boc.length > 0
+    }
+  };
+}
+
+function getAuthorities(carrier: Record<string, any>) {
+  const out = [];
+  for (const registration of carrier?.entityRegistrations || []) {
+    for (const link of registration.entityRegistrationOperatingAuthorities || []) {
+      const authority = link.entityOperatingAuthority || {};
+      if (authority.entityOperatingAuthorityId) out.push(authority);
+    }
+  }
+  return [...new Map(out.map((item) => [item.entityOperatingAuthorityId, item])).values()];
+}
+
+function getCarrierName(carrier: Record<string, any>) {
+  return (
+    carrier?.entityName ||
+    carrier?.entityNames?.find((entry: Record<string, any>) => entry.nameType === "Legal")?.entityName ||
+    carrier?.entityNames?.[0]?.entityName ||
+    "Unknown carrier"
+  );
+}
+
+function getPrimaryEmail(carrier: Record<string, any>) {
+  return (
+    carrier?.emailAddresses?.find((entry: Record<string, any>) => entry.primaryAddressFlag)?.emailAddress ||
+    carrier?.emailAddresses?.[0]?.emailAddress ||
+    ""
+  );
+}
+
+function getPrimaryPhone(carrier: Record<string, any>) {
+  return carrier?.phoneNumbers?.[0]?.phoneNumber || "";
+}
+
+function cleanEmail(value: unknown) {
+  const email = String(value || "").trim();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+}
+
+function cleanPhone(value: unknown) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (digits.length === 10) return digits;
+  if (digits.length === 11 && digits.startsWith("1")) return digits.slice(1);
+  return "";
 }
 
 function esc(value: unknown) {
