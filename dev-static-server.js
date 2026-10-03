@@ -14,8 +14,13 @@ const types = {
 
 http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${port}`);
+  if (url.pathname === "/admin") {
+    res.writeHead(308, { Location: "/admin/" });
+    res.end();
+    return;
+  }
   let pathname = url.pathname === "/" ? "/index.html" : url.pathname;
-  if (pathname === "/admin" || pathname === "/admin/") pathname = "/admin/index.html";
+  if (pathname === "/admin/") pathname = "/admin/index.html";
   if (pathname === "/verify") pathname = "/verify.html";
   const filePath = path.normalize(path.join(root, pathname));
 

@@ -7,7 +7,42 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="app">
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-brand">
+      <span>DT</span>
+      <div>
+        <b>DeepTruck</b>
+        <small>Dealer console</small>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs" role="tablist" aria-label="Account access">
+        <button id="login-tab" class="active" type="button" data-auth-mode="login">Login</button>
+        <button id="signup-tab" type="button" data-auth-mode="signup">Create account</button>
+      </div>
+
+      <form id="auth-form">
+        <div>
+          <p id="auth-kicker" class="eyebrow">Dealer login</p>
+          <h1 id="auth-title">Welcome back</h1>
+        </div>
+
+        <div id="signup-fields" class="signup-fields">
+          <label>Dealership name<input id="dealership-name" autocomplete="organization" placeholder="Maria Logistics"></label>
+          <label>Your name<input id="user-name" autocomplete="name" placeholder="Maria Ivanova"></label>
+        </div>
+
+        <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@dealership.com"></label>
+        <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
+
+        <button id="auth-submit" class="primary auth-submit" type="submit">Login</button>
+        <div id="auth-message" class="inline-message"></div>
+      </form>
+    </div>
+  </section>
+
+  <div id="admin-app" class="app auth-hidden">
     <aside class="sidebar">
       <div class="brand">
         <span>DT</span>
@@ -22,6 +57,11 @@
         <button data-view="billing">Billing</button>
         <button data-view="settings">Settings</button>
       </nav>
+      <div class="sidebar-account">
+        <small>Signed in</small>
+        <b id="account-email">-</b>
+        <button id="logout-button" type="button">Logout</button>
+      </div>
     </aside>
 
     <main>
@@ -115,10 +155,11 @@
         <div class="split">
           <section class="panel">
             <h2>Account settings</h2>
-            <label>Dealership name<input value="Maria Logistics"></label>
-            <label>Notification email<input value="maria@example.com"></label>
+            <label>Dealership name<input id="settings-dealership" value=""></label>
+            <label>Notification email<input id="settings-email" value="" readonly></label>
             <label>Extra request price<input value="$0.50"></label>
-            <button class="primary">Save changes</button>
+            <button id="save-account-button" class="primary">Save changes</button>
+            <div id="settings-message" class="inline-message"></div>
           </section>
           <section class="panel">
             <h2>Extension</h2>
@@ -136,6 +177,7 @@
       </section>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>

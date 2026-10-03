@@ -130,6 +130,14 @@ Keep `PUBLIC_BASE_URL` pointed at the Supabase Edge Function:
 https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
 ```
 
+For dealer account registration, Supabase Auth must allow the admin redirect URL:
+
+```text
+https://www.deeptruck.io/admin/
+```
+
+Add it in Supabase Dashboard under Authentication URL settings before using email confirmation in production.
+
 ## Backend contract
 
 Configure the backend URL in the extension options page.

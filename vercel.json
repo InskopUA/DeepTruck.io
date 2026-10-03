@@ -2,11 +2,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "public",
   "cleanUrls": true,
-  "rewrites": [
+  "redirects": [
     {
       "source": "/admin",
-      "destination": "/admin/index.html"
-    },
+      "destination": "/admin/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
     {
       "source": "/verify",
       "destination": "/verify.html"

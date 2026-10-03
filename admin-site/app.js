@@ -1,7 +1,39 @@
 const API_BASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify";
+const SUPABASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GaoXNE-0hGpMDv3cMy3QDA_UfQuvvIM";
 const POLL_INTERVAL_MS = 5000;
-const state = { items: [], query: "", manualCarrier: null, manualVerification: null, manualMessage: "", pollTimer: 0, isLookupLoading: false };
+const authClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const state = {
+  items: [],
+  query: "",
+  manualCarrier: null,
+  manualVerification: null,
+  manualMessage: "",
+  pollTimer: 0,
+  isLookupLoading: false,
+  authMode: "login",
+  session: null,
+  user: null
+};
 
+const authScreen = document.getElementById("auth-screen");
+const adminApp = document.getElementById("admin-app");
+const authForm = document.getElementById("auth-form");
+const authMessage = document.getElementById("auth-message");
+const authTitle = document.getElementById("auth-title");
+const authKicker = document.getElementById("auth-kicker");
+const authSubmit = document.getElementById("auth-submit");
+const signupFields = document.getElementById("signup-fields");
+const authEmail = document.getElementById("auth-email");
+const authPassword = document.getElementById("auth-password");
+const dealershipName = document.getElementById("dealership-name");
+const userName = document.getElementById("user-name");
+const accountEmail = document.getElementById("account-email");
+const logoutButton = document.getElementById("logout-button");
+const settingsDealership = document.getElementById("settings-dealership");
+const settingsEmail = document.getElementById("settings-email");
+const saveAccountButton = document.getElementById("save-account-button");
+const settingsMessage = document.getElementById("settings-message");
 const views = document.querySelectorAll(".view");
 const navButtons = document.querySelectorAll("nav button");
 const title = document.getElementById("page-title");
@@ -13,6 +45,51 @@ const dotInput = document.getElementById("dot-input");
 const dotSearchButton = document.getElementById("dot-search-button");
 const manualResult = document.getElementById("manual-result");
 const verifyMessage = document.getElementById("verify-message");
+
+if (!authClient) {
+  setAuthMessage("Authentication library failed to load. Refresh the page and try again.", true);
+} else {
+  initAuth();
+}
+
+document.querySelectorAll("[data-auth-mode]").forEach((button) => {
+  button.addEventListener("click", () => setAuthMode(button.dataset.authMode));
+});
+
+authForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  await submitAuthForm();
+});
+
+logoutButton?.addEventListener("click", async () => {
+  stopPolling();
+  await authClient.auth.signOut();
+  state.session = null;
+  state.user = null;
+  showAuth();
+});
+
+saveAccountButton?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  if (!state.session) return;
+  settingsMessage.textContent = "Saving...";
+  settingsMessage.classList.remove("error");
+  saveAccountButton.disabled = true;
+  try {
+    const { data, error } = await authClient.auth.updateUser({
+      data: { dealership_name: settingsDealership.value.trim() }
+    });
+    if (error) throw error;
+    state.user = data.user;
+    renderAccount();
+    settingsMessage.textContent = "Saved.";
+  } catch (error) {
+    settingsMessage.textContent = error.message || String(error);
+    settingsMessage.classList.add("error");
+  } finally {
+    saveAccountButton.disabled = false;
+  }
+});
 
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -63,11 +140,122 @@ details?.addEventListener("click", (event) => {
   }
 });
 
-load();
+async function initAuth() {
+  setAuthMode(location.hash === "#signup" ? "signup" : "login");
+  const { data } = await authClient.auth.getSession();
+  if (data.session) {
+    await useSession(data.session);
+  } else {
+    showAuth();
+  }
+
+  authClient.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      useSession(session);
+    } else {
+      state.session = null;
+      state.user = null;
+      showAuth();
+    }
+  });
+}
+
+async function submitAuthForm() {
+  if (!authClient) return;
+  setAuthMessage("");
+  authSubmit.disabled = true;
+  authSubmit.textContent = state.authMode === "signup" ? "Creating..." : "Logging in...";
+
+  try {
+    const email = authEmail.value.trim();
+    const password = authPassword.value;
+
+    if (state.authMode === "signup") {
+      const { data, error } = await authClient.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            dealership_name: dealershipName.value.trim(),
+            full_name: userName.value.trim()
+          },
+          emailRedirectTo: `${location.origin}/admin/`
+        }
+      });
+      if (error) throw error;
+      if (data.session) {
+        await useSession(data.session);
+      } else {
+        setAuthMessage("Account created. Check your email to confirm access.");
+      }
+      return;
+    }
+
+    const { data, error } = await authClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    await useSession(data.session);
+  } catch (error) {
+    setAuthMessage(error.message || String(error), true);
+  } finally {
+    authSubmit.disabled = false;
+    renderAuthMode();
+  }
+}
+
+function setAuthMode(mode) {
+  state.authMode = mode === "signup" ? "signup" : "login";
+  renderAuthMode();
+  setAuthMessage("");
+}
+
+function renderAuthMode() {
+  const signup = state.authMode === "signup";
+  document.querySelectorAll("[data-auth-mode]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.authMode === state.authMode);
+  });
+  signupFields.classList.toggle("active", signup);
+  dealershipName.required = signup;
+  userName.required = signup;
+  authTitle.textContent = signup ? "Create dealer account" : "Welcome back";
+  authKicker.textContent = signup ? "Dealer signup" : "Dealer login";
+  authSubmit.textContent = signup ? "Create account" : "Login";
+  authPassword.autocomplete = signup ? "new-password" : "current-password";
+}
+
+function setAuthMessage(message, isError = false) {
+  authMessage.textContent = message || "";
+  authMessage.classList.toggle("error", Boolean(isError));
+}
+
+async function useSession(session) {
+  state.session = session;
+  state.user = session.user;
+  showApp();
+  renderAccount();
+  await load();
+}
+
+function showAuth() {
+  authScreen.classList.remove("auth-hidden");
+  adminApp.classList.add("auth-hidden");
+}
+
+function showApp() {
+  authScreen.classList.add("auth-hidden");
+  adminApp.classList.remove("auth-hidden");
+}
+
+function renderAccount() {
+  const metadata = state.user?.user_metadata || {};
+  accountEmail.textContent = state.user?.email || "-";
+  settingsEmail.value = state.user?.email || "";
+  settingsDealership.value = metadata.dealership_name || "";
+}
 
 async function load() {
+  if (!state.session) return;
   try {
-    const response = await fetch(`${API_BASE_URL}/verification-requests?limit=100`);
+    const response = await fetch(`${API_BASE_URL}/verification-requests?limit=100`, { headers: authHeaders() });
     const data = await response.json();
     if (!response.ok || data.error) throw new Error(data.error || "Failed to load history.");
     state.items = data.items || [];
@@ -128,7 +316,7 @@ async function createManualVerification() {
   try {
     const response = await fetch(`${API_BASE_URL}/verification-requests`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({
         dot: carrier.dot,
         carrierName: carrier.name,
@@ -155,7 +343,7 @@ async function refreshManualVerification(showMessage = false) {
   if (!state.manualVerification?.id) return;
   if (showMessage) setManualMessage("Refreshing verification status...");
   try {
-    const response = await fetch(`${API_BASE_URL}/verification-requests/${state.manualVerification.id}`);
+    const response = await fetch(`${API_BASE_URL}/verification-requests/${state.manualVerification.id}`, { headers: authHeaders() });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.error) throw new Error(data.error || "Verification status request failed.");
     state.manualVerification = data;
@@ -404,7 +592,7 @@ function documentCard(label, document, uploaded, fallbackFileName) {
 }
 
 async function lookupCarrier(dot) {
-  const response = await fetch(`${API_BASE_URL}/carrier-lookup/${dot}`);
+  const response = await fetch(`${API_BASE_URL}/carrier-lookup/${dot}`, { headers: authHeaders() });
   const data = await response.json().catch(() => ({}));
   if (!response.ok || data.error) throw new Error(data.error || "Carrier lookup failed.");
   return data;
@@ -489,4 +677,8 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
   return escapeHtml(value).replace(/`/g, "&#96;");
+}
+
+function authHeaders() {
+  return state.session?.access_token ? { Authorization: `Bearer ${state.session.access_token}` } : {};
 }

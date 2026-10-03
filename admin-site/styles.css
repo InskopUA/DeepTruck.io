@@ -36,6 +36,115 @@ input {
   font: inherit;
 }
 
+.auth-hidden {
+  display: none !important;
+}
+
+.auth-screen {
+  align-items: center;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(180px, 260px) minmax(320px, 420px);
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-brand {
+  align-self: stretch;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  display: grid;
+  gap: 12px;
+  grid-template-rows: auto 1fr;
+  padding: 18px;
+}
+
+.auth-brand span {
+  background: #18202b;
+  border-radius: 8px;
+  color: #fff;
+  display: grid;
+  font: 800 12px "SFMono-Regular", Consolas, monospace;
+  height: 38px;
+  place-items: center;
+  width: 38px;
+}
+
+.auth-brand b {
+  display: block;
+  font-size: 16px;
+}
+
+.auth-brand small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+.auth-tabs {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 16px;
+  padding: 4px;
+}
+
+.auth-tabs button {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 800;
+  min-height: 34px;
+}
+
+.auth-tabs button.active {
+  background: #fff;
+  border-color: var(--line2);
+  color: var(--text);
+}
+
+.auth-card h1 {
+  font-size: 23px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font: 800 10px "SFMono-Regular", Consolas, monospace;
+  letter-spacing: 0;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+
+.signup-fields {
+  display: none;
+}
+
+.signup-fields.active {
+  display: block;
+}
+
+.auth-submit {
+  margin-top: 14px;
+  width: 100%;
+}
+
 .app {
   display: grid;
   grid-template-columns: 210px minmax(0, 1fr);
@@ -101,6 +210,39 @@ nav button.active {
   background: var(--soft);
   border-color: var(--line);
   color: var(--text);
+}
+
+.sidebar-account {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding: 14px 5px 0;
+}
+
+.sidebar-account small {
+  color: var(--faint);
+  display: block;
+  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.sidebar-account b {
+  display: block;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-account button {
+  background: #fff;
+  border: 1px solid var(--line2);
+  border-radius: 7px;
+  color: #414a56;
+  cursor: pointer;
+  font-size: 10.5px;
+  font-weight: 760;
+  margin-top: 10px;
+  min-height: 32px;
+  width: 100%;
 }
 
 main {
@@ -817,6 +959,16 @@ label {
 }
 
 @media (max-width: 900px) {
+  .auth-screen {
+    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+
+  .auth-brand {
+    align-self: auto;
+  }
+
   .app {
     grid-template-columns: 1fr;
   }
@@ -827,7 +979,18 @@ label {
   }
 
   nav {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .sidebar-account {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .sidebar-account small,
+  .sidebar-account button {
+    margin: 0;
   }
 
   .metrics,
