@@ -8,61 +8,61 @@
 </head>
 <body>
   <section id="auth-screen" class="auth-screen">
-    <div class="auth-brand">
-      <div class="auth-logo-row">
-        <span>DT</span>
-        <div>
-          <b>DeepTruck</b>
-          <small>Dealer console</small>
-        </div>
-      </div>
-
-      <div class="auth-preview">
-        <div class="auth-preview-head">
+    <div class="auth-shell">
+      <div class="auth-brand">
+        <div class="auth-logo-row">
+          <span>DT</span>
           <div>
-            <small>LIVE CHECK</small>
-            <b>OMAX LLC</b>
+            <b>DeepTruck</b>
+            <small>Dealer console</small>
           </div>
-          <em>Pending</em>
         </div>
-        <div class="auth-preview-grid">
-          <span>USDOT <b>4345567</b></span>
-          <span>MC <b>MC1698436</b></span>
-          <span>Email <b>confirmed</b></span>
-          <span>Phone <b>verified</b></span>
+
+        <div class="auth-hero-copy">
+          <p class="eyebrow">Carrier verification workspace</p>
+          <h1>Verify the carrier before the load moves.</h1>
+          <p>Search USDOT records, send identity checks, collect documents, and keep the dealer-side audit trail in one console.</p>
         </div>
-        <div class="auth-preview-steps">
-          <div class="done"><span></span>Email</div>
-          <div class="done"><span></span>SMS</div>
-          <div><span></span>Documents</div>
+
+        <div class="auth-signal-grid">
+          <div><span>Email</span><b>Confirmed</b></div>
+          <div><span>SMS</span><b>Verified</b></div>
+          <div><span>License</span><b>Collected</b></div>
+          <div><span>COI / W-9</span><b>Tracked</b></div>
+        </div>
+
+        <div class="auth-workflow">
+          <div><span></span>Central Dispatch carrier profile</div>
+          <div><span></span>FMCSA contact verification</div>
+          <div><span></span>Dealer review history</div>
         </div>
       </div>
-    </div>
 
-    <div class="auth-card">
-      <div class="auth-tabs" role="tablist" aria-label="Account access">
-        <button id="login-tab" class="active" type="button" data-auth-mode="login">Login</button>
-        <button id="signup-tab" type="button" data-auth-mode="signup">Create account</button>
+      <div class="auth-card">
+        <div class="auth-tabs" role="tablist" aria-label="Account access">
+          <button id="login-tab" class="active" type="button" data-auth-mode="login">Login</button>
+          <button id="signup-tab" type="button" data-auth-mode="signup">Create account</button>
+        </div>
+
+        <form id="auth-form">
+          <div>
+            <p id="auth-kicker" class="eyebrow">Dealer login</p>
+            <h1 id="auth-title">Welcome back</h1>
+            <p class="auth-copy">Access carrier checks, documents, and verification history for your dealership.</p>
+          </div>
+
+          <div id="signup-fields" class="signup-fields">
+            <label>Dealership name<input id="dealership-name" autocomplete="organization" placeholder="Maria Logistics"></label>
+            <label>Your name<input id="user-name" autocomplete="name" placeholder="Maria Ivanova"></label>
+          </div>
+
+          <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@dealership.com"></label>
+          <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
+
+          <button id="auth-submit" class="primary auth-submit" type="submit">Login</button>
+          <div id="auth-message" class="inline-message"></div>
+        </form>
       </div>
-
-      <form id="auth-form">
-        <div>
-          <p id="auth-kicker" class="eyebrow">Dealer login</p>
-          <h1 id="auth-title">Welcome back</h1>
-          <p class="auth-copy">Access carrier checks, documents, and verification history for your dealership.</p>
-        </div>
-
-        <div id="signup-fields" class="signup-fields">
-          <label>Dealership name<input id="dealership-name" autocomplete="organization" placeholder="Maria Logistics"></label>
-          <label>Your name<input id="user-name" autocomplete="name" placeholder="Maria Ivanova"></label>
-        </div>
-
-        <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@dealership.com"></label>
-        <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
-
-        <button id="auth-submit" class="primary auth-submit" type="submit">Login</button>
-        <div id="auth-message" class="inline-message"></div>
-      </form>
     </div>
   </section>
 
