@@ -79,9 +79,14 @@ Deno.serve(async (req) => {
       return json(await lookupCarrier(carrierLookupMatch[1]));
     }
 
+    const publicStatusMatch = path.match(/^\/public\/verification-requests\/([^/]+)$/);
+    if (req.method === "GET" && publicStatusMatch) {
+      return json(await toPublicRecord(await getRecord(publicStatusMatch[1]), false));
+    }
+
     const statusMatch = path.match(/^\/verification-requests\/([^/]+)$/);
     if (req.method === "GET" && statusMatch) {
-      return json(await toPublicRecord(await getRecord(statusMatch[1]), true));
+      return json(await toPublicRecord(await getRecordForUser(req, statusMatch[1]), true));
     }
 
     const verifyMatch = path.match(/^\/verify\/([^/]+)$/);
@@ -207,6 +212,23 @@ async function getRecord(id: string) {
 
   if (error || !data) {
     const notFound = new Error("Verification request was not found.") as Error & { statusCode?: number };
+    notFound.statusCode = 404;
+    throw notFound;
+  }
+  return data;
+}
+
+async function getRecordForUser(req: Request, id: string) {
+  const user = await requireUser(req);
+  const { data, error } = await supabase
+    .from("carrier_verification_requests")
+    .select("*")
+    .eq("id", id)
+    .eq("shipper_user_id", user.id)
+    .single();
+
+  if (error || !data) {
+    const notFound = new Error("Verification request was not found for this account.") as Error & { statusCode?: number };
     notFound.statusCode = 404;
     throw notFound;
   }

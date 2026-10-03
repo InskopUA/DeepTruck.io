@@ -61,7 +61,7 @@ els.w9.addEventListener("change", () => uploadSelectedDocument("w9"));
 els.coi.addEventListener("change", () => uploadSelectedDocument("coi"));
 
 async function load() {
-  const record = await request(`${API_BASE_URL}/verification-requests/${id}`);
+  const record = await request(`${API_BASE_URL}/public/verification-requests/${id}`);
   if (!record.emailVerified && !emailAutoVerified) {
     emailAutoVerified = true;
     await verifyEmail();
