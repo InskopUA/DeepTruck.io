@@ -1,6 +1,6 @@
 # CarrierVerify
 
-Chrome extension MVP for verifying a carrier before a dealer assigns a load.
+Chrome extension MVP for verifying a carrier before a shipper assigns a load.
 
 ## What it does
 
@@ -37,7 +37,7 @@ Then open extension options and set:
 http://localhost:8787
 ```
 
-When the dealer clicks `Send verification`, the backend prints the verification link and SMS code in the terminal. Open the link, verify email, enter the SMS code, upload a license file, then click `Check status` in Central Dispatch.
+When the shipper clicks `Send verification`, the backend prints the verification link and SMS code in the terminal. Open the link, verify email, enter the SMS code, upload a license file, then click `Check status` in Central Dispatch.
 
 ## Production recommendation
 
@@ -101,7 +101,7 @@ https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
 Vercel should host only the public web UI:
 
 - `/` public landing page
-- `/admin` dealer admin console
+- `/admin` shipper admin console
 - `/verify.html?id=...` carrier verification page
 - `/verify?id=...` same verification page through a clean URL rewrite
 
@@ -130,7 +130,7 @@ Keep `PUBLIC_BASE_URL` pointed at the Supabase Edge Function:
 https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
 ```
 
-For dealer account registration, Supabase Auth must allow the admin redirect URL:
+For shipper account registration, Supabase Auth must allow the admin redirect URL:
 
 ```text
 https://www.deeptruck.io/admin/
@@ -176,4 +176,4 @@ Response:
 
 ### `GET /verification-requests/:id`
 
-Return the same shape with updated booleans. The dealer screen switches to `Verified` when all three are true.
+Return the same shape with updated booleans. The shipper screen switches to `Verified` when all three are true.

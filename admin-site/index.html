@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>DeepTruck Dealer Admin</title>
+  <title>DeepTruck Shipper Console</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,14 +14,14 @@
           <span>DT</span>
           <div>
             <b>DeepTruck</b>
-            <small>Dealer console</small>
+            <small>Shipper console</small>
           </div>
         </div>
 
         <div class="auth-hero-copy">
           <p class="eyebrow">Carrier verification workspace</p>
           <h1>Verify the carrier before the load moves.</h1>
-          <p>Search USDOT records, send identity checks, collect documents, and keep the dealer-side audit trail in one console.</p>
+          <p>Search USDOT records, send identity checks, collect documents, and keep the shipper-side audit trail in one console.</p>
         </div>
 
         <div class="auth-signal-grid">
@@ -34,7 +34,7 @@
         <div class="auth-workflow">
           <div><span></span>Central Dispatch carrier profile</div>
           <div><span></span>FMCSA contact verification</div>
-          <div><span></span>Dealer review history</div>
+          <div><span></span>Shipper review history</div>
         </div>
       </div>
 
@@ -46,17 +46,17 @@
 
         <form id="auth-form">
           <div>
-            <p id="auth-kicker" class="eyebrow">Dealer login</p>
+            <p id="auth-kicker" class="eyebrow">Shipper login</p>
             <h1 id="auth-title">Welcome back</h1>
-            <p class="auth-copy">Access carrier checks, documents, and verification history for your dealership.</p>
+            <p class="auth-copy">Access carrier checks, documents, and verification history for your shipping team.</p>
           </div>
 
           <div id="signup-fields" class="signup-fields">
-            <label>Dealership name<input id="dealership-name" autocomplete="organization" placeholder="Maria Logistics"></label>
+            <label>Company name<input id="company-name" autocomplete="organization" placeholder="Maria Logistics"></label>
             <label>Your name<input id="user-name" autocomplete="name" placeholder="Maria Ivanova"></label>
           </div>
 
-          <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@dealership.com"></label>
+          <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
           <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
 
           <button id="auth-submit" class="primary auth-submit" type="submit">Login</button>
@@ -72,7 +72,7 @@
         <span>DT</span>
         <div>
           <b>DeepTruck</b>
-          <small>Dealer console</small>
+          <small>Shipper console</small>
         </div>
       </div>
       <nav>
@@ -152,7 +152,7 @@
             <p class="muted">Monthly plans include a fixed number of verification requests. Extra requests are billed after the monthly limit.</p>
             <div class="billing-card">
               <span>Current plan</span>
-              <b>Dealer</b>
+              <b>Shipper</b>
               <small>$49/mo includes 50 requests</small>
             </div>
             <button class="primary">Add payment method</button>
@@ -164,7 +164,7 @@
               <span>$19/mo includes 5 requests</span>
             </div>
             <div class="plan">
-              <b>Dealer</b>
+              <b>Shipper</b>
               <span>$49/mo includes 50 requests</span>
             </div>
             <div class="plan muted-plan">
@@ -179,7 +179,7 @@
         <div class="split">
           <section class="panel">
             <h2>Account settings</h2>
-            <label>Dealership name<input id="settings-dealership" value=""></label>
+            <label>Company name<input id="settings-company" value=""></label>
             <label>Notification email<input id="settings-email" value="" readonly></label>
             <label>Extra request price<input value="$0.50"></label>
             <button id="save-account-button" class="primary">Save changes</button>

@@ -1,9 +1,39 @@
 const form = document.getElementById("settings-form");
+const loginForm = document.getElementById("login-form");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginButton = document.getElementById("login-button");
+const logoutButton = document.getElementById("logout-button");
+const authStatus = document.getElementById("auth-status");
 const apiBaseUrl = document.getElementById("apiBaseUrl");
 const apiKey = document.getElementById("apiKey");
 const status = document.getElementById("status");
 
 load();
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  authStatus.textContent = "Logging in...";
+  loginButton.disabled = true;
+  try {
+    const response = await send("auth.login", {
+      email: loginEmail.value,
+      password: loginPassword.value
+    });
+    loginPassword.value = "";
+    renderAccount(response.user);
+  } catch (error) {
+    authStatus.textContent = error.message || String(error);
+  } finally {
+    loginButton.disabled = false;
+  }
+});
+
+logoutButton.addEventListener("click", async () => {
+  authStatus.textContent = "Logging out...";
+  await send("auth.logout");
+  renderAccount(null);
+});
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -22,9 +52,24 @@ form.addEventListener("submit", async (event) => {
 });
 
 async function load() {
-  const settings = await send("settings.get");
+  const [settings, auth] = await Promise.all([
+    send("settings.get"),
+    send("auth.get")
+  ]);
   apiBaseUrl.value = settings.apiBaseUrl;
   apiKey.value = settings.apiKey;
+  renderAccount(auth.user);
+}
+
+function renderAccount(user) {
+  if (user?.email) {
+    loginEmail.value = user.email;
+    authStatus.textContent = `Signed in as ${user.email}`;
+    logoutButton.disabled = false;
+    return;
+  }
+  authStatus.textContent = "Not signed in";
+  logoutButton.disabled = true;
 }
 
 function send(type, payload = {}) {

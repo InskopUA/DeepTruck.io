@@ -26,11 +26,11 @@ const authSubmit = document.getElementById("auth-submit");
 const signupFields = document.getElementById("signup-fields");
 const authEmail = document.getElementById("auth-email");
 const authPassword = document.getElementById("auth-password");
-const dealershipName = document.getElementById("dealership-name");
+const companyName = document.getElementById("company-name");
 const userName = document.getElementById("user-name");
 const accountEmail = document.getElementById("account-email");
 const logoutButton = document.getElementById("logout-button");
-const settingsDealership = document.getElementById("settings-dealership");
+const settingsCompany = document.getElementById("settings-company");
 const settingsEmail = document.getElementById("settings-email");
 const saveAccountButton = document.getElementById("save-account-button");
 const settingsMessage = document.getElementById("settings-message");
@@ -77,7 +77,7 @@ saveAccountButton?.addEventListener("click", async (event) => {
   saveAccountButton.disabled = true;
   try {
     const { data, error } = await authClient.auth.updateUser({
-      data: { dealership_name: settingsDealership.value.trim() }
+      data: { company_name: settingsCompany.value.trim() }
     });
     if (error) throw error;
     state.user = data.user;
@@ -176,7 +176,7 @@ async function submitAuthForm() {
         password,
         options: {
           data: {
-            dealership_name: dealershipName.value.trim(),
+            company_name: companyName.value.trim(),
             full_name: userName.value.trim()
           },
           emailRedirectTo: `${location.origin}/admin/`
@@ -214,10 +214,10 @@ function renderAuthMode() {
     button.classList.toggle("active", button.dataset.authMode === state.authMode);
   });
   signupFields.classList.toggle("active", signup);
-  dealershipName.required = signup;
+  companyName.required = signup;
   userName.required = signup;
-  authTitle.textContent = signup ? "Create dealer account" : "Welcome back";
-  authKicker.textContent = signup ? "Dealer signup" : "Dealer login";
+  authTitle.textContent = signup ? "Create shipper account" : "Welcome back";
+  authKicker.textContent = signup ? "Shipper signup" : "Shipper login";
   authSubmit.textContent = signup ? "Create account" : "Login";
   authPassword.autocomplete = signup ? "new-password" : "current-password";
 }
@@ -249,7 +249,7 @@ function renderAccount() {
   const metadata = state.user?.user_metadata || {};
   accountEmail.textContent = state.user?.email || "-";
   settingsEmail.value = state.user?.email || "";
-  settingsDealership.value = metadata.dealership_name || "";
+  settingsCompany.value = metadata.company_name || metadata.dealership_name || "";
 }
 
 async function load() {
@@ -542,7 +542,7 @@ function openDetails(id) {
     <section class="detail-section">
       <div class="detail-section-title">
         <h3>Verification checks</h3>
-        <span>${complete ? "ready for dealer review" : "waiting on carrier"}</span>
+        <span>${complete ? "ready for shipper review" : "waiting on carrier"}</span>
       </div>
       <div class="checks">
         ${checkRow("Email verified", item.emailVerified)}

@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 type VerificationRecord = {
   id: string;
+  shipper_user_id: string | null;
   dot: string;
   carrier_name: string;
   email: string;
@@ -66,11 +67,11 @@ Deno.serve(async (req) => {
     const path = stripFunctionPrefix(url.pathname);
 
     if (req.method === "POST" && path === "/verification-requests") {
-      return json(await createVerificationRequest(await req.json()));
+      return json(await createVerificationRequest(req, await req.json()));
     }
 
     if (req.method === "GET" && path === "/verification-requests") {
-      return json(await listVerificationRequests(url));
+      return json(await listVerificationRequests(req, url));
     }
 
     const carrierLookupMatch = path.match(/^\/carrier-lookup\/(\d+)$/);
@@ -102,7 +103,8 @@ Deno.serve(async (req) => {
   }
 });
 
-async function createVerificationRequest(body: Record<string, unknown>) {
+async function createVerificationRequest(req: Request, body: Record<string, unknown>) {
+  const user = await requireUser(req);
   const dot = requiredString(body.dot, "dot");
   const carrierName = requiredString(body.carrierName, "carrierName");
   const email = requiredString(body.email, "email");
@@ -118,6 +120,7 @@ async function createVerificationRequest(body: Record<string, unknown>) {
       email,
       phone,
       mc: String(body.mc || ""),
+      shipper_user_id: user.id,
       sms_code_hash: smsCodeHash,
       status: "pending"
     })
@@ -210,11 +213,13 @@ async function getRecord(id: string) {
   return data;
 }
 
-async function listVerificationRequests(url: URL) {
+async function listVerificationRequests(req: Request, url: URL) {
+  const user = await requireUser(req);
   const limit = Math.min(Number(url.searchParams.get("limit") || "50"), 100);
   const { data, error } = await supabase
     .from("carrier_verification_requests")
     .select("*")
+    .eq("shipper_user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -264,7 +269,7 @@ function renderEmail(carrierName: string, verificationUrl: string) {
           <tr>
             <td style="padding:22px 24px 24px">
               <p style="font-size:16px;line-height:1.5;margin:0 0 10px;color:#161a20">Hi ${esc(carrierName)},</p>
-              <p style="font-size:14px;line-height:1.65;margin:0 0 18px;color:#68717d">A dealer needs to verify your carrier identity before assigning a vehicle load. Please complete the checklist below.</p>
+              <p style="font-size:14px;line-height:1.65;margin:0 0 18px;color:#68717d">A shipper needs to verify your carrier identity before assigning a vehicle load. Please complete the checklist below.</p>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #edf0f3;border-radius:9px;overflow:hidden;margin:0 0 20px;background:#fbfcfd">
                 <tr>
@@ -296,7 +301,7 @@ function renderEmail(carrierName: string, verificationUrl: string) {
                   </td>
                 </tr>
               </table>
-              <p style="font-size:11px;line-height:1.5;margin:0;color:#68717d">This request is required before the dealer releases load details. If you did not expect this request, you can ignore this email.</p>
+              <p style="font-size:11px;line-height:1.5;margin:0;color:#68717d">This request is required before the shipper releases load details. If you did not expect this request, you can ignore this email.</p>
             </td>
           </tr>
         </table>
@@ -472,6 +477,24 @@ function requiredString(value: unknown, name: string) {
   const out = String(value || "").trim();
   if (!out) throw new Error(`${name} is required.`);
   return out;
+}
+
+async function requireUser(req: Request) {
+  const header = req.headers.get("authorization") || "";
+  const token = header.match(/^Bearer\s+(.+)$/i)?.[1] || "";
+  if (!token) {
+    const error = new Error("Sign in is required.") as Error & { statusCode?: number };
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data.user) {
+    const authError = new Error("Your session is invalid or expired.") as Error & { statusCode?: number };
+    authError.statusCode = 401;
+    throw authError;
+  }
+  return data.user;
 }
 
 async function uploadDocument(id: string, type: string, body: Record<string, unknown>) {

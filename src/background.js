@@ -1,5 +1,7 @@
 const MOTUS_BASE = "https://motus.dot.gov/api";
 const DEFAULT_API_BASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify";
+const SUPABASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GaoXNE-0hGpMDv3cMy3QDA_UfQuvvIM";
 
 const DEMO_DELAY_MS = 450;
 
@@ -18,6 +20,12 @@ async function routeMessage(message) {
       return createVerification(message.carrier);
     case "verification.get":
       return getVerification(message.verificationId);
+    case "auth.login":
+      return login(message.email, message.password);
+    case "auth.logout":
+      return logout();
+    case "auth.get":
+      return getAuthState();
     case "settings.get":
       return getSettings();
     case "settings.save":
@@ -176,6 +184,7 @@ async function upsertCarrier(carrier) {
 
 async function createVerification(carrier) {
   const settings = await getSettings();
+  const authHeaders = await getApiAuthHeaders(settings);
   const payload = {
     dot: carrier.dot,
     carrierName: carrier.name,
@@ -190,7 +199,7 @@ async function createVerification(carrier) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(settings.apiKey ? { Authorization: `Bearer ${settings.apiKey}` } : {})
+        ...authHeaders
       },
       body: JSON.stringify(payload)
     });
@@ -225,10 +234,11 @@ async function getVerification(verificationId) {
 
   const settings = await getSettings();
   if (settings.apiBaseUrl && !record.demoMode) {
+    const authHeaders = await getApiAuthHeaders(settings);
     const response = await fetch(`${settings.apiBaseUrl.replace(/\/$/, "")}/verification-requests/${verificationId}`, {
       headers: {
         Accept: "application/json",
-        ...(settings.apiKey ? { Authorization: `Bearer ${settings.apiKey}` } : {})
+        ...authHeaders
       }
     });
     const data = await response.json().catch(() => ({}));
@@ -294,6 +304,89 @@ async function saveSettings(settings) {
   };
   await chrome.storage.sync.set({ settings: clean });
   return clean;
+}
+
+async function login(email, password) {
+  const cleanEmail = String(email || "").trim();
+  const cleanPassword = String(password || "");
+  if (!cleanEmail || !cleanPassword) throw new Error("Email and password are required.");
+
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email: cleanEmail, password: cleanPassword })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error_description || data.msg || data.error || "Login failed.");
+
+  const session = normalizeSession(data);
+  await chrome.storage.local.set({ authSession: session });
+  return getAuthState();
+}
+
+async function logout() {
+  await chrome.storage.local.remove("authSession");
+  return { user: null };
+}
+
+async function getAuthState() {
+  const session = await getValidSession(true);
+  return {
+    user: session?.user ? { id: session.user.id, email: session.user.email, user_metadata: session.user.user_metadata || {} } : null
+  };
+}
+
+async function getApiAuthHeaders(settings) {
+  if (settings.apiKey) return { Authorization: `Bearer ${settings.apiKey}` };
+  const session = await getValidSession(true);
+  if (!session?.access_token) throw new Error("Sign in to CarrierVerify before sending verification requests.");
+  return { Authorization: `Bearer ${session.access_token}` };
+}
+
+async function getValidSession(allowRefresh) {
+  const { authSession } = await chrome.storage.local.get("authSession");
+  if (!authSession?.access_token) return null;
+  if (!allowRefresh || !isSessionExpired(authSession)) return authSession;
+  if (!authSession.refresh_token) return null;
+  return refreshSession(authSession.refresh_token);
+}
+
+function isSessionExpired(session) {
+  const expiresAt = Number(session.expires_at || 0);
+  return expiresAt && Date.now() > (expiresAt - 60) * 1000;
+}
+
+async function refreshSession(refreshToken) {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+    method: "POST",
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ refresh_token: refreshToken })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    await chrome.storage.local.remove("authSession");
+    throw new Error("Your session expired. Sign in again in extension settings.");
+  }
+  const session = normalizeSession(data);
+  await chrome.storage.local.set({ authSession: session });
+  return session;
+}
+
+function normalizeSession(data) {
+  const expiresIn = Number(data.expires_in || 3600);
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    token_type: data.token_type || "bearer",
+    expires_at: data.expires_at || Math.floor(Date.now() / 1000) + expiresIn,
+    user: data.user || null
+  };
 }
 
 function sleep(ms) {

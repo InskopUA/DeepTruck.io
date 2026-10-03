@@ -10,16 +10,34 @@
   <main>
     <header>
       <h1>CarrierVerify Settings</h1>
-      <p>The production backend is already configured. Use this page only to override it during development.</p>
+      <p>Sign in with the same account you use in the DeepTruck shipper console.</p>
     </header>
 
+    <section>
+      <h2>Account</h2>
+      <form id="login-form">
+        <label>
+          Email
+          <input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com">
+        </label>
+        <label>
+          Password
+          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+        </label>
+        <button id="login-button" type="submit">Login</button>
+        <button id="logout-button" class="secondary" type="button">Logout</button>
+        <span id="auth-status"></span>
+      </form>
+    </section>
+
     <form id="settings-form">
+      <h2>Developer settings</h2>
       <label>
         Verification API base URL
         <input id="apiBaseUrl" placeholder="https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify">
       </label>
       <label>
-        API key
+        API key override
         <input id="apiKey" type="password" placeholder="Optional bearer token">
       </label>
       <button>Save settings</button>
