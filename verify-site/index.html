@@ -2,411 +2,346 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070b12">
   <title>DeepTruck Verify</title>
+  <meta name="description" content="Pre-load carrier identity checks for vehicle shipping teams.">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="premium.css">
 </head>
-<body class="landing">
-  <header class="sitebar">
-    <div class="sitebar-inner">
-      <a class="site-logo" href="/">DeepTruck Verify</a>
-      <nav class="site-nav" aria-label="Main">
-        <a href="#product">Product</a>
-        <a href="#workflow">Workflow</a>
-        <a href="#extension">Extension</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#faq">FAQ</a>
+<body class="premium-landing">
+  <div class="noise"></div>
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <div class="nav-wrap">
+    <div class="container">
+      <nav class="nav" id="nav">
+        <a class="brand" href="#top">
+          <span class="brand-mark"></span>
+          <span>DeepTruck <small>Verify</small></span>
+        </a>
+        <div class="nav-links" id="navLinks">
+          <a href="#product">Product</a>
+          <a href="#workflow">Workflow</a>
+          <a href="#extension">Extension</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="nav-actions">
+          <a class="btn btn-ghost" href="/admin/">Login</a>
+          <a class="btn btn-primary" href="/admin/#signup">Create account</a>
+          <button class="hamburger" id="hamburger" type="button" aria-label="Open menu">Menu</button>
+        </div>
       </nav>
-      <div class="site-actions">
-        <a class="ghost-link" href="/admin/">Login</a>
-        <a class="soft-link" href="/admin/#signup">Create account</a>
-      </div>
     </div>
-  </header>
+  </div>
 
-  <main class="landing-page">
-    <section class="hero hero-premium">
-      <div class="hero-copy">
-        <p class="eyebrow">Carrier identity verification for vehicle loads</p>
-        <h1><span>Verify carriers</span><span>before you release</span><span>the load.</span></h1>
-        <p class="hero-text">DeepTruck gives shippers, brokers, and dispatch teams a verification checkpoint before sensitive pickup and vehicle details are shared.</p>
-        <div class="hero-actions">
-          <a class="primary-link" href="/admin/#signup">Create account</a>
-          <a class="secondary-link" href="#extension">See extension workflow</a>
-        </div>
-        <div class="trust-row">
-          <span>Central Dispatch workflow</span>
-          <span>FMCSA-listed contact check</span>
-          <span>Email + SMS verification</span>
-          <span>Document collection</span>
-        </div>
-      </div>
-
-      <aside class="product-card hero-console" aria-label="DeepTruck verification session preview">
-        <div class="console-top">
-          <div>
-            <span class="mono">LIVE VERIFICATION</span>
-            <b>OMAX LLC</b>
-            <small>USDOT 4345567 · MC1698436</small>
+  <main id="top">
+    <section class="hero">
+      <div class="grid-bg"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy reveal visible">
+          <div class="eyebrow"><span class="pulse"></span> Carrier identity checks for vehicle loads</div>
+          <h1>Know who's taking the load <span class="gradient-text">before you release it.</span></h1>
+          <p class="lead">DeepTruck Verify gives shipper teams a fast pre-load identity check: confirm the FMCSA-listed email, verify the listed phone by SMS, and collect the driver's license before shipment details are released.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="/admin/#signup">Create account</a>
+            <a class="btn btn-ghost btn-lg" href="#extension">Install extension</a>
           </div>
-          <span class="status pulse">Pending review</span>
-        </div>
-        <div class="console-score">
-          <div>
-            <span>Identity score</span>
-            <strong>82%</strong>
+          <div class="trust-row">
+            <span>Central Dispatch workflow</span>
+            <span class="dot"></span>
+            <span>Email + SMS check</span>
+            <span class="dot"></span>
+            <span>Driver license upload</span>
           </div>
-          <div class="score-ring" aria-hidden="true"><span></span></div>
         </div>
-        <div class="console-checks">
-          <div class="is-done"><span></span><b>Email</b><em>Verified</em></div>
-          <div class="is-done"><span></span><b>Phone</b><em>SMS confirmed</em></div>
-          <div class="is-done"><span></span><b>Driver</b><em>License uploaded</em></div>
-          <div><span></span><b>Insurance</b><em>COI pending</em></div>
-        </div>
-        <div class="console-timeline">
-          <p>Verification timeline</p>
-          <ol>
-            <li class="is-done">Request sent</li>
-            <li class="is-done">SMS confirmed</li>
-            <li class="is-active">Documents received</li>
-            <li>Ready for release decision</li>
-          </ol>
-        </div>
-      </aside>
-    </section>
 
-    <section class="proof-strip trust-layer" aria-label="DeepTruck verification trust layer">
-      <div><span>Built for</span><b>Vehicle shipping teams</b></div>
-      <div><span>Contact source</span><b>FMCSA-listed email and phone</b></div>
-      <div><span>Carrier response</span><b>Email, SMS, license, W-9, COI</b></div>
-      <div><span>Record</span><b>Timestamped shipper history</b></div>
-    </section>
-
-    <section id="product" class="section product-showcase">
-      <div class="section-title split-title">
-        <div>
-          <p class="eyebrow">Product first</p>
-          <h2>Everything your team needs before releasing a load.</h2>
-        </div>
-        <p>Carrier lookup, identity status, documents, and verification history live in one workflow instead of scattered screenshots, inboxes, and spreadsheets.</p>
-      </div>
-      <div class="dashboard-demo" aria-label="DeepTruck dashboard product mockup">
-        <div class="demo-sidebar">
-          <b>DeepTruck</b>
-          <span class="active">Verifications</span>
-          <span>History</span>
-          <span>Billing</span>
-          <span>Settings</span>
-        </div>
-        <div class="demo-main">
-          <div class="demo-bar">
-            <div>
-              <span>Carrier profile</span>
-              <b>OMAX LLC</b>
+        <div class="product-stage reveal visible delay-1" id="productStage">
+          <div class="product-glow"></div>
+          <div class="app-window" id="appWindow">
+            <div class="window-top">
+              <span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span>
+              <div class="address-bar">app.deeptruck.io / verification / OMAX-4345567</div>
             </div>
-            <button>Verify carrier</button>
+            <div class="app-content">
+              <aside class="mock-sidebar">
+                <div class="side-logo"></div>
+                <div class="side-ico active">OK</div>
+                <div class="side-ico">Q</div>
+                <div class="side-ico">H</div>
+                <div class="side-ico">B</div>
+              </aside>
+              <div class="main-ui">
+                <div class="ui-heading">
+                  <div>
+                    <div class="tiny">Live check</div>
+                    <div class="ui-title">OMAX LLC</div>
+                    <div class="ui-sub">Carrier identity verification</div>
+                  </div>
+                  <span class="status-pill" id="liveStatus">Pending</span>
+                </div>
+                <div class="identity-card">
+                  <div class="score-ring"><b>82%</b><small>identity match</small></div>
+                  <div class="carrier-grid">
+                    <div class="kv"><span>USDOT</span><b>4345567</b></div>
+                    <div class="kv"><span>MC</span><b>MC1698436</b></div>
+                    <div class="kv"><span>Email</span><b>info@omaxllc.net</b></div>
+                    <div class="kv"><span>Phone</span><b>(307) 441-5452</b></div>
+                  </div>
+                </div>
+                <div class="checks">
+                  <div class="check" data-check><span class="check-ico">@</span>Email confirmed<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check><span class="check-ico">#</span>SMS code verified<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check><span class="check-ico">ID</span>Driver license uploaded<strong>Waiting</strong><span class="progress"></span></div>
+                </div>
+                <div class="timeline">
+                  <div class="tl-title">Verification timeline</div>
+                  <div class="events">
+                    <div class="event on">Request sent</div>
+                    <div class="event" data-event>SMS confirmed</div>
+                    <div class="event" data-event>Documents received</div>
+                    <div class="event" data-event>Ready to review</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="demo-grid">
-            <article><span>USDOT</span><b>4345567</b></article>
-            <article><span>Authority</span><b>Active</b></article>
-            <article><span>Email</span><b>Verified</b></article>
-            <article><span>Phone</span><b>SMS verified</b></article>
-          </div>
-          <div class="demo-columns">
-            <section>
-              <h3>Documents</h3>
-              <div class="doc-line done"><span></span>Driver license <b>Uploaded</b></div>
-              <div class="doc-line done"><span></span>W-9 <b>Uploaded</b></div>
-              <div class="doc-line"><span></span>COI <b>Pending</b></div>
-            </section>
-            <section>
-              <h3>Activity</h3>
-              <div class="activity-line"><b>16:42</b> Request sent to FMCSA-listed email</div>
-              <div class="activity-line"><b>16:44</b> SMS code confirmed</div>
-              <div class="activity-line"><b>16:47</b> Driver license received</div>
-            </section>
-          </div>
+          <div class="floating-chip fc-1"><b><span class="fc-dot"></span>Listed phone matched</b>SMS challenge completed</div>
+          <div class="floating-chip fc-2"><b>Before release</b>3 identity checks in one record</div>
         </div>
       </div>
     </section>
 
-    <section class="section compare-section">
-      <div class="compare-copy">
-        <p class="eyebrow">Problem to checkpoint</p>
-        <h2>Replace assumption with a repeatable verification path.</h2>
-        <p>DeepTruck does not replace the marketplace or FMCSA profile. It adds the missing operational checkpoint between "carrier contacted us" and "we released load details."</p>
-      </div>
-      <div class="compare-grid">
-        <article class="before-card">
-          <span>Before DeepTruck</span>
-          <ol>
-            <li>Carrier profile opened</li>
-            <li>Dispatcher receives phone or email</li>
-            <li>Identity is assumed legitimate</li>
-            <li>Vehicle details are released</li>
-          </ol>
-          <b>Risk: no separate proof that the person controls the carrier identity.</b>
-        </article>
-        <article class="after-card">
-          <span>With DeepTruck</span>
-          <ol>
-            <li>USDOT profile detected</li>
-            <li>Request goes to listed contacts</li>
-            <li>SMS and email are confirmed</li>
-            <li>Documents are collected</li>
-            <li>History stays with the shipper account</li>
-          </ol>
-          <b>Outcome: a reviewable checkpoint before sharing sensitive details.</b>
-        </article>
+    <section class="trust-strip">
+      <div class="container trust-inner reveal">
+        <div class="trust-item"><span class="mini-icon">CD</span>Central Dispatch workflow</div>
+        <div class="trust-item"><span class="mini-icon">@</span>Listed email check</div>
+        <div class="trust-item"><span class="mini-icon">#</span>SMS verification</div>
+        <div class="trust-item"><span class="mini-icon">ID</span>Driver documents</div>
+        <div class="trust-item"><span class="mini-icon">TS</span>Timestamped history</div>
       </div>
     </section>
 
-    <section id="workflow" class="section workflow-system">
-      <div class="section-title">
-        <div>
-          <p class="eyebrow">Workflow</p>
-          <h2>From carrier profile to verified request.</h2>
-          <p>Three operational steps, each tied to an actual product surface.</p>
+    <section id="product" class="product-section">
+      <div class="container">
+        <div class="reveal">
+          <div class="section-kicker">Product, not paperwork</div>
+          <h2 class="section-title">One place to see who was checked, what passed, and what still needs attention.</h2>
+          <p class="section-copy">DeepTruck turns the carrier check into an operational record your team can scan in seconds instead of digging through screenshots, emails, texts, and spreadsheets.</p>
         </div>
-        <span>Central Dispatch friendly</span>
-      </div>
-      <div class="workflow-rail">
-        <article>
-          <span class="num">01</span>
-          <h3>Detect the USDOT</h3>
-          <p>The Chrome extension reads the carrier profile where dispatchers already work.</p>
-          <div class="mini-window"><b>USDOT detected</b><small>4345567 · OMAX LLC</small></div>
-        </article>
-        <article>
-          <span class="num">02</span>
-          <h3>Send the request</h3>
-          <p>The verification request goes to the carrier's listed email and phone.</p>
-          <div class="mini-window dark"><b>Email + SMS sent</b><small>Waiting on carrier</small></div>
-        </article>
-        <article>
-          <span class="num">03</span>
-          <h3>Review before release</h3>
-          <p>Your team sees contact, driver, document, and timeline status in one place.</p>
-          <div class="mini-window success"><b>Ready for review</b><small>3 of 4 checks complete</small></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="extension" class="section extension-section">
-      <div class="browser-frame">
-        <div class="browser-top"><span></span><span></span><span></span><b>centraldispatch.com/carrier-profile</b></div>
-        <div class="browser-body">
-          <div class="carrier-profile-card">
-            <span>Carrier profile</span>
-            <h3>OMAX LLC</h3>
-            <p>USDOT 4345567 · MC1698436</p>
-            <div class="profile-lines"><i></i><i></i><i></i></div>
-          </div>
-          <aside class="extension-panel">
-            <b>DeepTruck</b>
-            <p>Carrier found on page</p>
-            <div><span>USDOT</span><strong>4345567</strong></div>
-            <div><span>Status</span><strong>Ready to verify</strong></div>
-            <button>Start verification</button>
+        <div class="dash-shell reveal delay-1">
+          <aside class="dash-side">
+            <div class="dash-brand"><span class="brand-mark mini"></span>DeepTruck</div>
+            <div class="dash-menu">
+              <div class="active">Verification queue</div>
+              <div>History</div>
+              <div>Documents</div>
+              <div>Team</div>
+              <div>Billing</div>
+            </div>
           </aside>
-        </div>
-      </div>
-      <div class="extension-copy">
-        <p class="eyebrow">Chrome extension</p>
-        <h2>Verification starts where dispatchers already work.</h2>
-        <p>No copying carrier data into a spreadsheet. No switching tabs to rebuild context. The extension connects the carrier profile to the shipper console and account history.</p>
-        <ul>
-          <li>Detects the USDOT on a carrier profile</li>
-          <li>Uses the same account as the admin console</li>
-          <li>Keeps verification records separated by user account</li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="section capabilities-section">
-      <div class="section-title split-title">
-        <div>
-          <p class="eyebrow">Capabilities</p>
-          <h2>Built around the carrier identity decision.</h2>
-        </div>
-        <p>Every surface supports the same question: is this the right carrier, and what is still missing before we release details?</p>
-      </div>
-      <div class="bento-grid">
-        <article class="bento-large">
-          <span>Carrier identity</span>
-          <h3>Profile, contacts, verification state, and documents in one record.</h3>
-          <div class="identity-stack">
-            <div><b>OMAX LLC</b><em>USDOT 4345567</em></div>
-            <div><span class="ok"></span>Email verified</div>
-            <div><span class="ok"></span>SMS verified</div>
-            <div><span></span>COI pending</div>
+          <div class="dash-main">
+            <div class="dash-head">
+              <div><h3>Verification queue</h3><p>Review carrier identity before sharing sensitive load details.</p></div>
+              <button class="new-btn" type="button">+ New verification</button>
+            </div>
+            <div class="summary-grid">
+              <div class="metric"><span>Verified</span><b class="green">12</b><small>ready to review</small></div>
+              <div class="metric"><span>Pending</span><b class="amber">4</b><small>awaiting carrier</small></div>
+              <div class="metric"><span>Documents</span><b>9</b><small>received</small></div>
+              <div class="metric"><span>Today</span><b>16</b><small>requests</small></div>
+            </div>
+            <div class="table-box">
+              <div class="table-toolbar"><div class="search">Search carrier or USDOT</div><div class="filter">Status</div><div class="filter">Date</div></div>
+              <div class="table-row header"><div>Carrier</div><div>Status</div><div>Contact</div><div>Docs</div><div>Updated</div></div>
+              <div class="table-row"><div class="entity"><b>OMAX LLC</b><small>USDOT 4345567 · MC1698436</small></div><div><span class="tag">Verified</span></div><div>Email + SMS</div><div>3 / 3</div><div>2m ago</div></div>
+              <div class="table-row"><div class="entity"><b>Carrier #2187</b><small>USDOT 2910841</small></div><div><span class="tag pending">Pending</span></div><div>Email sent</div><div>1 / 3</div><div>11m ago</div></div>
+              <div class="table-row"><div class="entity"><b>Carrier #2194</b><small>USDOT 3819020</small></div><div><span class="tag review">Review</span></div><div>SMS verified</div><div>2 / 3</div><div>34m ago</div></div>
+              <div class="table-row"><div class="entity"><b>Carrier #2201</b><small>USDOT 3502264</small></div><div><span class="tag">Verified</span></div><div>Email + SMS</div><div>3 / 3</div><div>1h ago</div></div>
+            </div>
           </div>
-        </article>
-        <article><span>Email verification</span><b>Request goes to the listed carrier email.</b></article>
-        <article><span>SMS check</span><b>Phone confirmation before release.</b></article>
-        <article><span>Driver license</span><b>Collect driver identity documents.</b></article>
-        <article><span>W-9 + COI</span><b>Track required carrier documents.</b></article>
-        <article><span>History</span><b>Timestamped verification records for each account.</b></article>
-        <article><span>Team visibility</span><b>Dispatchers can review status from the console.</b></article>
-      </div>
-    </section>
-
-    <section class="section anatomy-section">
-      <div>
-        <p class="eyebrow">Verification anatomy</p>
-        <h2>One request, multiple proof points.</h2>
-      </div>
-      <div class="anatomy-card">
-        <div class="anatomy-row"><span>Carrier record</span><b>OMAX LLC</b><em>Loaded</em></div>
-        <div class="anatomy-row done"><span>FMCSA email</span><b>info@omaxllc.net</b><em>Verified</em></div>
-        <div class="anatomy-row done"><span>FMCSA phone</span><b>(307) 441-5452</b><em>Verified</em></div>
-        <div class="anatomy-row done"><span>Driver license</span><b>Uploaded by carrier</b><em>Received</em></div>
-        <div class="anatomy-row done"><span>W-9</span><b>Uploaded by carrier</b><em>Received</em></div>
-        <div class="anatomy-row pending"><span>COI</span><b>Awaiting upload</b><em>Review</em></div>
-        <div class="final-status"><span>Final status</span><b>Requires review</b></div>
-      </div>
-    </section>
-
-    <section id="pricing" class="section pricing-section">
-      <div class="section-title split-title">
-        <div>
-          <p class="eyebrow">Pricing</p>
-          <h2>Start with the verification volume your team needs.</h2>
         </div>
-        <p>Monthly plans include verification requests. Additional requests are billed at $0.50/request after the monthly limit.</p>
-      </div>
-      <div class="pricing-grid pricing-compact">
-        <article class="price-card">
-          <span class="plan-label">Starter</span>
-          <h3>$19<span>/mo</span></h3>
-          <p>For small teams adding a basic carrier identity checkpoint.</p>
-          <ul><li>5 requests included</li><li>Email + SMS verification</li><li>Document collection</li></ul>
-          <a class="secondary-link" href="/admin/#signup">Start</a>
-        </article>
-        <article class="price-card featured">
-          <span class="plan-label">Shipper</span>
-          <h3>$49<span>/mo</span></h3>
-          <p>For active dispatch teams using verification regularly.</p>
-          <ul><li>50 requests included</li><li>Console history</li><li>Chrome extension workflow</li></ul>
-          <a class="primary-link" href="/admin/#signup">Create account</a>
-        </article>
-        <article class="price-card">
-          <span class="plan-label">Scale</span>
-          <h3>$79<span>/mo</span></h3>
-          <p>For teams that need more checks across dispatchers.</p>
-          <ul><li>100 requests included</li><li>Shared workflow visibility</li><li>Verification details</li></ul>
-          <a class="secondary-link" href="/admin/#signup">Upgrade</a>
-        </article>
       </div>
     </section>
 
-    <section class="section security-section">
-      <div>
-        <p class="eyebrow">Trust controls</p>
-        <h2>Designed to create a record before sensitive details move.</h2>
-      </div>
-      <div class="security-grid">
-        <article><span>01</span><b>Listed contact verification</b><p>Email and phone checks are tied to the carrier profile data.</p></article>
-        <article><span>02</span><b>Controlled document collection</b><p>Driver license, W-9, and COI stay attached to the verification request.</p></article>
-        <article><span>03</span><b>Timestamped history</b><p>Each shipper account keeps its own request history and status trail.</p></article>
-      </div>
-    </section>
-
-    <section id="reviews" class="section reviews-section">
-      <div class="section-title">
-        <div>
-          <p class="eyebrow">Workflow feedback</p>
-          <h2>Built around real dispatch decisions.</h2>
+    <section id="workflow">
+      <div class="container">
+        <div class="center reveal">
+          <div class="section-kicker">Built into the decision point</div>
+          <h2 class="section-title">Three steps before the carrier receives sensitive load details.</h2>
+          <p class="section-copy">A lightweight checkpoint that fits the workflow your dispatch team already uses.</p>
         </div>
-        <span>anonymous workflow notes</span>
-      </div>
-      <div class="review-grid">
-        <article>
-          <p>"The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record."</p>
-          <div><b>Independent shipper</b><span>Used before assigning a pickup</span></div>
-        </article>
-        <article>
-          <p>"We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is exactly the checkpoint we needed."</p>
-          <div><b>Auto transport desk</b><span>Multi-dispatcher workflow</span></div>
-        </article>
-        <article>
-          <p>"The extension fits where the decision already happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails."</p>
-          <div><b>Operations manager</b><span>Central Dispatch workflow</span></div>
-        </article>
+        <div class="workflow-grid">
+          <article class="step reveal"><div class="step-no">01</div><h3>Read carrier profile</h3><p>The Chrome extension detects the USDOT on the Central Dispatch carrier profile and brings carrier contact data into the panel.</p><div class="step-ui"><div class="mini-row"><span>USDOT detected</span><strong>4345567</strong></div><div class="signal"><i style="width:100%"></i></div><div class="mini-row"><span>Carrier</span><strong>OMAX LLC</strong></div></div></article>
+          <article class="step reveal delay-1"><div class="step-no">02</div><h3>Send verification</h3><p>The carrier receives a verification link by email and an SMS code on the listed phone number.</p><div class="step-ui"><div class="mini-row"><span>Email request</span><strong class="ok">Sent</strong></div><div class="mini-row"><span>SMS challenge</span><strong class="ok">Sent</strong></div></div></article>
+          <article class="step reveal delay-2"><div class="step-no">03</div><h3>Approve with confidence</h3><p>See email, phone, and driver license status before deciding whether to share shipment details.</p><div class="step-ui"><div class="mini-row"><span>Identity status</span><strong class="ok">Ready to review</strong></div><div class="signal"><i style="width:82%"></i></div><div class="mini-row"><span>Identity match</span><strong>82%</strong></div></div></article>
+        </div>
       </div>
     </section>
 
-    <section id="faq" class="section faq-section">
-      <div class="section-title stacked">
-        <p class="eyebrow">FAQ</p>
-        <h2>Questions before adding verification to dispatch.</h2>
-      </div>
-      <div class="faq-list">
-        <details open>
-          <summary>What does DeepTruck Verify check?</summary>
-          <p>It verifies the carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</p>
-        </details>
-        <details>
-          <summary>How often are vehicles stolen in the U.S.?</summary>
-          <p>Vehicle theft is still a large market risk: NICB reported 1,020,729 stolen vehicles in 2023, 850,708 in 2024, and 659,880 in 2025. Even after the decline, that is hundreds of thousands of stolen vehicles per year, which is why pre-load identity checks matter before releasing inventory.</p>
-          <a class="source-link" target="_blank" rel="noreferrer" href="https://www.nicb.org/news/news-releases/vehicle-thefts-united-states-fell-17-2024">NICB 2024 theft report</a>
-        </details>
-        <details>
-          <summary>Why not trust Central Dispatch alone?</summary>
-          <p>Central Dispatch is the workflow shipper teams already use, but a marketplace profile does not prove the person replying today is the legitimate carrier or driver. Central Dispatch warns users about phishing and credential harvesting, and the FBI has investigated schemes involving fake or compromised Central Dispatch accounts. DeepTruck adds a separate verification layer before load details are released.</p>
-          <a class="source-link" target="_blank" rel="noreferrer" href="https://www.centraldispatch.com/resource-topic/security">Central Dispatch security guidance</a>
-        </details>
-        <details>
-          <summary>Does it replace FMCSA or Central Dispatch?</summary>
-          <p>No. It works on top of the existing carrier profile and creates a shipper-side verification record for the specific carrier request.</p>
-        </details>
-        <details>
-          <summary>Can my team see verification history?</summary>
-          <p>Yes. The shipper console keeps request history, status, timestamps, and uploaded documents for review.</p>
-        </details>
-        <details>
-          <summary>What happens after the monthly limit?</summary>
-          <p>Extra verification requests are billed at $0.50 per request after the included monthly volume.</p>
-        </details>
+    <section id="extension">
+      <div class="container extension">
+        <div class="reveal">
+          <div class="section-kicker">Chrome extension</div>
+          <h2 class="section-title">Verify where the dispatch decision already happens.</h2>
+          <p class="section-copy">No extra spreadsheet. No copying carrier data into another tool. Start the identity check directly from the carrier profile, then keep the verification record in DeepTruck.</p>
+          <div class="section-actions"><a class="btn btn-primary btn-lg" href="#pricing">Create account</a><a class="btn btn-ghost btn-lg" href="#product">See dashboard</a></div>
+        </div>
+        <div class="browser reveal delay-1">
+          <div class="browser-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="browser-url">centraldispatch.com / carrier / profile</div></div>
+          <div class="browser-body">
+            <div class="cd-page"><div class="cd-head"><b class="cd-title">Carrier Profile</b><span class="grey-btn"></span></div><div class="cd-company"><h4>OMAX LLC</h4><p>Active carrier profile</p><div class="cd-info"><div><span>USDOT</span><b>4345567</b></div><div><span>MC Number</span><b>MC1698436</b></div><div><span>Phone</span><b>(307) 441-5452</b></div><div><span>Email</span><b>info@omaxllc.net</b></div></div></div><div class="fake-lines"><i></i><i></i><i></i></div></div>
+            <aside class="ext-panel"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567</div><div class="found"><b>Listed contacts loaded</b>Email + phone ready for verification</div><button class="verify-btn" type="button">Start verification</button><p class="ext-note">DeepTruck adds an independent shipper-side identity checkpoint. It does not replace FMCSA or Central Dispatch.</p></aside>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section final-cta">
-      <div>
-        <p class="eyebrow">Start verifying before release</p>
-        <h2>Verify carriers before your team shares pickup information.</h2>
-      </div>
-      <div class="hero-actions">
-        <a class="primary-link" href="/admin/#signup">Create account</a>
-        <a class="secondary-link" href="#extension">Review extension workflow</a>
+    <section>
+      <div class="container">
+        <div class="reveal"><div class="section-kicker">Everything in one verification record</div><h2 class="section-title">A safety layer designed around the exact moment your team decides to trust a carrier.</h2></div>
+        <div class="bento">
+          <article class="bento-card large reveal"><h3>Documents, attached to the check</h3><p>Keep driver license, W-9 and certificate of insurance alongside the verification request.</p><div class="bento-visual"><div class="doc"><span class="doc-icon">ID</span><div><b>Driver license</b><br><small>Uploaded 2 min ago</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon">W9</span><div><b>W-9</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon">COI</span><div><b>Certificate of insurance</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div></div></article>
+          <article class="bento-card reveal delay-1"><h3>Clear status at a glance</h3><p>Use consistent states instead of searching through messages.</p><div class="status-cloud"><span class="good">Verified</span><span>Pending</span><span>Review</span><span>Documents</span></div></article>
+          <article class="bento-card reveal delay-2"><h3>Listed contacts</h3><p>Verification goes to the carrier contact used for the identity check.</p><div class="bento-visual compact"><div class="mini-row"><span>Email</span><strong>Confirmed</strong></div><div class="mini-row"><span>Phone</span><strong>SMS verified</strong></div></div></article>
+          <article class="bento-card wide reveal delay-1"><h3>Timestamped verification history</h3><p>Keep a simple trail of what happened and when.</p><div class="bento-visual"><div class="history-line"><div class="h-event"><span class="h-dot"></span><div><b>Verification request created</b>10:42 AM · Dispatcher</div></div><div class="h-event"><span class="h-dot"></span><div><b>SMS code completed</b>10:45 AM · Listed phone</div></div><div class="h-event"><span class="h-dot"></span><div><b>Driver documents received</b>10:47 AM · Verification link</div></div></div></div></article>
+        </div>
       </div>
     </section>
+
+    <section>
+      <div class="container">
+        <div class="center reveal"><div class="section-kicker">One extra checkpoint</div><h2 class="section-title">A profile tells you who the carrier is. Verification helps confirm who is replying today.</h2></div>
+        <div class="compare reveal delay-1">
+          <div class="compare-col"><span class="compare-label">Without verification</span><h3>Trust the conversation.</h3><div class="flow-list"><div class="flow-row"><span class="flow-ico">1</span><div><strong>Open carrier profile</strong><span>Review marketplace information</span></div></div><div class="flow-row"><span class="flow-ico">2</span><div><strong>Receive a call or email</strong><span>Assume the sender controls the carrier identity</span></div></div><div class="flow-row"><span class="flow-ico">3</span><div><strong>Share load details</strong><span>No separate identity checkpoint</span></div></div></div></div>
+          <div class="compare-col good-flow"><span class="compare-label">With DeepTruck</span><h3>Verify the identity trail.</h3><div class="flow-list"><div class="flow-row"><span class="flow-ico">1</span><div><strong>Read carrier profile</strong><span>USDOT and carrier details enter the verification flow</span></div></div><div class="flow-row"><span class="flow-ico">2</span><div><strong>Email + SMS challenge</strong><span>Check the listed contact path</span></div></div><div class="flow-row"><span class="flow-ico">3</span><div><strong>Collect driver documents</strong><span>Keep the request and uploads together</span></div></div><div class="flow-row"><span class="flow-ico">4</span><div><strong>Review before release</strong><span>Make the dispatch decision with a recorded checkpoint</span></div></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="container">
+        <div class="center reveal"><div class="section-kicker">Simple monthly plans</div><h2 class="section-title">Start small. Scale verification volume when your dispatch team adopts the workflow.</h2><p class="section-copy">Additional verification requests are billed at $0.50 per request after the included monthly volume. SMS and email verification included.</p></div>
+        <div class="pricing-grid">
+          <article class="price-card reveal"><div class="plan">Starter</div><div class="price">$19<small>/mo</small></div><p class="price-desc">For small shippers that want a simple safety layer.</p><div class="features"><div>5 requests included</div><div>Email + SMS verification</div><div>Verification history</div></div><a class="btn btn-ghost" href="/admin/#signup">Start</a></article>
+          <article class="price-card featured reveal delay-1"><span class="recommended">Best fit</span><div class="plan">Shipper</div><div class="price">$49<small>/mo</small></div><p class="price-desc">For active shippers sending regular loads.</p><div class="features"><div>50 requests included</div><div>Email + SMS verification</div><div>Driver document collection</div></div><a class="btn btn-primary" href="/admin/#signup">Create account</a></article>
+          <article class="price-card reveal delay-2"><div class="plan">Scale</div><div class="price">$79<small>/mo</small></div><p class="price-desc">For teams that need more checks across multiple dispatchers.</p><div class="features"><div>100 requests included</div><div>Email + SMS verification</div><div>Team verification history</div></div><a class="btn btn-ghost" href="/admin/#signup">Upgrade</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="reviews">
+      <div class="container">
+        <div class="reveal"><div class="section-kicker">Shipper feedback</div><h2 class="section-title">Built for the moment a dispatcher asks: "Can I trust this carrier?"</h2></div>
+        <div class="reviews">
+          <article class="quote-big reveal"><div class="quote-mark">"</div><blockquote>The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record.</blockquote><div class="quote-meta"><b>Independent shipper</b><span>Used before assigning a pickup</span></div></article>
+          <div class="quotes-small"><article class="quote-card reveal delay-1"><p>"We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is exactly the checkpoint we needed."</p><b>Auto transport desk</b><span>Multi-dispatcher workflow</span></article><article class="quote-card reveal delay-2"><p>"The extension fits where the decision already happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails."</p><b>Operations manager</b><span>Central Dispatch workflow</span></article></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container faq">
+        <div class="reveal"><div class="section-kicker">FAQ</div><h2 class="section-title">The common questions before adding verification to a load workflow.</h2><p class="section-copy">DeepTruck is an additional shipper-side identity layer, not a replacement for FMCSA or your marketplace workflow.</p></div>
+        <div class="faq-list reveal delay-1">
+          <div class="faq-item open"><button class="faq-q" type="button">What does DeepTruck Verify check?<span class="faq-plus">+</span></button><div class="faq-a">It verifies carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button">Why not trust Central Dispatch alone?<span class="faq-plus">+</span></button><div class="faq-a">A marketplace profile is useful carrier information, but it does not by itself prove the person replying today controls the legitimate carrier identity. DeepTruck adds a separate verification checkpoint before release.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button">Does it replace FMCSA or Central Dispatch?<span class="faq-plus">+</span></button><div class="faq-a">No. DeepTruck works on top of the existing carrier profile and creates a shipper-side verification record for the specific carrier request.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button">Can my team see verification history?<span class="faq-plus">+</span></button><div class="faq-a">Yes. The shipper console keeps request history, status, timestamps, and uploaded documents for review.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button">What happens after the monthly limit?<span class="faq-plus">+</span></button><div class="faq-a">Additional verification requests are billed at $0.50 per request after the included monthly volume.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="final-cta"><div class="container"><div class="cta-box reveal"><div class="cta-content"><div class="section-kicker">Before the load moves</div><h2>Stop sending loads to unverified carriers.</h2><p>Add a fast identity checkpoint before your team shares sensitive pickup and shipment information.</p><div class="cta-actions"><a class="btn btn-primary btn-lg" href="/admin/#signup">Create account</a><a class="btn btn-ghost btn-lg" href="#extension">Install extension</a></div></div></div></div></section>
   </main>
 
-  <footer class="site-footer premium-footer">
-    <div>
-      <a class="site-logo" href="/">DeepTruck Verify</a>
-      <p>Pre-load carrier identity checks for vehicle shipping teams.</p>
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-left"><a class="brand" href="#top"><span class="brand-mark"></span><span>DeepTruck <small>Verify</small></span></a><p>Pre-load carrier identity checks for auto shipper teams.</p></div>
+      <div class="footer-links">
+        <div class="footer-col"><b>Product</b><a href="#workflow">Workflow</a><a href="#extension">Extension</a><a href="#pricing">Pricing</a></div>
+        <div class="footer-col"><b>Account</b><a href="/admin/">Login</a><a href="/admin/#signup">Create account</a></div>
+        <div class="footer-col"><b>Legal</b><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms</a><a href="mailto:verify@deeptruck.io">verify@deeptruck.io</a></div>
+      </div>
     </div>
-    <nav aria-label="Product">
-      <b>Product</b>
-      <a href="#product">Console</a>
-      <a href="#workflow">Workflow</a>
-      <a href="#extension">Chrome extension</a>
-    </nav>
-    <nav aria-label="Account">
-      <b>Account</b>
-      <a href="/admin/">Login</a>
-      <a href="/admin/#signup">Create account</a>
-      <a href="#pricing">Pricing</a>
-    </nav>
-    <nav aria-label="Legal">
-      <b>Legal</b>
-      <a href="/privacy.html">Privacy policy</a>
-      <a href="/terms.html">Terms</a>
-      <a href="mailto:verify@deeptruck.io">Contact</a>
-    </nav>
   </footer>
+
+  <script>
+    const nav = document.getElementById("nav");
+    const hamburger = document.getElementById("hamburger");
+    hamburger?.addEventListener("click", () => nav.classList.toggle("open"));
+    document.querySelectorAll(".nav-links a").forEach((link) => link.addEventListener("click", () => nav.classList.remove("open")));
+    window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.scrollY > 20), { passive: true });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.13 });
+    document.querySelectorAll(".reveal:not(.visible)").forEach((element) => observer.observe(element));
+
+    document.querySelectorAll(".faq-q").forEach((button) => button.addEventListener("click", () => {
+      const item = button.parentElement;
+      document.querySelectorAll(".faq-item").forEach((entry) => {
+        if (entry !== item) entry.classList.remove("open");
+      });
+      item.classList.toggle("open");
+    }));
+
+    const checks = [...document.querySelectorAll("[data-check]")];
+    const events = [...document.querySelectorAll("[data-event]")];
+    const liveStatus = document.getElementById("liveStatus");
+    function runVerification() {
+      checks.forEach((check) => {
+        check.classList.remove("done");
+        check.querySelector("strong").textContent = "Waiting";
+      });
+      events.forEach((event) => event.classList.remove("on"));
+      liveStatus.textContent = "Pending";
+      liveStatus.removeAttribute("style");
+      checks.forEach((check, index) => setTimeout(() => {
+        check.classList.add("done");
+        check.querySelector("strong").textContent = "Verified";
+        if (events[index]) events[index].classList.add("on");
+        if (index === checks.length - 1) {
+          setTimeout(() => {
+            events.forEach((event) => event.classList.add("on"));
+            liveStatus.textContent = "Ready to review";
+            liveStatus.style.color = "#92e9b1";
+            liveStatus.style.borderColor = "rgba(111,234,159,.25)";
+            liveStatus.style.background = "rgba(111,234,159,.08)";
+          }, 500);
+        }
+      }, 900 + index * 900));
+    }
+    setTimeout(runVerification, 650);
+    setInterval(runVerification, 8500);
+
+    const stage = document.getElementById("productStage");
+    const appWindow = document.getElementById("appWindow");
+    if (stage && appWindow && matchMedia("(pointer:fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      stage.addEventListener("mousemove", (event) => {
+        const rect = stage.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width - 0.5;
+        const y = (event.clientY - rect.top) / rect.height - 0.5;
+        appWindow.style.transform = `rotateY(${x * 5 - 2}deg) rotateX(${-y * 4 + 1}deg) translateY(-2px)`;
+      });
+      stage.addEventListener("mouseleave", () => {
+        appWindow.style.transform = "rotateY(-2deg) rotateX(1deg)";
+      });
+      const glow = document.getElementById("cursorGlow");
+      document.addEventListener("mousemove", (event) => {
+        glow.style.left = `${event.clientX}px`;
+        glow.style.top = `${event.clientY}px`;
+        glow.style.opacity = "1";
+      });
+    }
+  </script>
 </body>
 </html>
