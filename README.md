@@ -107,6 +107,7 @@ Vercel should host only the public web UI:
 - `/` public landing page
 - `/login` sign-in page
 - `/signup` registration page
+- `/extension` Chrome extension download and installation guide
 - `/admin` authenticated shipper workspace
 - `/verify.html?id=...` carrier verification page
 - `/verify?id=...` same verification page through a clean URL rewrite
@@ -120,7 +121,7 @@ Output directory: public
 Install command: npm install
 ```
 
-The build copies `verify-site/` into `public/` and `admin-site/` into `public/admin/`. The Chrome extension is not deployed to Vercel; it stays as the unpacked extension package using `manifest.json` and `src/`.
+The build copies `verify-site/` into `public/` and `admin-site/` into `public/admin/`. It packages only `manifest.json` and `src/` into `public/downloads/deeptruck-verify.zip` for the installation page. Until a Chrome Web Store listing is available, visitors install the downloaded package through Chrome's Load unpacked option.
 
 After the Vercel domain is live, update the Supabase function secret so verification links in emails/SMS open the Vercel page instead of localhost:
 

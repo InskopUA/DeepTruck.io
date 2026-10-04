@@ -3483,3 +3483,23 @@ body.premium-landing {
   .hero-emblem { --shield-look: 0; }
   .hero-visual .hero-product { transition: none; }
 }
+
+/* Install the extension from the same workflow the feature previews describe. */
+.premium-landing .extension-section { background: transparent; border: 0; padding: 100px 0; }
+.extension-card { align-items: center; background: radial-gradient(ellipse at 85% 65%, rgba(90, 140, 195, .065), transparent 50%), #0b0e12; border: 1px solid rgba(255, 255, 255, .09); border-radius: 30px; display: flex; min-height: 450px; overflow: hidden; padding: 68px 64px; position: relative; }
+.extension-copy { max-width: 66%; position: relative; z-index: 2; }
+.extension-copy h2 { font-size: clamp(30px, 2.65vw, 47px); font-weight: 600; letter-spacing: -.045em; line-height: 1.28; margin: 0; max-width: 790px; }
+.extension-copy p { color: #919ba9; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.7; margin: 24px 0 30px; max-width: 650px; }
+.extension-install.btn-primary { background: rgba(134, 181, 237, .065); border: 1px solid rgba(152, 190, 234, .45); border-radius: 8px; box-shadow: none; color: #c2d9f3; font-size: 15px; gap: 10px; padding: 13px 20px; }
+.extension-install.btn-primary:hover { background: rgba(134, 181, 237, .13); }
+.extension-install:focus-visible { outline: 2px solid #9ac7fc; outline-offset: 5px; }
+.extension-mascot { --shield-look: -10; animation: extensionShieldLook 15s ease-in-out infinite; bottom: -92px; height: 535px; position: absolute; right: -36px; width: 514px; z-index: 1; }
+.extension-mascot .shield-artwork { display: block; height: 100%; overflow: visible; stroke: none; stroke-width: 1; width: 100%; }
+.extension-mascot .shield-eyes { animation-delay: -3s; }
+@keyframes extensionShieldLook { 0%, 15%, 100% { --shield-look: -12; } 40%, 55% { --shield-look: 9; } 80% { --shield-look: -4; } }
+.extension-motion-paused, .extension-motion-paused .shield-eyes { animation-play-state: paused; }
+@media (min-width: 1600px) { .extension-card { min-height: 500px; padding: 80px; } .extension-mascot { bottom: -108px; height: 610px; width: 585px; right: -30px; } }
+@media (max-width: 1100px) and (min-width: 761px) { .extension-card { padding: 48px 40px; min-height: 410px; } .extension-copy { max-width: 65%; } .extension-copy h2 { font-size: 32px; } .extension-mascot { height: 470px; width: 451px; bottom: -86px; right: -85px; } }
+@media (max-width: 760px) { .premium-landing .extension-section { padding: 54px 0; } .extension-card { border-radius: 22px; display: block; min-height: 0; padding: 34px 28px 0; } .extension-copy { max-width: 100%; } .extension-copy h2 { font-size: clamp(27px, 5.6vw, 36px); max-width: 520px; } .extension-copy p { font-size: 14px; margin: 18px 0 24px; max-width: 430px; } .extension-install.btn-primary { font-size: 13px; padding: 12px 16px; } .extension-mascot { bottom: auto; height: 390px; margin: 14px -52px -30px auto; position: relative; right: auto; width: 374px; } }
+@media (max-width: 390px) { .extension-card { padding: 30px 24px 0; } .extension-mascot { height: 360px; margin: 12px -46px -26px auto; width: 346px; } }
+@media (prefers-reduced-motion: reduce) { .extension-mascot, .extension-mascot .shield-eyes { animation: none; } .extension-mascot { --shield-look: -10; } }

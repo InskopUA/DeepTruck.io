@@ -220,12 +220,78 @@
       </div>
     </section>
 
-    <section class="signup-cta">
-      <div class="container signup-cta-inner reveal">
-        <h2>Add verification to every load.</h2>
-        <p>Start checking carrier identity before your dispatch team shares pickup and vehicle information.</p>
-        <div class="verification-badge"><div class="badge-head"><span class="brand-mark mini"></span><div><b>OMAX LLC</b><small>Carrier verification</small></div></div><div class="badge-checks"><span>Email <b>Done</b></span><span>SMS <b>Done</b></span><span>Driver <b>Done</b></span></div><strong>READY TO REVIEW</strong></div>
-        <div class="cta-actions"><a class="btn btn-primary btn-lg" href="/signup">Sign Up</a><a class="btn btn-ghost btn-lg" href="/login">Sign In</a></div>
+    <section class="extension-section" id="extension" aria-labelledby="extension-title">
+      <div class="container extension-card reveal">
+        <div class="extension-copy">
+          <h2 id="extension-title">Chrome extension.<br>Verify carriers right on Central Dispatch.</h2>
+          <p>We built it to let you start a verification directly from any carrier profile.</p>
+          <a class="btn btn-primary btn-lg extension-install" href="/extension.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 8.5h8M9 13.8l-4-7M13.7 15l-4 7"/></svg>Install Extension</a>
+        </div>
+        <div class="extension-mascot" role="img" aria-label="DeepTruck shield character">
+            <svg class="shield-artwork" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 500" fill="none" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="extension-mascot-glass" x1="100" y1="40" x2="370" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#92c6ff" stop-opacity=".10"/><stop offset=".45" stop-color="#080c12" stop-opacity=".95"/><stop offset="1" stop-color="#79b9ff" stop-opacity=".04"/></linearGradient>
+                <linearGradient id="extension-mascot-rim" x1="104" y1="66" x2="348" y2="402" gradientUnits="userSpaceOnUse"><stop stop-color="#eef6ff"/><stop offset=".25" stop-color="#87bcf5"/><stop offset=".48" stop-color="#d6ebff"/><stop offset=".73" stop-color="#578aca"/><stop offset="1" stop-color="#a2d3fb"/></linearGradient>
+                <linearGradient id="extension-mascot-mesh" x1="90" y1="80" x2="355" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#b9dbff" stop-opacity=".45"/><stop offset=".5" stop-color="#76b0ee" stop-opacity=".15"/><stop offset="1" stop-color="#b6d4f7" stop-opacity=".34"/></linearGradient>
+                <radialGradient id="extension-mascot-halo"><stop stop-color="#609be0" stop-opacity=".17"/><stop offset="1" stop-color="#609be0" stop-opacity="0"/></radialGradient>
+                <filter id="extension-mascot-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
+                <filter id="extension-mascot-soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="17"/></filter>
+                <path id="extension-mascot-shield" d="M240 58C198 88 157 105 112 111V231C112 318 171 376 240 410C309 376 368 318 368 231V111C323 105 282 88 240 58Z"/>
+                <clipPath id="extension-mascot-clip"><use href="#extension-mascot-shield"/></clipPath>
+                <path id="extension-mascot-torso" d="M198 332C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508H442C437 480 425 450 395 429C359 404 308 399 294 386C282 372 282 351 282 332Z"/>
+                <clipPath id="extension-mascot-torso-clip"><use href="#extension-mascot-torso"/></clipPath>
+                <linearGradient id="extension-mascot-body-glass" x1="110" y1="369" x2="342" y2="505" gradientUnits="userSpaceOnUse"><stop stop-color="#426c98" stop-opacity=".23"/><stop offset=".44" stop-color="#0c1520" stop-opacity=".95"/><stop offset="1" stop-color="#203d60" stop-opacity=".18"/></linearGradient>
+                <radialGradient id="extension-mascot-body-light" cx=".5" cy=".1" r=".85"><stop stop-color="#9bccff" stop-opacity=".14"/><stop offset="1" stop-color="#6faeff" stop-opacity="0"/></radialGradient>
+                <linearGradient id="extension-mascot-body-fade" x1="0" y1="410" x2="0" y2="478" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient>
+                <mask id="extension-mascot-bodyFade"><rect width="480" height="500" fill="white"/><rect y="410" width="480" height="98" fill="url(#extension-mascot-body-fade)"/></mask>
+              </defs>
+              <ellipse cx="240" cy="252" rx="216" ry="235" fill="url(#extension-mascot-halo)"/>
+              <g class="shield-body">
+                <use href="#extension-mascot-torso" transform="translate(3 -3)" fill="#0b111b" stroke="#5684b5" stroke-opacity=".35"/>
+                <use href="#extension-mascot-torso" fill="url(#extension-mascot-body-glass)"/>
+                <use href="#extension-mascot-torso" fill="url(#extension-mascot-body-light)"/>
+                <g clip-path="url(#extension-mascot-torso-clip)" stroke="url(#extension-mascot-mesh)" stroke-width=".9">
+                  <path d="M193 340Q240 359 287 340M192 355Q240 376 288 355M188 372Q240 396 292 372M176 390Q240 423 304 390M151 405Q240 438 329 405M104 424Q240 461 376 424M65 450Q240 489 415 450M45 478Q240 518 435 478"/>
+                  <path d="M240 328V515M221 332Q213 390 209 420Q202 466 201 515M204 336Q203 383 180 411Q154 453 150 515M191 353Q187 389 146 416Q103 454 91 515M185 384Q133 399 104 434Q67 473 59 515M259 332Q267 390 271 420Q278 466 279 515M276 336Q277 383 300 411Q326 453 330 515M289 353Q293 389 334 416Q377 454 389 515M295 384Q347 399 376 434Q413 473 421 515"/>
+                  <path d="M91 428L150 506M131 412L203 510M174 394L259 510M389 428L330 506M349 412L277 510M306 394L221 510" opacity=".25"/>
+                </g>
+                <path class="shield-neck" d="M198 340C198 359 197 374 186 386M282 340C282 359 283 374 294 386M186 386Q240 414 294 386M181 392Q240 422 299 392" stroke="url(#extension-mascot-rim)" stroke-width="1.2" opacity=".65"/>
+                <path class="shield-shoulders" d="M198 340C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508M282 340C282 351 282 372 294 386C308 399 359 404 395 429C425 450 437 480 442 508" stroke="#8ec2ff" stroke-width="6" filter="url(#extension-mascot-glow)" opacity=".55"/>
+                <path d="M198 340C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508M282 340C282 351 282 372 294 386C308 399 359 404 395 429C425 450 437 480 442 508" stroke="url(#extension-mascot-rim)" stroke-width="1.6"/>
+                <path d="M187 398C165 411 124 416 96 438C73 457 61 481 57 507M293 398C315 411 356 416 384 438C407 457 419 481 423 507" stroke="#92c6ff" stroke-opacity=".25"/>
+              </g>
+              <g class="shield-head">
+                <g transform="translate(0 5) scale(1 .91)">
+                  <use class="shield-head-back" href="#extension-mascot-shield" fill="#0c111a" stroke="#5989bf" stroke-opacity=".35" stroke-width="1.5"/>
+                  <use href="#extension-mascot-shield" stroke="#91c4ff" stroke-width="10" opacity=".48" filter="url(#extension-mascot-soft)"/>
+                  <use href="#extension-mascot-shield" fill="url(#extension-mascot-glass)"/>
+                  <g class="shield-mesh" clip-path="url(#extension-mascot-clip)" stroke="url(#extension-mascot-mesh)" stroke-width=".9">
+                    <path d="M96 112Q240 140 384 112M96 137Q240 169 384 137M96 163Q240 198 384 163M96 191Q240 228 384 191M96 220Q240 258 384 220M96 250Q240 288 384 250M96 280Q240 318 384 280M96 310Q240 347 384 310M96 340Q240 375 384 340M96 370Q240 402 384 370"/>
+                    <path d="M240 46V424M213 58Q195 242 220 413M186 72Q153 242 198 402M159 84Q119 245 176 389M132 97Q91 252 154 367M267 58Q285 242 260 413M294 72Q327 242 282 402M321 84Q361 245 304 389M348 97Q389 252 326 367"/>
+                    <path d="M104 125L335 361M104 158L313 389M104 192L284 416M135 96L368 330M166 80L368 294M197 64L368 258M376 125L145 361M376 158L167 389M376 192L196 416M345 96L112 330M314 80L112 294M283 64L112 258" opacity=".22"/>
+                  </g>
+                  <use href="#extension-mascot-shield" stroke="url(#extension-mascot-rim)" stroke-width="3" filter="url(#extension-mascot-glow)"/>
+                  <use href="#extension-mascot-shield" stroke="url(#extension-mascot-rim)" stroke-width="1.5"/>
+                  <path d="M240 73C201 99 166 113 126 123V231C126 308 178 363 240 395C302 363 354 308 354 231V123C314 113 279 99 240 73Z" stroke="#9bc9fb" stroke-opacity=".25"/>
+                  <g class="shield-face">
+                    <g class="shield-eyes">
+                      <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" fill="#090e16" fill-opacity=".94" stroke="url(#extension-mascot-rim)" stroke-width="2.5"/>
+                      <path d="M158 183Q185 184 217 198M322 183Q295 184 263 198" stroke="#c8e3ff" stroke-width="4" stroke-linecap="round"/>
+                      <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" stroke="#8bbfff" stroke-width="5" opacity=".5" filter="url(#extension-mascot-glow)"/>
+                      <path d="M167 199Q188 201 208 211M166 216Q187 227 209 219M172 233Q188 243 203 232M313 199Q292 201 272 211M314 216Q293 227 271 219M308 233Q292 243 277 232" stroke="url(#extension-mascot-mesh)" stroke-width=".8"/>
+                      <g class="shield-pupils">
+                        <ellipse cx="190" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                        <ellipse cx="290" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                        <path d="M190 211V224M290 211V224" stroke="#e4f2ff" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M190 211V224M290 211V224" stroke="#8bbfff" stroke-width="7" opacity=".6" filter="url(#extension-mascot-glow)"/>
+                      </g>
+                    </g>
+                  </g>
+                  <circle cx="112" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="368" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="240" cy="58" r="2" fill="#f0f7ff"/>
+                </g>
+              </g>
+            </svg>
+        </div>
       </div>
     </section>
 
@@ -427,6 +493,12 @@
     }));
     setFeature(0);
     updateFeatureFromScroll();
+
+    const extensionMascot = document.querySelector(".extension-mascot");
+    const extensionMotionObserver = new IntersectionObserver(([entry]) => {
+      extensionMascot.classList.toggle("extension-motion-paused", !entry.isIntersecting);
+    });
+    if (extensionMascot) extensionMotionObserver.observe(extensionMascot);
 
     const stage = document.getElementById("productStage");
     const appWindow = document.getElementById("appWindow");
