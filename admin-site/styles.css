@@ -1639,3 +1639,142 @@ tbody tr {
     grid-column: 2;
   }
 }
+
+/* Auth polish pass */
+.auth-screen {
+  background:
+    radial-gradient(760px 420px at 18% 0%, rgba(52, 120, 246, 0.13), transparent 68%),
+    linear-gradient(180deg, #08101a, #070b12);
+}
+
+.auth-shell {
+  background: rgba(13, 21, 32, 0.94);
+  border-color: rgba(255, 255, 255, 0.09);
+  border-radius: 18px;
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.3);
+  grid-template-columns: minmax(380px, 0.9fr) minmax(390px, 0.78fr);
+  max-width: 1040px;
+  min-height: 640px;
+}
+
+.auth-brand {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.008));
+  gap: 24px;
+  padding: 34px;
+}
+
+.auth-brand::after {
+  background: linear-gradient(180deg, transparent, rgba(50, 120, 246, 0.08));
+  height: 44%;
+}
+
+.auth-logo-row span {
+  border-radius: 10px;
+  height: 36px;
+  width: 36px;
+}
+
+.auth-hero-copy h1 {
+  font-size: clamp(38px, 4vw, 52px);
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  max-width: 460px;
+}
+
+.auth-hero-copy p:last-child {
+  color: #9caabc;
+  max-width: 430px;
+}
+
+.auth-product-card {
+  background: rgba(7, 12, 20, 0.58);
+  border-color: rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  box-shadow: none;
+  gap: 8px;
+  padding: 16px;
+}
+
+.auth-product-head {
+  padding-bottom: 10px;
+}
+
+.auth-product-head b {
+  font-size: 16px;
+}
+
+.auth-product-head span {
+  border-radius: 10px;
+  font-size: 10px;
+  padding: 6px 8px;
+}
+
+.auth-product-row {
+  background: rgba(255, 255, 255, 0.018);
+  border-radius: 10px;
+  font-size: 12px;
+  padding: 10px 12px;
+}
+
+.auth-workflow {
+  gap: 8px;
+}
+
+.auth-workflow div {
+  color: #b9c3d0;
+  font-size: 11px;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.018);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 44px 42px;
+}
+
+.auth-tabs {
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+
+.auth-tabs button {
+  min-height: 38px;
+}
+
+.auth-card h1 {
+  font-size: 30px;
+  letter-spacing: -0.035em;
+  max-width: 360px;
+}
+
+.auth-copy {
+  font-size: 12px;
+  max-width: 360px;
+}
+
+.auth-card label {
+  color: #b7c2d0;
+  font-size: 11px;
+  margin-top: 13px;
+}
+
+.auth-card input {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.12);
+  border-radius: 9px;
+  min-height: 46px;
+}
+
+.auth-submit {
+  min-height: 44px;
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-card {
+    border-left: 0;
+  }
+}

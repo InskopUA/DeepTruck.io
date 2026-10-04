@@ -76,23 +76,23 @@
               <div class="main-ui">
                 <div class="ui-heading">
                   <div><div class="tiny">Verification record</div><div class="ui-title">OMAX LLC</div><div class="ui-sub">USDOT 4345567 · MC1698436</div></div>
-                  <span class="status-pill ready">Ready to review</span>
+                  <span class="status-pill" id="liveStatus">Pending</span>
                 </div>
                 <div class="identity-card compact-record">
-                  <div class="completion-mark"><b>3/3</b><small>checks completed</small></div>
+                  <div class="completion-mark" id="completionMark"><b>0/3</b><small>checks pending</small></div>
                   <div class="carrier-grid">
-                    <div class="kv"><span>Email</span><b>Verified</b></div>
-                    <div class="kv"><span>Phone</span><b>Verified by SMS</b></div>
-                    <div class="kv"><span>Driver documents</span><b>Received</b></div>
-                    <div class="kv"><span>Review status</span><b>Ready</b></div>
+                    <div class="kv"><span>Email</span><b id="emailState">Waiting</b></div>
+                    <div class="kv"><span>Phone</span><b id="phoneState">Waiting</b></div>
+                    <div class="kv"><span>Driver documents</span><b id="driverState">Waiting</b></div>
+                    <div class="kv"><span>Review status</span><b id="reviewState">Pending</b></div>
                   </div>
                 </div>
                 <div class="checks">
-                  <div class="check done"><span class="check-ico"><svg><use href="#icon-mail"></use></svg></span>Email verified<strong>Verified</strong><span class="progress"></span></div>
-                  <div class="check done"><span class="check-ico"><svg><use href="#icon-phone"></use></svg></span>Phone verified by SMS<strong>Verified</strong><span class="progress"></span></div>
-                  <div class="check done"><span class="check-ico"><svg><use href="#icon-doc"></use></svg></span>Driver documents received<strong>Received</strong><span class="progress"></span></div>
+                  <div class="check" data-check data-state-target="emailState" data-done-text="Verified"><span class="check-ico"><svg><use href="#icon-mail"></use></svg></span>Email verified<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check data-state-target="phoneState" data-done-text="Verified by SMS"><span class="check-ico"><svg><use href="#icon-phone"></use></svg></span>Phone verified by SMS<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check data-state-target="driverState" data-done-text="Received"><span class="check-ico"><svg><use href="#icon-doc"></use></svg></span>Driver documents received<strong>Waiting</strong><span class="progress"></span></div>
                 </div>
-                <div class="timeline"><div class="tl-title">Verification timeline</div><div class="events"><div class="event on">Request sent</div><div class="event on">Email confirmed</div><div class="event on">SMS completed</div><div class="event on">Ready to review</div></div></div>
+                <div class="timeline"><div class="tl-title">Verification timeline</div><div class="events"><div class="event on">Request sent</div><div class="event" data-event>Email confirmed</div><div class="event" data-event>SMS completed</div><div class="event" data-event>Ready to review</div></div></div>
               </div>
             </div>
           </div>
@@ -219,6 +219,65 @@
       button.setAttribute("aria-expanded", String(isOpening));
     }));
 
+    const checks = [...document.querySelectorAll("[data-check]")];
+    const events = [...document.querySelectorAll("[data-event]")];
+    const liveStatus = document.getElementById("liveStatus");
+    const completionMark = document.getElementById("completionMark");
+    const reviewState = document.getElementById("reviewState");
+    const heroWindow = document.getElementById("appWindow");
+    let verificationTimers = [];
+    function resetVerification() {
+      verificationTimers.forEach(clearTimeout);
+      verificationTimers = [];
+      liveStatus?.classList.remove("ready");
+      if (liveStatus) liveStatus.textContent = "Pending";
+      if (completionMark) {
+        completionMark.classList.remove("complete");
+        completionMark.querySelector("b").textContent = "0/3";
+        completionMark.querySelector("small").textContent = "checks pending";
+      }
+      checks.forEach((check) => {
+        check.classList.remove("done", "running");
+        check.querySelector("strong").textContent = "Waiting";
+        const target = document.getElementById(check.dataset.stateTarget);
+        if (target) target.textContent = "Waiting";
+      });
+      events.forEach((event) => event.classList.remove("on"));
+      if (reviewState) reviewState.textContent = "Pending";
+    }
+    function runVerification() {
+      if (!checks.length) return;
+      resetVerification();
+      checks.forEach((check, index) => {
+        verificationTimers.push(setTimeout(() => {
+          check.classList.add("running");
+        }, 450 + index * 950));
+        verificationTimers.push(setTimeout(() => {
+          check.classList.remove("running");
+          check.classList.add("done");
+          check.querySelector("strong").textContent = index === 2 ? "Received" : "Verified";
+          const target = document.getElementById(check.dataset.stateTarget);
+          if (target) target.textContent = check.dataset.doneText;
+          if (events[index]) events[index].classList.add("on");
+          if (completionMark) {
+            completionMark.querySelector("b").textContent = `${index + 1}/3`;
+            completionMark.querySelector("small").textContent = index === 2 ? "checks completed" : "checks running";
+          }
+          if (index === checks.length - 1) {
+            verificationTimers.push(setTimeout(() => {
+              events.forEach((event) => event.classList.add("on"));
+              liveStatus?.classList.add("ready");
+              if (liveStatus) liveStatus.textContent = "Ready to review";
+              completionMark?.classList.add("complete");
+              if (reviewState) reviewState.textContent = "Ready";
+            }, 350));
+          }
+        }, 980 + index * 950));
+      });
+    }
+    setTimeout(runVerification, 650);
+    heroWindow?.addEventListener("click", runVerification);
+
     const featureSection = document.querySelector("[data-feature-scroll]");
     const featureItems = [...document.querySelectorAll("[data-feature-index]")];
     const featurePanels = [...document.querySelectorAll("[data-feature-panel]")];
@@ -234,7 +293,7 @@
     function updateFeatureFromScroll() {
       if (!featureSection || matchMedia("(max-width: 899px)").matches) return;
       const rect = featureSection.getBoundingClientRect();
-      const distance = featureSection.offsetHeight - innerHeight;
+      const distance = Math.max(1, featureSection.offsetHeight - innerHeight);
       const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, distance)));
       setFeature(Math.min(featureItems.length - 1, Math.floor(progress * featureItems.length)));
       if (progressBar) progressBar.style.height = `${Math.max(8, progress * 100)}%`;
@@ -244,7 +303,7 @@
     featureItems.forEach((item) => item.addEventListener("click", () => {
       if (matchMedia("(max-width: 899px)").matches) return;
       const index = Number(item.dataset.featureIndex);
-      const distance = featureSection.offsetHeight - innerHeight;
+      const distance = Math.max(1, featureSection.offsetHeight - innerHeight);
       scrollTo({ top: featureSection.offsetTop + (distance * (index / featureItems.length)) + 2, behavior: "smooth" });
     }));
     updateFeatureFromScroll();

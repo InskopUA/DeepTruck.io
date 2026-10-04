@@ -3154,3 +3154,153 @@ body.premium-landing {
     grid-template-columns: 1fr;
   }
 }
+
+/* Repair pass: animated hero, feature scroll, and CTA spacing */
+.completion-mark {
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.completion-mark.complete {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(111, 234, 159, 0.25), transparent 48%),
+    rgba(111, 234, 159, 0.08);
+  border-color: rgba(111, 234, 159, 0.28);
+  box-shadow: 0 0 34px rgba(111, 234, 159, 0.12);
+}
+
+.hero-product .check.running {
+  border-color: rgba(99, 168, 255, 0.32);
+}
+
+.hero-product .check.running .progress {
+  animation: verifyProgress 0.85s ease both;
+  opacity: 1;
+  transform-origin: left center;
+  width: 100%;
+}
+
+@keyframes verifyProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.feature-scroll {
+  height: 560vh;
+}
+
+.feature-intro {
+  padding: 86px 0 0;
+}
+
+.feature-stage {
+  align-items: start;
+}
+
+.feature-stage-inner {
+  gap: 56px;
+  grid-template-columns: minmax(330px, 0.42fr) minmax(0, 0.58fr);
+  min-height: 100svh;
+  padding: clamp(104px, 12svh, 132px) 0 42px;
+}
+
+.feature-left {
+  max-height: calc(100svh - 178px);
+  overflow: hidden;
+}
+
+.feature-item {
+  gap: 5px;
+  padding: 10px 0 10px 18px;
+}
+
+.feature-item span {
+  font-size: 10px;
+}
+
+.feature-item strong {
+  font-size: clamp(14px, 1.15vw, 17px);
+}
+
+.feature-item em {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.feature-item.active {
+  padding-left: 22px;
+}
+
+.feature-item.active em {
+  max-height: 78px;
+}
+
+.feature-right,
+.demo-surface {
+  min-height: min(560px, calc(100svh - 178px));
+}
+
+.feature-browser {
+  height: min(560px, calc(100svh - 178px));
+}
+
+.feature-browser .browser-body {
+  min-height: min(520px, calc(100svh - 218px));
+}
+
+.path-grid {
+  padding-top: 18px;
+}
+
+.path-card {
+  min-height: 138px;
+  padding: 18px;
+}
+
+.signup-cta {
+  background:
+    radial-gradient(720px 360px at 50% 28%, rgba(52, 120, 246, 0.14), transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.006));
+  border-bottom: 1px solid var(--premium-line);
+  border-top: 1px solid var(--premium-line);
+  padding: 112px 0 !important;
+}
+
+.signup-cta-inner {
+  background: transparent;
+  border: 0;
+  min-height: 0;
+  padding: 0;
+}
+
+.signup-cta h2 {
+  font-size: clamp(44px, 6vw, 88px);
+  letter-spacing: -0.05em;
+  line-height: 0.98;
+  max-width: 980px;
+}
+
+.verification-badge {
+  margin: 42px 0 30px;
+  max-width: 760px;
+  min-width: 0;
+  padding: 26px;
+  width: min(760px, 100%);
+}
+
+@media (max-width: 1100px) {
+  .feature-stage-inner {
+    gap: 30px;
+    grid-template-columns: 0.46fr 0.54fr;
+  }
+
+  .feature-item strong {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 899px) {
+  .feature-left {
+    max-height: none;
+    overflow: visible;
+  }
+}
