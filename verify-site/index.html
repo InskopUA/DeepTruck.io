@@ -197,7 +197,6 @@
             <button class="feature-item" type="button" data-feature-index="5" aria-expanded="false" aria-controls="feature-description-5" style="order: 10"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-team"></use></svg></span><strong>Team workspace</strong><em id="feature-description-5">Verification status and history stay available in the DeepTruck workspace so your team can review the same record.</em></button>
           </div>
           <div class="feature-right">
-            <div class="feature-shade" aria-hidden="true"></div>
             <article class="feature-visual active" data-feature-panel="0" style="order: 1">
               <div class="browser feature-browser"><div class="browser-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="browser-url">centraldispatch.com / carrier / profile</div></div><div class="browser-body"><div class="cd-page"><div class="cd-head"><b class="cd-title">Carrier Profile</b><span class="grey-btn"></span></div><div class="cd-company"><h4>OMAX LLC</h4><p>Active carrier profile</p><div class="cd-info"><div><span>USDOT</span><b>4345567</b></div><div><span>MC Number</span><b>MC1698436</b></div><div><span>Phone</span><b>(307) 441-5452</b></div><div><span>Email</span><b>info@omaxllc.net</b></div></div></div><div class="fake-lines"><i></i><i></i><i></i></div></div><aside class="ext-panel feature-panel-slide"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567<br>MC1698436</div><span class="verify-btn">Start verification</span></aside></div></div>
             </article>
@@ -363,7 +362,6 @@
     const featureItems = [...document.querySelectorAll("[data-feature-index]")];
     const featurePanels = [...document.querySelectorAll("[data-feature-panel]")];
     const featureList = document.querySelector(".feature-left");
-    const featureShade = document.querySelector(".feature-shade");
     const featurePreviews = document.querySelector(".feature-right");
     const featureDesktop = matchMedia("(min-width: 900px)");
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -383,20 +381,21 @@
       const cutoff = nav.getBoundingClientRect().bottom + 14;
       if (!featureDesktop.matches) {
         featurePreviews.style.removeProperty("--feature-clip-top");
+        featurePreviews.style.removeProperty("--feature-viewport-bottom");
         featurePanels.forEach((panel) => {
-          panel.style.setProperty("--feature-clip-top", `${Math.max(0, cutoff - panel.getBoundingClientRect().top)}px`);
+          const clipTop = Math.max(0, cutoff - panel.getBoundingClientRect().top);
+          panel.style.setProperty("--feature-clip-top", `${clipTop}px`);
+          panel.style.setProperty("--feature-top-fade", `${clipTop > 0 ? Math.min(104, innerHeight * .16) : 0}px`);
         });
         return;
       }
-      featurePanels.forEach((panel) => panel.style.removeProperty("--feature-clip-top"));
+      featurePanels.forEach((panel) => {
+        panel.style.removeProperty("--feature-clip-top");
+        panel.style.removeProperty("--feature-top-fade");
+      });
       const previewRect = featurePreviews.getBoundingClientRect();
       featurePreviews.style.setProperty("--feature-clip-top", `${Math.max(0, cutoff - previewRect.top)}px`);
-      const shadeTop = Math.max(cutoff, previewRect.top);
-      const shadeBottom = Math.min(innerHeight, previewRect.bottom);
-      featureShade.style.left = `${previewRect.left}px`;
-      featureShade.style.width = `${previewRect.width}px`;
-      featureShade.style.top = `${shadeTop}px`;
-      featureShade.style.height = `${Math.max(0, shadeBottom - shadeTop)}px`;
+      featurePreviews.style.setProperty("--feature-viewport-bottom", `${Math.min(previewRect.height, Math.max(0, innerHeight - previewRect.top))}px`);
       // Use the actual preview positions: no artificial scroll runway or wheel capture.
       const line = parseFloat(getComputedStyle(featureList).top) + Math.min(180, innerHeight * 0.25);
       let index = 0;

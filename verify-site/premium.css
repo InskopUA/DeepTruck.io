@@ -3090,9 +3090,22 @@ body.premium-landing {
 }
 
 .feature-right {
+  --feature-top-fade: min(144px, 16vh);
+  --feature-bottom-fade: min(180px, 26vh);
+  --feature-fade-mask:
+    linear-gradient(180deg,
+      transparent var(--feature-clip-top, 0px),
+      #000 calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)),
+      #000 max(calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)), calc(var(--feature-viewport-bottom, 100%) - var(--feature-bottom-fade))),
+      transparent var(--feature-viewport-bottom, 100%)),
+    linear-gradient(90deg, #000 65%, rgba(0, 0, 0, .35));
   clip-path: inset(var(--feature-clip-top, 0px) 0 0);
   display: grid;
   gap: 72px;
+  -webkit-mask-image: var(--feature-fade-mask);
+  mask-image: var(--feature-fade-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   min-width: 0;
   width: calc(100% + max(var(--page-gutter), (100vw - var(--premium-max)) / 2));
 }
@@ -3144,15 +3157,6 @@ body.premium-landing {
   opacity: 0.68;
 }
 
-.feature-shade {
-  background:
-    linear-gradient(180deg, var(--premium-bg), transparent 20%, transparent 70%, var(--premium-bg)),
-    linear-gradient(90deg, transparent 65%, rgba(9, 11, 14, 0.65));
-  pointer-events: none;
-  position: fixed;
-  z-index: 4;
-}
-
 .feature-browser .cd-page {
   min-width: 0;
   padding: 24px 18px;
@@ -3189,16 +3193,20 @@ body.premium-landing {
   .feature-stage-inner { gap: 0; grid-template-columns: 1fr; }
   .feature-left,
   .feature-right { display: contents; }
-  .feature-right { clip-path: none; }
+  .feature-right { clip-path: none; -webkit-mask-image: none; mask-image: none; }
   .premium-landing .feature-item { color: var(--premium-text); padding: 20px 0; }
   .feature-item em { display: block; }
-  .feature-visual { clip-path: inset(var(--feature-clip-top, 0px) 0 0); margin: 20px 0 56px; }
+  .feature-visual {
+    clip-path: inset(var(--feature-clip-top, 0px) 0 0);
+    -webkit-mask-image: linear-gradient(180deg, transparent var(--feature-clip-top, 0px), #000 calc(var(--feature-clip-top, 0px) + var(--feature-top-fade, 0px)));
+    mask-image: linear-gradient(180deg, transparent var(--feature-clip-top, 0px), #000 calc(var(--feature-clip-top, 0px) + var(--feature-top-fade, 0px)));
+    margin: 20px 0 56px;
+  }
   .feature-visual:last-child { margin-bottom: 0; }
   .feature-visual .demo-surface,
   .feature-browser { height: auto; min-height: 360px; }
   .feature-visual .demo-surface { padding: 22px; }
   .feature-browser .browser-body { min-height: 360px; }
-  .feature-shade { display: none; }
   .feature-visual > .browser,
   .feature-visual > .demo-surface { opacity: 1; }
 }
