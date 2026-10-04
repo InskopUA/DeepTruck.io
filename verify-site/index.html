@@ -26,7 +26,6 @@
     <symbol id="icon-team" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
   </svg>
   <div class="noise"></div>
-  <div class="cursor-glow" id="cursorGlow"></div>
 
   <div class="nav-wrap">
     <div class="container">
@@ -51,7 +50,6 @@
     <section class="hero hero-centered">
       <div class="container hero-layout">
         <div class="hero-copy reveal visible">
-          <p class="hero-announcement"><svg><use href="#icon-check"></use></svg> Verify before you release the load</p>
           <h1>Carrier Verification Platform</h1>
           <p class="lead">Verify carrier contacts, collect driver documents, and release every load with confidence.</p>
           <div class="hero-actions">
@@ -115,7 +113,7 @@
             <div><i></i><span>Ready to review</span><time>10:48</time></div>
           </div>
         </div>
-        <p class="hero-proof"><svg><use href="#icon-check"></use></svg> Email & SMS verification <span>·</span> Driver documents <span>·</span> One shared record</p>
+        <p class="hero-proof"><svg><use href="#icon-check"></use></svg> Trusted by 2,000+ shippers across USA</p>
       </div>
     </section>
 
@@ -209,10 +207,12 @@
     hamburger?.addEventListener("click", () => {
       const isOpen = nav.classList.toggle("open");
       hamburger.setAttribute("aria-expanded", String(isOpen));
+      scheduleFeatureUpdate();
     });
     document.querySelectorAll(".nav-links a").forEach((link) => link.addEventListener("click", () => {
       nav.classList.remove("open");
       hamburger?.setAttribute("aria-expanded", "false");
+      scheduleFeatureUpdate();
     }));
     window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.scrollY > 20), { passive: true });
 
@@ -315,10 +315,19 @@
       featurePanels.forEach((panel, panelIndex) => panel.classList.toggle("active", panelIndex === index));
     }
     function updateFeatureFromScroll() {
-      if (!featureList || !featureDesktop.matches) return;
+      if (!featureList) return;
+      const cutoff = nav.getBoundingClientRect().bottom + 14;
+      if (!featureDesktop.matches) {
+        featurePreviews.style.removeProperty("--feature-clip-top");
+        featurePanels.forEach((panel) => {
+          panel.style.setProperty("--feature-clip-top", `${Math.max(0, cutoff - panel.getBoundingClientRect().top)}px`);
+        });
+        return;
+      }
+      featurePanels.forEach((panel) => panel.style.removeProperty("--feature-clip-top"));
       const previewRect = featurePreviews.getBoundingClientRect();
-      const stickyTop = parseFloat(getComputedStyle(featureList).top);
-      const shadeTop = Math.max(stickyTop - 12, previewRect.top);
+      featurePreviews.style.setProperty("--feature-clip-top", `${Math.max(0, cutoff - previewRect.top)}px`);
+      const shadeTop = Math.max(cutoff, previewRect.top);
       const shadeBottom = Math.min(innerHeight, previewRect.bottom);
       featureShade.style.left = `${previewRect.left}px`;
       featureShade.style.width = `${previewRect.width}px`;
@@ -358,6 +367,10 @@
 
     const stage = document.getElementById("productStage");
     const appWindow = document.getElementById("appWindow");
+    const heroMotionObserver = new IntersectionObserver(([entry]) => {
+      stage.classList.toggle("hero-motion-paused", !entry.isIntersecting);
+    });
+    if (stage) heroMotionObserver.observe(stage);
     if (stage && appWindow && matchMedia("(pointer:fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       stage.addEventListener("mousemove", (event) => {
         if (matchMedia("(max-width: 760px)").matches) return;
@@ -368,12 +381,6 @@
       });
       stage.addEventListener("mouseleave", () => {
         appWindow.style.transform = "";
-      });
-      const glow = document.getElementById("cursorGlow");
-      document.addEventListener("mousemove", (event) => {
-        glow.style.left = `${event.clientX}px`;
-        glow.style.top = `${event.clientY}px`;
-        glow.style.opacity = "1";
       });
     }
   </script>
