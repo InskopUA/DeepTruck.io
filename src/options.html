@@ -3,31 +3,38 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>CarrierVerify Settings</title>
+  <title>Extension account · DeepTruck Verify</title>
   <link rel="stylesheet" href="options.css">
 </head>
-<body>
-  <main>
-    <header>
-      <h1>CarrierVerify Account</h1>
-      <p>Sign in with the same account you use in the DeepTruck shipper console.</p>
-    </header>
+<body class="options-page" data-account-state="loading">
+  <main class="account-shell">
+    <header class="brand-header">
+      <a class="brand" href="https://www.deeptruck.io" target="_blank" rel="noopener noreferrer"><img src="assets/shield-mark.svg" alt="" width="30" height="34"><span>DeepTruck <small>Verify</small></span></a>
 
-    <section>
+    </header>
+    <div id="account-loading" class="account-loading" role="status"><span class="spinner"></span>Loading your account…</div>
+    <section id="signin-panel" class="account-panel" hidden aria-labelledby="signin-title">
+      <p class="eyebrow">Browser extension</p>
+      <h1 id="signin-title">Sign in to Verify</h1>
+      <p class="intro">Use your DeepTruck account to verify carriers right on Central Dispatch.</p>
       <form id="login-form">
-        <label>
-          Email
-          <input id="loginEmail" type="email" autocomplete="email" placeholder="you@company.com">
-        </label>
-        <label>
-          Password
-          <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
-        </label>
-        <button id="login-button" type="submit">Login</button>
-        <button id="logout-button" class="secondary" type="button">Logout</button>
-        <span id="auth-status"></span>
+        <label for="loginEmail">Email address<input id="loginEmail" name="email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
+        <label for="loginPassword">Password<span class="password-field"><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"><button id="password-toggle" class="icon-button" type="button" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span></label>
+        <button id="login-button" class="primary" type="submit">Sign in</button>
       </form>
+      <p class="signup-link">New to DeepTruck? <a href="https://www.deeptruck.io/signup" target="_blank" rel="noopener noreferrer">Create an account</a></p>
     </section>
+    <section id="connected-panel" class="account-panel" hidden aria-labelledby="connected-title">
+      <div class="connection-status"><span></span>Signed in</div>
+      <h1 id="connected-title">Ready to verify</h1>
+      <p class="intro">Open a carrier profile on Central Dispatch, then click <b>Verify carrier</b>.</p>
+      <div class="account-card"><span id="account-avatar" class="avatar"></span><div><b id="account-name"></b><span id="account-email"></span><small id="account-company"></small></div></div>
+      <a class="primary" href="https://app.centraldispatch.com" target="_blank" rel="noopener noreferrer">Open Central Dispatch <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      <a class="secondary workspace-link" href="https://www.deeptruck.io/admin/" target="_blank" rel="noopener noreferrer">Open your workspace <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
+      <div class="account-bottom"><span>DeepTruck account</span><button id="logout-button" class="text-button" type="button">Sign out</button></div>
+    </section>
+    <p id="auth-status" class="status-message" role="status" aria-live="polite"></p>
+    <footer class="account-footer"><span>Carrier verification, in your workflow.</span><a href="mailto:verify@deeptruck.io">Help</a></footer>
   </main>
   <script src="account.js"></script>
 </body>

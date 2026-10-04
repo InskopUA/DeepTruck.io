@@ -9,14 +9,24 @@ const state = {
   loading: false,
   error: "",
   pollTimer: 0,
-  open: false
+  open: false,
+  authReady: false,
+  canVerify: false,
+  authError: ""
 };
 
 init();
 
 function init() {
   mount();
+  refreshAccount();
   scanAndRefresh();
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.authSession) refreshAccount();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && state.open) { setPanelOpen(false); document.getElementById(LAUNCHER_ID)?.focus(); }
+  });
 
   let lastUrl = location.href;
   const observer = new MutationObserver((mutations) => {
@@ -58,6 +68,8 @@ async function scanAndRefresh() {
 }
 
 async function lookup() {
+  if (state.loading) return;
+  state.error = "";
   state.loading = true;
   update();
   try {
@@ -80,10 +92,16 @@ async function lookup() {
 async function onClick(event) {
   const action = event.target?.closest("[data-cv-action]")?.dataset.cvAction;
   if (!action) return;
+  if (action === "signin") {
+    try { await send("account.open"); } catch (error) { state.error = error.message; update(); }
+    return;
+  }
+  if (action !== "close" && state.loading) return;
 
   if (action === "close") {
     state.open = false;
     setPanelOpen(false);
+    document.getElementById(LAUNCHER_ID)?.focus();
     return;
   }
 
@@ -181,9 +199,26 @@ async function refreshVerificationStatus() {
   }
 }
 
+async function refreshAccount() {
+  try {
+    const account = await send("auth.get");
+    state.canVerify = account.canVerify ?? Boolean(account.user);
+    state.authError = "";
+  } catch (error) {
+    state.canVerify = false;
+    state.authError = error.message || "Please sign in again.";
+  } finally { state.authReady = true; update(); }
+}
+
 function update() {
   const root = document.getElementById(ROOT_ID);
-  if (root) root.innerHTML = render();
+  if (!root) return;
+  const scrollTop = root.querySelector(".cv-body")?.scrollTop || 0;
+  const focusedAction = root.contains(document.activeElement) ? document.activeElement.dataset.cvAction : null;
+  root.innerHTML = render();
+  const body = root.querySelector(".cv-body");
+  if (body) body.scrollTop = scrollTop;
+  if (focusedAction) root.querySelector(`[data-cv-action="${focusedAction}"]`)?.focus({ preventScroll: true });
 }
 
 function setPanelOpen(open) {
@@ -198,31 +233,52 @@ function setPanelOpen(open) {
   updateLauncherState();
 }
 
+function cvIcon(name) {
+  const paths = {
+    close: '<path d="m6 6 12 12M6 18 18 6"/>',
+    refresh: '<path d="M20 7v5h-5M4 17v-5h5M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3a7 7 0 0 0 11.6-1"/>',
+    arrow: '<path d="M5 12h14m-5-5 5 5-5 5"/>',
+    check: '<path d="m5 12 4 4L19 6"/>',
+    email: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/>',
+    phone: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
+    document: '<path d="M6 3h8l4 4v14H6ZM14 3v5h4M9 12h6M9 16h6"/>',
+    external: '<path d="M14 3h7v7m0-7-10 10M10 3H3v18h18v-7"/>'
+  };
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.document}</svg>`;
+}
+function cvShield() {
+  return '<svg class="cv-shield" viewBox="0 0 64 72" aria-hidden="true"><path d="M32 4C23 10 14 13 6 14V35C6 49 17 61 32 68C47 61 58 49 58 35V14C50 13 41 10 32 4Z" fill="#eef5ff" stroke="#3979c9" stroke-width="2.5" stroke-linejoin="round"/></svg>';
+}
 function render() {
   const carrier = state.carrier;
   const verification = state.verification;
   const verified = verification?.emailVerified && verification?.phoneVerified && verification?.licenseUploaded && verification?.w9Uploaded && verification?.coiUploaded;
-
+  const error = state.error || state.authError;
   return `
-    <div class="cv-card ${state.open ? "cv-open" : "cv-closed"}">
-      <div class="cv-head">
-        <div>
-          <div class="cv-kicker">CarrierVerify</div>
-          <div class="cv-title">${carrier ? escapeHtml(carrier.name) : "Carrier check"}</div>
-        </div>
+    <section class="cv-card ${state.open ? "cv-open" : "cv-closed"}" role="region" aria-label="DeepTruck carrier verification">
+      <header class="cv-head">
+        <a class="cv-brand" href="https://www.deeptruck.io" target="_blank" rel="noopener noreferrer">${cvShield()}<span>DeepTruck <small>Verify</small></span></a>
         <div class="cv-head-actions">
-          <span class="cv-pill ${verified ? "cv-good" : verification ? "cv-warn" : "cv-neutral"}">
-            ${verified ? "Verified" : verification ? "Pending" : state.dot ? `DOT ${escapeHtml(state.dot)}` : "No DOT"}
-          </span>
-          <button data-cv-action="close" aria-label="Close CarrierVerify panel">×</button>
+          <button data-cv-action="refresh" title="Refresh carrier profile" aria-label="Refresh carrier profile" ${state.loading ? "disabled" : ""}>${cvIcon("refresh")}</button>
+          <button data-cv-action="close" aria-label="Close verification panel">${cvIcon("close")}</button>
         </div>
+      </header>
+      <div class="cv-carrier-heading">
+          <div class="cv-heading-top"><span class="cv-kicker">Carrier profile</span><span class="cv-pill ${verified ? "cv-good" : verification ? "cv-warn" : "cv-neutral"}">${verified ? "Verified" : verification ? "Pending" : "Profile"}</span></div>
+          <h2 class="cv-title">${carrier ? escapeHtml(carrier.name) : state.loading ? "Finding your carrier…" : "Carrier verification"}</h2>
+          <p class="cv-subtitle">${state.dot ? `USDOT ${escapeHtml(state.dot)}${carrier?.mc ? ` · ${escapeHtml(carrier.mc)}` : ""}` : "Central Dispatch"}</p>
       </div>
-
-      ${state.loading ? `<div class="cv-loader">Loading carrier data...</div>` : ""}
-      ${state.error ? `<div class="cv-error">${escapeHtml(state.error)}</div>` : ""}
-      ${carrier ? renderCarrier(carrier) : `<div class="cv-empty">Open a Central Dispatch carrier profile with a USDOT number.</div>`}
-      ${carrier ? renderVerification(carrier, verification, verified) : ""}
-    </div>
+      <div class="cv-body">
+        ${state.loading ? `<div class="cv-loader" role="status"><span class="cv-spinner"></span>${carrier ? "Updating verification…" : "Loading carrier profile…"}</div>` : ""}
+        ${error ? `<div class="cv-error" role="alert">${escapeHtml(error)}</div>` : ""}
+        ${carrier ? renderCarrier(carrier) : state.loading ? "" : `<div class="cv-empty">Open a carrier profile with a USDOT number to get started.</div>`}
+        ${carrier && verification ? renderVerification(verification, verified) : ""}
+      </div>
+      <div class="cv-panel-bottom">
+        ${carrier ? renderActions(carrier, verification, verified) : `<div class="cv-actions"><button class="cv-secondary" data-cv-action="refresh" ${state.loading ? "disabled" : ""}>${cvIcon("refresh")} Try again</button></div>`}
+        <footer class="cv-footer"><span>DeepTruck Verify</span><a href="https://www.deeptruck.io/admin/" target="_blank" rel="noopener noreferrer">Open workspace ${cvIcon("arrow")}</a></footer>
+      </div>
+    </section>
   `;
 }
 
@@ -239,7 +295,7 @@ function syncLauncher() {
     const launcher = existing || createLauncher(true);
     launcher.classList.add("cv-launcher-floating");
     launcher.classList.toggle("cv-launcher-active", state.open);
-    launcher.textContent = state.open ? "CarrierVerify open" : "Verify carrier";
+    renderLauncher(launcher);
     if (!launcher.parentElement) document.documentElement.appendChild(launcher);
     return;
   }
@@ -247,7 +303,7 @@ function syncLauncher() {
   const launcher = existing || createLauncher(false);
   launcher.classList.toggle("cv-launcher-floating", false);
   launcher.classList.toggle("cv-launcher-active", state.open);
-  launcher.textContent = state.open ? "CarrierVerify open" : "Verify carrier";
+  renderLauncher(launcher);
 
   if (preferButton) {
     launcher.classList.add("cv-launcher-prefer");
@@ -263,19 +319,26 @@ function updateLauncherState() {
   const launcher = document.getElementById(LAUNCHER_ID);
   if (!launcher) return;
   launcher.classList.toggle("cv-launcher-active", state.open);
-  launcher.textContent = state.open ? "CarrierVerify open" : "Verify carrier";
+  renderLauncher(launcher);
+}
+
+function renderLauncher(button) {
+  button.innerHTML = `${cvShield()}<span>${state.open ? "Verify open" : "Verify carrier"}</span>`;
+  button.setAttribute("aria-expanded", String(state.open));
+  button.setAttribute("aria-controls", ROOT_ID);
 }
 
 function createLauncher(floating) {
   const button = document.createElement("button");
   button.id = LAUNCHER_ID;
   button.type = "button";
-  button.textContent = state.open ? "CarrierVerify open" : "Verify carrier";
+  renderLauncher(button);
   button.className = floating ? "cv-launcher-floating" : "";
   button.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    setPanelOpen(true);
+    setPanelOpen(!state.open);
+    if (state.open) document.querySelector(`#${ROOT_ID} [data-cv-action="close"]`)?.focus();
   });
   return button;
 }
@@ -320,15 +383,13 @@ function renderCarrier(carrier) {
   const insuranceExpiry = getInsuranceExpiry(carrier.insurance?.currentFilings || []);
   const activeFor = getDurationLabel(carrier.activeSince);
   const fmcsaUpdated = getUpdatedAgeLabel(carrier.fmcsaUpdatedAt);
-  const bipd = carrier.insurance.minimumBipdAmount ? `${money(carrier.insurance.minimumBipdAmount)} min BIPD` : "No min BIPD";
+  const bipd = carrier.insurance?.minimumBipdAmount ? `${money(carrier.insurance?.minimumBipdAmount)} min BIPD` : "No min BIPD";
   return `
     <div class="cv-grid">
-      ${field("USDOT", carrier.dot)}
-      ${field("MC", carrier.mc || "-")}
       ${field("Email", carrier.email || "Not listed")}
       ${field("Phone", formatPhone(carrier.phone) || "Not listed")}
       ${field("Authority", carrier.authorityStatus || carrier.dotStatus || "-")}
-      ${field("Fleet", `${carrier.fleet.powerUnits ?? "-"} units / ${carrier.fleet.drivers ?? "-"} drivers`)}
+      ${field("Fleet", `${carrier.fleet?.powerUnits ?? "-"} units / ${carrier.fleet?.drivers ?? "-"} drivers`)}
     </div>
     <div class="cv-safety">
       <div class="cv-signal cv-signal-status ${carrier.outOfService ? "cv-red" : "cv-green"}">
@@ -345,40 +406,42 @@ function renderCarrier(carrier) {
         <em>${escapeHtml(insuranceExpiry.timeLabel)}</em>
       </div>
       <div class="cv-signal-grid">
-        ${signal("BOC-3", carrier.insurance.bocFiled ? "Filed" : "Not found")}
+        ${signal("BOC-3", carrier.insurance?.bocFiled ? "Filed" : "Not found")}
         ${signal("Coverage", bipd)}
       </div>
     </div>
   `;
 }
 
-function renderVerification(carrier, verification, verified) {
-  const canStart = carrier.email && carrier.phone;
+function renderActions(carrier, verification, verified) {
+  const disabled = state.loading ? "disabled" : "";
+  if (!state.authReady) return '<div class="cv-note">Loading your account…</div>';
+  if (!state.canVerify) return `<div class="cv-action-intro">Sign in to your DeepTruck account to start or review a verification.</div><div class="cv-actions"><button data-cv-action="signin">Sign in to Verify ${cvIcon("arrow")}</button></div>`;
   if (!verification) {
-    return `
-      <div class="cv-actions">
-        <button data-cv-action="start" ${canStart ? "" : "disabled"}>Send verification</button>
-        <button class="cv-secondary" data-cv-action="refresh">Refresh</button>
-      </div>
-      ${canStart ? "" : `<div class="cv-note">FMCSA/MOTUS record must include both email and phone before sending.</div>`}
-    `;
+    const canStart = carrier.email && carrier.phone;
+    return `<div class="cv-action-intro">Verify listed contacts and collect driver documents in one request.</div>
+      ${!canStart ? '<div class="cv-note">An email address and phone number are needed to send a request.</div>' : ""}
+      <div class="cv-actions"><button data-cv-action="start" ${canStart ? disabled : "disabled"}>${cvShield()} Send verification</button></div>`;
   }
-
-  return `
-    <div class="cv-checks">
-      ${check("Email verified", verification.emailVerified)}
-      ${check("SMS code verified", verification.phoneVerified)}
-      ${check("Driver license uploaded", verification.licenseUploaded)}
-      ${check("W-9 uploaded", verification.w9Uploaded)}
-      ${check("COI uploaded", verification.coiUploaded)}
-    </div>
-    <div class="cv-actions">
-      <button data-cv-action="poll">${verified ? "Refresh verified status" : "Check status"}</button>
-      <button class="cv-secondary" data-cv-action="new">New request</button>
-      ${verification.verificationUrl ? `<a target="_blank" rel="noreferrer" href="${escapeAttribute(normalizeVerificationUrl(verification.verificationUrl, verification.id))}">Open link</a>` : ""}
-    </div>
-    ${verification.demoMode ? `<div class="cv-note">Demo mode: connect your backend in extension options to send real email/SMS and receive license uploads.</div>` : ""}
-  `;
+  return `<div class="cv-actions"><button data-cv-action="poll" ${disabled}>${cvIcon("refresh")} ${verified ? "Refresh status" : "Check status"}</button><button class="cv-secondary" data-cv-action="new" ${disabled}>New request</button></div>
+    ${verification.verificationUrl ? `<a class="cv-request-link" target="_blank" rel="noopener noreferrer" href="${escapeAttribute(normalizeVerificationUrl(verification.verificationUrl, verification.id))}">Open verification link ${cvIcon("external")}</a>` : ""}`;
+}
+function renderVerification(verification, verified) {
+  const checks = [verification.emailVerified, verification.phoneVerified, verification.licenseUploaded, verification.w9Uploaded, verification.coiUploaded];
+  const completed = checks.filter(Boolean).length;
+  return `<div class="cv-verification">
+      <div class="cv-section-heading"><h3>Verification checks</h3><span>${completed} of 5 complete</span></div>
+      <div class="cv-progress" role="progressbar" aria-label="Verification checks completed" aria-valuemin="0" aria-valuemax="5" aria-valuenow="${completed}"><span style="width:${completed * 20}%"></span></div>
+      <div class="cv-checks">
+        ${check("Email verified", verification.emailVerified, "email")}
+        ${check("Phone verified by SMS", verification.phoneVerified, "phone")}
+        ${check("Driver license", verification.licenseUploaded, "document")}
+        ${check("W-9", verification.w9Uploaded, "document")}
+        ${check("Insurance certificate", verification.coiUploaded, "document")}
+      </div>
+      ${verified ? `<div class="cv-complete">${cvIcon("check")} All checks complete. Ready for your review.</div>` : ""}
+      ${verification.demoMode ? '<div class="cv-note">Demo request — no email or SMS has been sent.</div>' : ""}
+    </div>`;
 }
 
 function field(label, value) {
@@ -389,8 +452,8 @@ function signal(label, value) {
   return `<div class="cv-signal"><span>${escapeHtml(label)}</span><b>${escapeHtml(value)}</b></div>`;
 }
 
-function check(label, done) {
-  return `<div class="cv-check ${done ? "cv-done" : ""}"><span>${done ? "✓" : "•"}</span>${escapeHtml(label)}</div>`;
+function check(label, done, icon) {
+  return `<div class="cv-check ${done ? "cv-done" : ""}"><span class="cv-check-icon">${cvIcon(icon)}</span><span class="cv-check-label">${escapeHtml(label)}</span><b>${done ? "Done" : "Pending"}</b></div>`;
 }
 
 function extractDot(text) {
@@ -433,7 +496,7 @@ function send(type, payload = {}) {
         return;
       }
       if (!response?.ok) {
-        reject(new Error(response?.error || "CarrierVerify request failed."));
+        reject(new Error(response?.error || "DeepTruck request failed."));
         return;
       }
       resolve(response.payload);
@@ -449,7 +512,7 @@ function formatPhone(value) {
 
 function normalizeVerificationUrl(url, id) {
   if (url.includes("/functions/v1/carrier-verify/verify/")) {
-    return `https://carrierverify.skopetskyi-serhii-us.chatgpt.site/verify.html?id=${encodeURIComponent(id)}`;
+    return `https://www.deeptruck.io/verify?id=${encodeURIComponent(id)}`;
   }
   return url;
 }

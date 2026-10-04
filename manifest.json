@@ -1,9 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "CarrierVerify",
-  "version": "0.1.0",
-  "description": "Verify carrier email, phone, and driver license before assigning a load.",
-  "permissions": ["storage", "activeTab"],
+  "name": "DeepTruck Verify",
+  "version": "0.2.0",
+  "description": "Verify carrier contacts, collect driver documents, and keep a shared record on Central Dispatch.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
   "host_permissions": [
     "https://app.centraldispatch.com/*",
     "https://motus.dot.gov/*",
@@ -16,15 +19,32 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://app.centraldispatch.com/*"],
-      "js": ["src/content.js"],
-      "css": ["src/content.css"],
+      "matches": [
+        "https://app.centraldispatch.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
       "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_title": "CarrierVerify",
-    "default_popup": "src/popup.html"
+    "default_title": "DeepTruck Verify",
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "src/assets/icon-16.png",
+      "32": "src/assets/icon-32.png",
+      "48": "src/assets/icon-48.png"
+    }
   },
-  "options_page": "src/options.html"
+  "options_page": "src/options.html",
+  "icons": {
+    "16": "src/assets/icon-16.png",
+    "32": "src/assets/icon-32.png",
+    "48": "src/assets/icon-48.png",
+    "128": "src/assets/icon-128.png"
+  }
 }

@@ -1,4 +1,4 @@
-# CarrierVerify
+# DeepTruck Verify
 
 Chrome extension MVP for verifying a carrier before a shipper assigns a load.
 
@@ -22,6 +22,10 @@ The extension includes demo mode so the UI can be tested immediately. Real email
 3. Click Load unpacked.
 4. Select this folder: `/Users/milla/Downloads/CarrierVerify`.
 5. Open a Central Dispatch carrier profile.
+
+To update an existing installation, open `chrome://extensions`, find **DeepTruck Verify** (formerly CarrierVerify), and click Reload. Refresh the Central Dispatch tab to load the updated panel.
+
+The popup and extension account page use the same DeepTruck account. Once signed in, the popup shows your account and links to Central Dispatch and your workspace. The carrier panel shows five checks: email, SMS, driver license, W-9, and insurance certificate. The shield icons are packaged locally with the extension.
 
 ## Local backend demo
 

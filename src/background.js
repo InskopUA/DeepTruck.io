@@ -24,6 +24,9 @@ async function routeMessage(message) {
       return login(message.email, message.password);
     case "auth.logout":
       return logout();
+    case "account.open":
+      await chrome.runtime.openOptionsPage();
+      return {};
     case "auth.get":
       return getAuthState();
     case "settings.get":
@@ -31,7 +34,7 @@ async function routeMessage(message) {
     case "settings.save":
       return saveSettings(message.settings);
     default:
-      throw new Error("Unsupported CarrierVerify action.");
+      throw new Error("Unsupported DeepTruck action.");
   }
 }
 
@@ -334,15 +337,17 @@ async function logout() {
 
 async function getAuthState() {
   const session = await getValidSession(true);
+  const settings = await getSettings();
   return {
-    user: session?.user ? { id: session.user.id, email: session.user.email, user_metadata: session.user.user_metadata || {} } : null
+    user: session?.user ? { id: session.user.id, email: session.user.email, user_metadata: session.user.user_metadata || {} } : null,
+    canVerify: Boolean(session?.access_token || settings.apiKey)
   };
 }
 
 async function getApiAuthHeaders(settings) {
   if (settings.apiKey) return { Authorization: `Bearer ${settings.apiKey}` };
   const session = await getValidSession(true);
-  if (!session?.access_token) throw new Error("Sign in to CarrierVerify before sending verification requests.");
+  if (!session?.access_token) throw new Error("Sign in to DeepTruck Verify before sending verification requests.");
   return { Authorization: `Bearer ${session.access_token}` };
 }
 
