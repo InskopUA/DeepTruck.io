@@ -25,6 +25,7 @@ http.createServer((req, res) => {
   if (pathname === "/verify") pathname = "/verify.html";
   if (pathname === "/login" || pathname === "/admin/login") pathname = "/admin/login.html";
   if (pathname === "/signup" || pathname === "/admin/signup") pathname = "/admin/signup.html";
+  if (pathname === "/privacy" || pathname === "/terms") pathname += ".html";
   const filePath = path.normalize(path.join(root, pathname));
 
   if (!filePath.startsWith(root)) {

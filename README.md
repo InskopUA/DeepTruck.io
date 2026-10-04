@@ -107,6 +107,8 @@ Vercel should host only the public web UI:
 - `/` public landing page
 - `/login` sign-in page
 - `/signup` registration page
+- `/privacy` privacy policy for the website, workspace, verification pages, and extension
+- `/terms` terms of service
 - `/admin` authenticated shipper workspace
 - `/verify.html?id=...` carrier verification page
 - `/verify?id=...` same verification page through a clean URL rewrite
