@@ -279,6 +279,8 @@
     heroWindow?.addEventListener("click", runVerification);
 
     const featureSection = document.querySelector("[data-feature-scroll]");
+    const featureIntro = document.querySelector(".feature-intro");
+    const featureStage = document.getElementById("feature-stage");
     const featureItems = [...document.querySelectorAll("[data-feature-index]")];
     const featurePanels = [...document.querySelectorAll("[data-feature-panel]")];
     const progressBar = document.getElementById("featureProgress");
@@ -292,10 +294,12 @@
     }
     function updateFeatureFromScroll() {
       if (!featureSection || matchMedia("(max-width: 899px)").matches) return;
-      const rect = featureSection.getBoundingClientRect();
-      const distance = Math.max(1, featureSection.offsetHeight - innerHeight);
-      const progress = Math.max(0, Math.min(1, -rect.top / Math.max(1, distance)));
-      setFeature(Math.min(featureItems.length - 1, Math.floor(progress * featureItems.length)));
+      const introHeight = matchMedia("(max-width: 899px)").matches ? (featureIntro?.offsetHeight || 0) : 0;
+      const start = featureSection.offsetTop + introHeight;
+      const distance = Math.max(1, featureSection.offsetHeight - innerHeight - introHeight);
+      const progress = Math.max(0, Math.min(1, (scrollY - start) / distance));
+      const stepSize = 1 / featureItems.length;
+      setFeature(Math.min(featureItems.length - 1, Math.floor(progress / stepSize)));
       if (progressBar) progressBar.style.height = `${Math.max(8, progress * 100)}%`;
     }
     window.addEventListener("scroll", updateFeatureFromScroll, { passive: true });
@@ -303,8 +307,10 @@
     featureItems.forEach((item) => item.addEventListener("click", () => {
       if (matchMedia("(max-width: 899px)").matches) return;
       const index = Number(item.dataset.featureIndex);
-      const distance = Math.max(1, featureSection.offsetHeight - innerHeight);
-      scrollTo({ top: featureSection.offsetTop + (distance * (index / featureItems.length)) + 2, behavior: "smooth" });
+      const introHeight = matchMedia("(max-width: 899px)").matches ? (featureIntro?.offsetHeight || 0) : 0;
+      const start = featureSection.offsetTop + introHeight;
+      const distance = Math.max(1, featureSection.offsetHeight - innerHeight - introHeight);
+      scrollTo({ top: start + (distance * (index / featureItems.length)) + 2, behavior: "smooth" });
     }));
     updateFeatureFromScroll();
 
