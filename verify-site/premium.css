@@ -1915,6 +1915,17 @@ body.premium-landing {
 
 .premium-landing footer {
   padding: 84px 0 30px;
+  position: relative;
+}
+
+.site-footer::before {
+  background: linear-gradient(90deg, transparent, rgba(134, 181, 237, 0.16) 20%, rgba(152, 190, 234, 0.38) 50%, rgba(134, 181, 237, 0.16) 80%, transparent);
+  box-shadow: 0 0 14px rgba(134, 181, 237, 0.12);
+  content: "";
+  height: 1px;
+  inset: 0 0 auto;
+  pointer-events: none;
+  position: absolute;
 }
 
 .footer-inner {
@@ -1946,14 +1957,9 @@ body.premium-landing {
 }
 
 .footer-cta {
-  border-radius: 999px;
-  gap: 24px;
-  padding: 13px 24px;
-}
-
-.footer-cta svg {
-  height: 17px;
-  width: 17px;
+  border-radius: 8px;
+  font-size: 16px;
+  padding: 12px 18px;
 }
 
 .footer-links {
@@ -3358,14 +3364,16 @@ body.premium-landing {
 .hero-centered .hero-actions { gap: 14px; justify-content: center; margin: 0; }
 .hero-centered .btn-lg { border-radius: 8px; font-size: 16px; padding: 12px 18px; }
 .hero-centered .btn-primary,
-.nav .btn-primary {
+.nav .btn-primary,
+.footer-cta.btn-primary {
   background: rgba(134, 181, 237, 0.065);
   border: 1px solid rgba(152, 190, 234, 0.45);
   box-shadow: none;
   color: #c2d9f3;
 }
 .hero-centered .btn-primary:hover,
-.nav .btn-primary:hover { background: rgba(134, 181, 237, 0.13); }
+.nav .btn-primary:hover,
+.footer-cta.btn-primary:hover { background: rgba(134, 181, 237, 0.13); }
 .hero-centered .btn-ghost { background: rgba(255, 255, 255, 0.025); border-color: transparent; color: #bac9db; }
 
 .hero-visual {
@@ -3568,6 +3576,7 @@ body.premium-landing {
   .hero-centered h1 { font-size: clamp(32px, 7.8vw, 48px); margin: 20px auto; max-width: 550px; overflow-wrap: normal; white-space: normal; width: 100%; }
   .hero-centered .lead { font-size: 15px; margin-bottom: 22px; max-width: 520px; }
   .hero-centered .btn-lg { font-size: 13px; padding: 11px 14px; width: auto; }
+  .footer-cta.btn-lg { font-size: 13px; padding: 11px 14px; }
   .hero-visual { height: 330px; margin-top: 18px; max-width: 620px; }
   .hero-emblem { height: 320px; top: 0; width: 307px; }
   .hero-visual .hero-product { left: 0; top: 92px; transform: rotate(-7deg) scale(.49); transform-origin: left top; width: 270px; }
