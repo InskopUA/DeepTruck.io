@@ -3290,12 +3290,19 @@ body.premium-landing {
   overflow: visible;
   stroke: none;
   stroke-width: 1;
-  transform: perspective(700px) rotateY(calc(var(--shield-look) * 1deg)) rotateZ(calc(var(--shield-look) * -.06deg));
-  transform-origin: 50% 48%;
   width: 100%;
 }
+.shield-head {
+  transform: perspective(700px) rotateY(calc(var(--shield-look) * 1deg)) rotateZ(calc(var(--shield-look) * -.06deg));
+  transform-origin: 240px 224px;
+}
+.shield-head-back { transform: translate(calc(7px - var(--shield-look) * .6px), -7px); }
+.shield-body {
+  transform: perspective(900px) rotateY(calc(var(--shield-look) * .15deg));
+  transform-origin: 240px 400px;
+}
 .shield-mesh { transform: translateX(calc(var(--shield-look) * .15px)); }
-.shield-face { transform: translateX(calc(var(--shield-look) * .7px)); }
+.shield-face { transform: translate(calc(var(--shield-look) * .85px), 30px); }
 .shield-pupils { transform: translateX(calc(var(--shield-look) * .3px)); }
 .shield-eyes {
   animation: heroShieldBlink 9.5s ease-in-out infinite;

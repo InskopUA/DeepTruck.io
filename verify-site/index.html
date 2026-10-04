@@ -71,41 +71,57 @@
                 <filter id="mascot-soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="17"/></filter>
                 <path id="mascot-shield" d="M240 58C198 88 157 105 112 111V231C112 318 171 376 240 410C309 376 368 318 368 231V111C323 105 282 88 240 58Z"/>
                 <clipPath id="mascot-clip"><use href="#mascot-shield"/></clipPath>
-                <linearGradient id="mascot-fade" x1="0" y1="340" x2="0" y2="494" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient>
-                <mask id="mascot-baseFade"><rect width="480" height="500" fill="white"/><rect y="340" width="480" height="160" fill="url(#mascot-fade)"/></mask>
+                <path id="mascot-torso" d="M198 332C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508H442C437 480 425 450 395 429C359 404 308 399 294 386C282 372 282 351 282 332Z"/>
+                <clipPath id="mascot-torso-clip"><use href="#mascot-torso"/></clipPath>
+                <linearGradient id="mascot-body-glass" x1="110" y1="369" x2="342" y2="505" gradientUnits="userSpaceOnUse"><stop stop-color="#426c98" stop-opacity=".23"/><stop offset=".44" stop-color="#0c1520" stop-opacity=".95"/><stop offset="1" stop-color="#203d60" stop-opacity=".18"/></linearGradient>
+                <radialGradient id="mascot-body-light" cx=".5" cy=".1" r=".85"><stop stop-color="#9bccff" stop-opacity=".14"/><stop offset="1" stop-color="#6faeff" stop-opacity="0"/></radialGradient>
+                <linearGradient id="mascot-body-fade" x1="0" y1="410" x2="0" y2="478" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient>
+                <mask id="mascot-bodyFade"><rect width="480" height="500" fill="white"/><rect y="410" width="480" height="98" fill="url(#mascot-body-fade)"/></mask>
               </defs>
               <ellipse cx="240" cy="252" rx="216" ry="235" fill="url(#mascot-halo)"/>
-              <g mask="url(#mascot-baseFade)">
-                <path d="M240 416L112 477M240 416L171 492M240 416L240 500M240 416L309 492M240 416L368 477M119 470Q240 444 361 470M150 487Q240 462 330 487" stroke="url(#mascot-mesh)" stroke-width=".8"/>
-                <use href="#mascot-shield" transform="translate(9 -7)" fill="#0c111a" stroke="#5989bf" stroke-opacity=".35" stroke-width="1.5"/>
-                <path d="M240 58L249 51M112 111L121 104M368 111L377 104M240 410L249 403" stroke="#bedaff" stroke-opacity=".6"/>
-                <use href="#mascot-shield" stroke="#91c4ff" stroke-width="10" opacity=".48" filter="url(#mascot-soft)"/>
-                <use href="#mascot-shield" fill="url(#mascot-glass)"/>
-                <g class="shield-mesh" clip-path="url(#mascot-clip)" stroke="url(#mascot-mesh)" stroke-width=".9">
-                  <path d="M96 112Q240 140 384 112M96 137Q240 169 384 137M96 163Q240 198 384 163M96 191Q240 228 384 191M96 220Q240 258 384 220M96 250Q240 288 384 250M96 280Q240 318 384 280M96 310Q240 347 384 310M96 340Q240 375 384 340M96 370Q240 402 384 370"/>
-                  <path d="M240 46V424M213 58Q195 242 220 413M186 72Q153 242 198 402M159 84Q119 245 176 389M132 97Q91 252 154 367M267 58Q285 242 260 413M294 72Q327 242 282 402M321 84Q361 245 304 389M348 97Q389 252 326 367"/>
-                  <path d="M104 125L335 361M104 158L313 389M104 192L284 416M135 96L368 330M166 80L368 294M197 64L368 258M376 125L145 361M376 158L167 389M376 192L196 416M345 96L112 330M314 80L112 294M283 64L112 258" opacity=".22"/>
+              <g class="shield-body" mask="url(#mascot-bodyFade)">
+                <use href="#mascot-torso" transform="translate(3 -3)" fill="#0b111b" stroke="#5684b5" stroke-opacity=".35"/>
+                <use href="#mascot-torso" fill="url(#mascot-body-glass)"/>
+                <use href="#mascot-torso" fill="url(#mascot-body-light)"/>
+                <g clip-path="url(#mascot-torso-clip)" stroke="url(#mascot-mesh)" stroke-width=".9">
+                  <path d="M193 340Q240 359 287 340M192 355Q240 376 288 355M188 372Q240 396 292 372M176 390Q240 423 304 390M151 405Q240 438 329 405M104 424Q240 461 376 424M65 450Q240 489 415 450M45 478Q240 518 435 478"/>
+                  <path d="M240 328V515M221 332Q213 390 209 420Q202 466 201 515M204 336Q203 383 180 411Q154 453 150 515M191 353Q187 389 146 416Q103 454 91 515M185 384Q133 399 104 434Q67 473 59 515M259 332Q267 390 271 420Q278 466 279 515M276 336Q277 383 300 411Q326 453 330 515M289 353Q293 389 334 416Q377 454 389 515M295 384Q347 399 376 434Q413 473 421 515"/>
+                  <path d="M91 428L150 506M131 412L203 510M174 394L259 510M389 428L330 506M349 412L277 510M306 394L221 510" opacity=".25"/>
                 </g>
-                <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="3" filter="url(#mascot-glow)"/>
-                <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="1.5"/>
-                <path d="M240 73C201 99 166 113 126 123V231C126 308 178 363 240 395C302 363 354 308 354 231V123C314 113 279 99 240 73Z" stroke="#9bc9fb" stroke-opacity=".25"/>
-                <g class="shield-face">
-                  <g class="shield-eyes">
-                    <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" fill="#090e16" fill-opacity=".94" stroke="url(#mascot-rim)" stroke-width="2.5"/>
-                    <path d="M158 183Q185 184 217 198M322 183Q295 184 263 198" stroke="#c8e3ff" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" stroke="#8bbfff" stroke-width="5" opacity=".5" filter="url(#mascot-glow)"/>
-                    <path d="M167 199Q188 201 208 211M166 216Q187 227 209 219M172 233Q188 243 203 232M313 199Q292 201 272 211M314 216Q293 227 271 219M308 233Q292 243 277 232" stroke="url(#mascot-mesh)" stroke-width=".8"/>
-                    <g class="shield-pupils">
-                      <ellipse cx="190" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
-                      <ellipse cx="290" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
-                      <path d="M190 211V224M290 211V224" stroke="#e4f2ff" stroke-width="3" stroke-linecap="round"/>
-                      <path d="M190 211V224M290 211V224" stroke="#8bbfff" stroke-width="7" opacity=".6" filter="url(#mascot-glow)"/>
+                <path class="shield-neck" d="M198 340C198 359 197 374 186 386M282 340C282 359 283 374 294 386M186 386Q240 414 294 386M181 392Q240 422 299 392" stroke="url(#mascot-rim)" stroke-width="1.2" opacity=".65"/>
+                <path class="shield-shoulders" d="M198 340C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508M282 340C282 351 282 372 294 386C308 399 359 404 395 429C425 450 437 480 442 508" stroke="#8ec2ff" stroke-width="6" filter="url(#mascot-glow)" opacity=".55"/>
+                <path d="M198 340C198 351 198 372 186 386C172 399 121 404 85 429C55 450 43 480 38 508M282 340C282 351 282 372 294 386C308 399 359 404 395 429C425 450 437 480 442 508" stroke="url(#mascot-rim)" stroke-width="1.6"/>
+                <path d="M187 398C165 411 124 416 96 438C73 457 61 481 57 507M293 398C315 411 356 416 384 438C407 457 419 481 423 507" stroke="#92c6ff" stroke-opacity=".25"/>
+              </g>
+              <g class="shield-head">
+                <g transform="translate(0 5) scale(1 .91)">
+                  <use class="shield-head-back" href="#mascot-shield" fill="#0c111a" stroke="#5989bf" stroke-opacity=".35" stroke-width="1.5"/>
+                  <use href="#mascot-shield" stroke="#91c4ff" stroke-width="10" opacity=".48" filter="url(#mascot-soft)"/>
+                  <use href="#mascot-shield" fill="url(#mascot-glass)"/>
+                  <g class="shield-mesh" clip-path="url(#mascot-clip)" stroke="url(#mascot-mesh)" stroke-width=".9">
+                    <path d="M96 112Q240 140 384 112M96 137Q240 169 384 137M96 163Q240 198 384 163M96 191Q240 228 384 191M96 220Q240 258 384 220M96 250Q240 288 384 250M96 280Q240 318 384 280M96 310Q240 347 384 310M96 340Q240 375 384 340M96 370Q240 402 384 370"/>
+                    <path d="M240 46V424M213 58Q195 242 220 413M186 72Q153 242 198 402M159 84Q119 245 176 389M132 97Q91 252 154 367M267 58Q285 242 260 413M294 72Q327 242 282 402M321 84Q361 245 304 389M348 97Q389 252 326 367"/>
+                    <path d="M104 125L335 361M104 158L313 389M104 192L284 416M135 96L368 330M166 80L368 294M197 64L368 258M376 125L145 361M376 158L167 389M376 192L196 416M345 96L112 330M314 80L112 294M283 64L112 258" opacity=".22"/>
+                  </g>
+                  <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="3" filter="url(#mascot-glow)"/>
+                  <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="1.5"/>
+                  <path d="M240 73C201 99 166 113 126 123V231C126 308 178 363 240 395C302 363 354 308 354 231V123C314 113 279 99 240 73Z" stroke="#9bc9fb" stroke-opacity=".25"/>
+                  <g class="shield-face">
+                    <g class="shield-eyes">
+                      <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" fill="#090e16" fill-opacity=".94" stroke="url(#mascot-rim)" stroke-width="2.5"/>
+                      <path d="M158 183Q185 184 217 198M322 183Q295 184 263 198" stroke="#c8e3ff" stroke-width="4" stroke-linecap="round"/>
+                      <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" stroke="#8bbfff" stroke-width="5" opacity=".5" filter="url(#mascot-glow)"/>
+                      <path d="M167 199Q188 201 208 211M166 216Q187 227 209 219M172 233Q188 243 203 232M313 199Q292 201 272 211M314 216Q293 227 271 219M308 233Q292 243 277 232" stroke="url(#mascot-mesh)" stroke-width=".8"/>
+                      <g class="shield-pupils">
+                        <ellipse cx="190" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                        <ellipse cx="290" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                        <path d="M190 211V224M290 211V224" stroke="#e4f2ff" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M190 211V224M290 211V224" stroke="#8bbfff" stroke-width="7" opacity=".6" filter="url(#mascot-glow)"/>
+                      </g>
                     </g>
                   </g>
+                  <circle cx="112" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="368" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="240" cy="58" r="2" fill="#f0f7ff"/>
                 </g>
-                <path d="M218 322L235 339L267 304" stroke="#bcdcff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M218 322L235 339L267 304" stroke="#8abef7" stroke-width="8" filter="url(#mascot-glow)"/>
-                <circle cx="112" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="368" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="240" cy="58" r="2" fill="#f0f7ff"/>
               </g>
             </svg>
           </div>

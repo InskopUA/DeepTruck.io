@@ -13,9 +13,6 @@
     <linearGradient id="logo-glass" x1="12" y1="8" x2="50" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#203448"/><stop offset="1" stop-color="#0b111a"/></linearGradient>
   </defs>
   <path d="M32 4C23 10 14 13 6 14V35C6 49 17 61 32 68C47 61 58 49 58 35V14C50 13 41 10 32 4Z" fill="url(#logo-glass)" stroke="url(#logo-rim)" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M15 27L27 30V35C27 41 24 44 21 44C17 44 15 40 15 35V27Z M49 27L37 30V35C37 41 40 44 43 44C47 44 49 40 49 35V27Z" fill="#090e16" stroke="#b6d9ff" stroke-width="1.8" stroke-linejoin="round"/>
-  <path d="M22 33V37M42 33V37" stroke="#e4f2ff" stroke-width="2.3" stroke-linecap="round"/>
-  <path d="M26 52L31 57L39 48" stroke="#a9d1ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
   <text x="86" y="230" fill="#f3f7fb" font-family="Inter, Arial, sans-serif" font-size="88" font-weight="800">DeepTruck Verify</text>
   <text x="86" y="324" fill="#aab5c4" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="500">Verify carrier identity before you release the load.</text>
