@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#070b12">
+  <meta name="theme-color" content="#090b0e">
   <title>DeepTruck Verify</title>
   <meta name="description" content="Verify carrier identity before load details are released.">
   <meta property="og:title" content="DeepTruck Verify">
@@ -48,20 +48,21 @@
   </div>
 
   <main id="top">
-    <section class="hero hero-simple">
-      <div class="grid-bg"></div>
-      <div class="container hero-grid">
+    <section class="hero hero-centered">
+      <div class="container hero-layout">
         <div class="hero-copy reveal visible">
-          <h1>Verify the carrier before you release the load.</h1>
-          <p class="lead">DeepTruck helps auto shippers verify the carrier's listed email and phone, collect driver documents, and keep a verification record before pickup and vehicle details are shared.</p>
+          <p class="hero-announcement"><svg><use href="#icon-check"></use></svg> Verify before you release the load</p>
+          <h1>Carrier Verification Platform</h1>
+          <p class="lead">Verify carrier contacts, collect driver documents, and release every load with confidence.</p>
           <div class="hero-actions">
             <a class="btn btn-primary btn-lg" href="/admin/#signup">Sign Up</a>
             <a class="btn btn-ghost btn-lg" href="#feature-stage">See How It Works</a>
           </div>
         </div>
 
-        <div class="product-stage reveal visible delay-1" id="productStage">
+        <div class="hero-visual product-stage reveal visible delay-1" id="productStage">
           <div class="product-glow"></div>
+          <img class="hero-emblem" src="hero-verification.svg" alt="Glowing DeepTruck verification shield">
           <div class="app-window hero-product" id="appWindow">
             <div class="window-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="address-bar">app.deeptruck.io / verification / OMAX-4345567</div></div>
             <div class="app-content">
@@ -95,14 +96,32 @@
               </div>
             </div>
           </div>
+          <div class="hero-carrier-card hero-orbit-card" aria-hidden="true">
+            <span class="orbit-label">Listed carrier contact</span>
+            <b>OMAX LLC</b><small>USDOT 4345567 · MC1698436</small>
+            <div><svg><use href="#icon-mail"></use></svg> info@omaxllc.net</div>
+            <div><svg><use href="#icon-phone"></use></svg> (307) 441-5452</div>
+          </div>
+          <div class="hero-documents-card hero-orbit-card" aria-hidden="true">
+            <span class="orbit-label">One document request</span>
+            <div><svg><use href="#icon-id"></use></svg><span>Driver license</span><small>Received</small></div>
+            <div><svg><use href="#icon-doc"></use></svg><span>W-9</span><small>Received</small></div>
+            <div><svg><use href="#icon-doc"></use></svg><span>Insurance certificate</span><small>Received</small></div>
+          </div>
+          <div class="hero-activity-card hero-orbit-card" aria-hidden="true">
+            <span class="orbit-label">Verification activity</span>
+            <div><i></i><span>Email confirmed</span><time>10:44</time></div>
+            <div><i></i><span>Phone verified by SMS</span><time>10:45</time></div>
+            <div><i></i><span>Ready to review</span><time>10:48</time></div>
+          </div>
         </div>
+        <p class="hero-proof"><svg><use href="#icon-check"></use></svg> Email & SMS verification <span>·</span> Driver documents <span>·</span> One shared record</p>
       </div>
     </section>
 
     <section id="features" class="feature-scroll" data-feature-scroll>
-      <div class="container feature-intro reveal">
-        <p class="section-kicker">Everything before release</p>
-        <h2 class="section-title">Verify the carrier without changing your dispatch workflow.</h2>
+      <div class="container feature-intro reveal center">
+        <h2 class="section-title">Every check. One workspace.</h2>
         <p class="section-copy">From the carrier profile to the final review, DeepTruck keeps every identity check in one place.</p>
       </div>
       <div class="feature-stage" id="feature-stage">
@@ -116,6 +135,7 @@
             <button class="feature-item" type="button" data-feature-index="5" aria-expanded="false" aria-controls="feature-description-5" style="order: 10"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-team"></use></svg></span><strong>Team workspace</strong><em id="feature-description-5">Verification status and history stay available in the DeepTruck workspace so your team can review the same record.</em></button>
           </div>
           <div class="feature-right">
+            <div class="feature-shade" aria-hidden="true"></div>
             <article class="feature-visual active" data-feature-panel="0" style="order: 1">
               <div class="browser feature-browser"><div class="browser-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="browser-url">centraldispatch.com / carrier / profile</div></div><div class="browser-body"><div class="cd-page"><div class="cd-head"><b class="cd-title">Carrier Profile</b><span class="grey-btn"></span></div><div class="cd-company"><h4>OMAX LLC</h4><p>Active carrier profile</p><div class="cd-info"><div><span>USDOT</span><b>4345567</b></div><div><span>MC Number</span><b>MC1698436</b></div><div><span>Phone</span><b>(307) 441-5452</b></div><div><span>Email</span><b>info@omaxllc.net</b></div></div></div><div class="fake-lines"><i></i><i></i><i></i></div></div><aside class="ext-panel feature-panel-slide"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567<br>MC1698436</div><span class="verify-btn">Start verification</span></aside></div></div>
             </article>
@@ -279,6 +299,8 @@
     const featureItems = [...document.querySelectorAll("[data-feature-index]")];
     const featurePanels = [...document.querySelectorAll("[data-feature-panel]")];
     const featureList = document.querySelector(".feature-left");
+    const featureShade = document.querySelector(".feature-shade");
+    const featurePreviews = document.querySelector(".feature-right");
     const featureDesktop = matchMedia("(min-width: 900px)");
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
     let activeFeature = -1;
@@ -294,6 +316,14 @@
     }
     function updateFeatureFromScroll() {
       if (!featureList || !featureDesktop.matches) return;
+      const previewRect = featurePreviews.getBoundingClientRect();
+      const stickyTop = parseFloat(getComputedStyle(featureList).top);
+      const shadeTop = Math.max(stickyTop - 12, previewRect.top);
+      const shadeBottom = Math.min(innerHeight, previewRect.bottom);
+      featureShade.style.left = `${previewRect.left}px`;
+      featureShade.style.width = `${previewRect.width}px`;
+      featureShade.style.top = `${shadeTop}px`;
+      featureShade.style.height = `${Math.max(0, shadeBottom - shadeTop)}px`;
       // Use the actual preview positions: no artificial scroll runway or wheel capture.
       const line = parseFloat(getComputedStyle(featureList).top) + Math.min(180, innerHeight * 0.25);
       let index = 0;
@@ -330,13 +360,14 @@
     const appWindow = document.getElementById("appWindow");
     if (stage && appWindow && matchMedia("(pointer:fine)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       stage.addEventListener("mousemove", (event) => {
+        if (matchMedia("(max-width: 760px)").matches) return;
         const rect = stage.getBoundingClientRect();
         const x = (event.clientX - rect.left) / rect.width - 0.5;
         const y = (event.clientY - rect.top) / rect.height - 0.5;
-        appWindow.style.transform = `rotateY(${x * 4 - 1.5}deg) rotateX(${-y * 3 + 0.5}deg) translateY(-2px)`;
+        appWindow.style.transform = `rotate(-7deg) rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
       });
       stage.addEventListener("mouseleave", () => {
-        appWindow.style.transform = "rotateY(-1.5deg) rotateX(0.5deg)";
+        appWindow.style.transform = "";
       });
       const glow = document.getElementById("cursorGlow");
       document.addEventListener("mousemove", (event) => {
