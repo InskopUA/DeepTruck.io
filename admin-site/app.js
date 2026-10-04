@@ -1,33 +1,11 @@
 const API_BASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify";
-const SUPABASE_URL = "https://yqpeebgmqtqoxumzfrsq.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_GaoXNE-0hGpMDv3cMy3QDA_UfQuvvIM";
 const POLL_INTERVAL_MS = 5000;
-const authClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const authClient = window.deepTruckAuth?.client;
 const state = {
-  items: [],
-  query: "",
-  manualCarrier: null,
-  manualVerification: null,
-  manualMessage: "",
-  pollTimer: 0,
-  isLookupLoading: false,
-  authMode: "login",
-  session: null,
-  user: null
+  items: [], query: "", filter: "all", manualCarrier: null, manualVerification: null,
+  manualMessage: "", pollTimer: 0, isLookupLoading: false, session: null, user: null
 };
-
-const authScreen = document.getElementById("auth-screen");
 const adminApp = document.getElementById("admin-app");
-const authForm = document.getElementById("auth-form");
-const authMessage = document.getElementById("auth-message");
-const authTitle = document.getElementById("auth-title");
-const authKicker = document.getElementById("auth-kicker");
-const authSubmit = document.getElementById("auth-submit");
-const signupFields = document.getElementById("signup-fields");
-const authEmail = document.getElementById("auth-email");
-const authPassword = document.getElementById("auth-password");
-const companyName = document.getElementById("company-name");
-const userName = document.getElementById("user-name");
 const accountEmail = document.getElementById("account-email");
 const logoutButton = document.getElementById("logout-button");
 const settingsCompany = document.getElementById("settings-company");
@@ -35,7 +13,7 @@ const settingsEmail = document.getElementById("settings-email");
 const saveAccountButton = document.getElementById("save-account-button");
 const settingsMessage = document.getElementById("settings-message");
 const views = document.querySelectorAll(".view");
-const navButtons = document.querySelectorAll("nav button");
+const navButtons = document.querySelectorAll(".sidebar [data-view]");
 const title = document.getElementById("page-title");
 const tbody = document.getElementById("history-body");
 const details = document.getElementById("details");
@@ -45,224 +23,180 @@ const dotInput = document.getElementById("dot-input");
 const dotSearchButton = document.getElementById("dot-search-button");
 const manualResult = document.getElementById("manual-result");
 const verifyMessage = document.getElementById("verify-message");
+let detailsTrigger = null;
+let openingLogin = false;
 
-if (!authClient) {
-  setAuthMessage("Authentication library failed to load. Refresh the page and try again.", true);
-} else {
-  initAuth();
-}
-
-document.querySelectorAll("[data-auth-mode]").forEach((button) => {
-  button.addEventListener("click", () => setAuthMode(button.dataset.authMode));
-});
-
-authForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  await submitAuthForm();
-});
-
-logoutButton?.addEventListener("click", async () => {
-  stopPolling();
-  await authClient.auth.signOut();
-  state.session = null;
-  state.user = null;
-  showAuth();
-});
-
-saveAccountButton?.addEventListener("click", async (event) => {
-  event.preventDefault();
-  if (!state.session) return;
-  settingsMessage.textContent = "Saving...";
-  settingsMessage.classList.remove("error");
-  saveAccountButton.disabled = true;
-  try {
-    const { data, error } = await authClient.auth.updateUser({
-      data: { company_name: settingsCompany.value.trim() }
-    });
-    if (error) throw error;
-    state.user = data.user;
-    renderAccount();
-    settingsMessage.textContent = "Saved.";
-  } catch (error) {
-    settingsMessage.textContent = error.message || String(error);
-    settingsMessage.classList.add("error");
-  } finally {
-    saveAccountButton.disabled = false;
-  }
-});
-
-navButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    navButtons.forEach((item) => item.classList.remove("active"));
-    button.classList.add("active");
-    views.forEach((view) => view.classList.toggle("active", view.id === button.dataset.view));
-    title.textContent = button.textContent;
-  });
-});
-
-window.searchCarrierFromDot = async (event) => {
-  event?.preventDefault();
-  await lookupManualCarrier(dotInput?.value);
+const pageCopy = {
+  verifications: ["Verifications", "Verify carrier contacts and keep every detail in one place."],
+  history: ["Verification history", "Your carrier checks, documents and shared records."],
+  billing: ["Plans & billing", "Choose the right verification volume for your team."],
+  settings: ["Account settings", "Make this workspace yours."]
 };
+function setView(view, updateAddress = true) {
+  const selected = pageCopy[view] ? view : "verifications";
+  navButtons.forEach(button => {
+    const active = button.dataset.view === selected;
+    button.classList.toggle("active", active);
+    if (active) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  views.forEach(section => section.classList.toggle("active", section.id === selected));
+  title.textContent = pageCopy[selected][0];
+  document.getElementById("page-description").textContent = pageCopy[selected][1];
+  document.getElementById("breadcrumb-page").textContent = selected === "history" ? "History" : pageCopy[selected][0];
+  document.getElementById("new-verification-button").hidden = selected !== "history";
+  document.title = `${pageCopy[selected][0]} · DeepTruck Verify`;
+  if (updateAddress) {
+    const hash = selected === "verifications" ? "" : `#${selected}`;
+    if (location.hash !== hash) history.pushState(null, "", `${location.pathname}${location.search}${hash}`);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+}
+navButtons.forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
+document.querySelectorAll("[data-go-view]").forEach(button => button.addEventListener("click", () => {
+  setView(button.dataset.goView);
+  if (button.dataset.goView === "verifications") dotInput.focus();
+}));
+window.addEventListener("popstate", () => setView(location.hash.slice(1), false));
+window.addEventListener("hashchange", () => setView(location.hash.slice(1), false));
 
-document.getElementById("search")?.addEventListener("input", (event) => {
-  state.query = event.target.value.toLowerCase();
+document.getElementById("search").addEventListener("input", event => {
+  state.query = event.target.value.toLowerCase(); renderTable();
+});
+document.querySelectorAll("[data-filter]").forEach(button => button.addEventListener("click", () => {
+  state.filter = button.dataset.filter;
+  document.querySelectorAll("[data-filter]").forEach(item => {
+    item.classList.toggle("active", item === button);
+    item.setAttribute("aria-pressed", String(item === button));
+  });
   renderTable();
+}));
+document.getElementById("refresh-history").addEventListener("click", async event => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try { await load(); } finally { button.disabled = false; }
 });
-
-dotForm?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  await lookupManualCarrier(dotInput.value);
-});
-
-dotSearchButton?.addEventListener("click", async (event) => {
-  event.preventDefault();
-  await lookupManualCarrier(dotInput.value);
-});
-
-manualResult?.addEventListener("click", async (event) => {
+window.searchCarrierFromDot = async event => {
+  event?.preventDefault(); await lookupManualCarrier(dotInput.value);
+};
+dotForm.addEventListener("submit", window.searchCarrierFromDot);
+manualResult.addEventListener("click", async event => {
   const action = event.target?.closest("[data-action]")?.dataset.action;
-  if (!action) return;
   if (action === "send-verification") await createManualVerification();
   if (action === "refresh-verification") await refreshManualVerification(true);
-  if (action === "new-search") resetManualVerification();
+  if (action === "new-search") { resetManualVerification(); dotInput.focus(); }
 });
-
-document.getElementById("close-details")?.addEventListener("click", () => {
-  details.classList.remove("open");
-  details.setAttribute("aria-hidden", "true");
-});
-
-details?.addEventListener("click", (event) => {
-  if (event.target === details) {
-    details.classList.remove("open");
-    details.setAttribute("aria-hidden", "true");
-  }
-});
-
-async function initAuth() {
-  setAuthMode(location.hash === "#signup" ? "signup" : "login");
-  const { data } = await authClient.auth.getSession();
-  if (data.session) {
-    await useSession(data.session);
-  } else {
-    showAuth();
-  }
-
-  authClient.auth.onAuthStateChange((_event, session) => {
-    if (session) {
-      useSession(session);
-    } else {
-      state.session = null;
-      state.user = null;
-      showAuth();
-    }
-  });
-}
-
-async function submitAuthForm() {
-  if (!authClient) return;
-  setAuthMessage("");
-  authSubmit.disabled = true;
-  authSubmit.textContent = state.authMode === "signup" ? "Signing up..." : "Signing in...";
-
+logoutButton.addEventListener("click", async () => {
+  logoutButton.disabled = true;
   try {
-    const email = authEmail.value.trim();
-    const password = authPassword.value;
-
-    if (state.authMode === "signup") {
-      const { data, error } = await authClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            company_name: companyName.value.trim(),
-            full_name: userName.value.trim()
-          },
-          emailRedirectTo: `${location.origin}/admin/`
-        }
-      });
-      if (error) throw error;
-      if (data.session) {
-        await useSession(data.session);
-      } else {
-        setAuthMessage("Account created. Check your email to confirm access.");
-      }
-      return;
-    }
-
-    const { data, error } = await authClient.auth.signInWithPassword({ email, password });
+    const { error } = await authClient.auth.signOut();
     if (error) throw error;
-    await useSession(data.session);
+    stopPolling(); showAuth();
   } catch (error) {
-    setAuthMessage(error.message || String(error), true);
+    const message = document.getElementById("app-message");
+    message.textContent = error.message || "Unable to sign out. Please try again.";
+    message.classList.add("error");
+    logoutButton.disabled = false;
+  }
+});
+document.getElementById("settings-form").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!state.session) return;
+  const company = settingsCompany.value.trim();
+  if (!company) { settingsMessage.textContent = "Enter your company name."; settingsMessage.classList.add("error"); return; }
+  settingsMessage.textContent = ""; settingsMessage.classList.remove("error");
+  saveAccountButton.disabled = true; saveAccountButton.textContent = "Saving…";
+  try {
+    const { data, error } = await authClient.auth.updateUser({ data: { company_name: company } });
+    if (error) throw error;
+    state.user = data.user; renderAccount(); settingsMessage.textContent = "Changes saved.";
+  } catch (error) {
+    settingsMessage.textContent = error.message || "Unable to save changes.";
+    settingsMessage.classList.add("error");
   } finally {
-    authSubmit.disabled = false;
-    renderAuthMode();
+    saveAccountButton.disabled = false; saveAccountButton.textContent = "Save changes";
+  }
+});
+function closeDetails() {
+  details.classList.remove("open"); details.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
+  detailsTrigger?.focus();
+}
+document.getElementById("close-details").addEventListener("click", closeDetails);
+details.addEventListener("click", event => { if (event.target === details) closeDetails(); });
+document.addEventListener("keydown", event => {
+  if (!details.classList.contains("open")) return;
+  if (event.key === "Escape") { event.preventDefault(); closeDetails(); return; }
+  if (event.key === "Tab") {
+    const focusable = [...details.querySelectorAll('button:not([disabled]), a[href], [tabindex="0"]')];
+    const first = focusable[0], last = focusable.at(-1);
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
+});
+async function initSession() {
+  if (location.hash === "#signup") { location.replace("/signup"); return; }
+  if (location.hash === "#login") { location.replace("/login"); return; }
+  if (!authClient) { document.getElementById("session-message").textContent = "Unable to load your workspace. Please refresh the page."; return; }
+  try {
+    const { data, error } = await authClient.auth.getSession();
+    if (error) throw error;
+    if (data.session) await useSession(data.session);
+    else { showAuth(); return; }
+    authClient.auth.onAuthStateChange((event, session) => {
+      if (event === "INITIAL_SESSION") return;
+      if (session) setTimeout(() => useSession(session), 0);
+      else if (event === "SIGNED_OUT") showAuth();
+    });
+  } catch (error) {
+    document.getElementById("session-message").textContent = "Unable to restore your session. Please sign in again.";
+    const link = document.createElement("a"); link.href = "/login"; link.textContent = "Go to sign in";
+    document.getElementById("session-loading").append(link);
   }
 }
-
-function setAuthMode(mode) {
-  state.authMode = mode === "signup" ? "signup" : "login";
-  renderAuthMode();
-  setAuthMessage("");
-}
-
-function renderAuthMode() {
-  const signup = state.authMode === "signup";
-  document.querySelectorAll("[data-auth-mode]").forEach((button) => {
-    button.classList.toggle("active", button.dataset.authMode === state.authMode);
-  });
-  signupFields.classList.toggle("active", signup);
-  companyName.required = signup;
-  userName.required = signup;
-  authTitle.textContent = signup ? "Create your DeepTruck account" : "Welcome back";
-  authKicker.textContent = signup ? "Sign Up" : "Sign In";
-  authSubmit.textContent = signup ? "Sign Up" : "Sign In";
-  authPassword.autocomplete = signup ? "new-password" : "current-password";
-}
-
-function setAuthMessage(message, isError = false) {
-  authMessage.textContent = message || "";
-  authMessage.classList.toggle("error", Boolean(isError));
-}
-
 async function useSession(session) {
-  state.session = session;
-  state.user = session.user;
-  showApp();
-  renderAccount();
-  await load();
+  if (state.user && state.user.id !== session.user.id) { location.reload(); return; }
+  const firstLoad = !state.session;
+  state.session = session; state.user = session.user;
+  document.getElementById("session-loading").hidden = true;
+  adminApp.classList.remove("auth-hidden"); renderAccount();
+  if (firstLoad) { setView(location.hash.slice(1), false); await load(); }
 }
-
 function showAuth() {
-  authScreen.classList.remove("auth-hidden");
-  adminApp.classList.add("auth-hidden");
+  if (openingLogin) return;
+  openingLogin = true;
+  stopPolling();
+  location.replace("/login");
 }
-
-function showApp() {
-  authScreen.classList.add("auth-hidden");
-  adminApp.classList.remove("auth-hidden");
-}
-
 function renderAccount() {
   const metadata = state.user?.user_metadata || {};
-  accountEmail.textContent = state.user?.email || "-";
+  const name = metadata.full_name || [metadata.first_name, metadata.last_name].filter(Boolean).join(" ") || state.user?.email?.split("@")[0] || "Your account";
+  const company = metadata.company_name || metadata.dealership_name || "Your workspace";
+  accountEmail.textContent = state.user?.email || "";
+  document.querySelectorAll("[data-account-name]").forEach(el => el.textContent = name);
+  const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+  document.querySelectorAll("[data-account-initials]").forEach(el => el.textContent = initials);
+  document.getElementById("workspace-company").textContent = company;
   settingsEmail.value = state.user?.email || "";
   settingsCompany.value = metadata.company_name || metadata.dealership_name || "";
+  document.getElementById("settings-name").value = name;
 }
+initSession();
 
 async function load() {
   if (!state.session) return;
+  const requestUser = state.user?.id;
   try {
     const response = await fetch(`${API_BASE_URL}/verification-requests?limit=100`, { headers: authHeaders() });
     const data = await response.json();
     if (!response.ok || data.error) throw new Error(data.error || "Failed to load history.");
+    if (state.user?.id !== requestUser) return;
     state.items = data.items || [];
     renderMetrics();
     renderTable();
   } catch (error) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty">${escapeHtml(error.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty error">${escapeHtml(error.message)}</td></tr>`;
+    document.getElementById("recent-body").innerHTML = `<tr><td colspan="3" class="empty error">${escapeHtml(error.message)}</td></tr>`;
   }
 }
 
@@ -386,37 +320,31 @@ function updatePolling() {
 }
 
 function renderMetrics() {
-  const verified = state.items.filter((item) => item.status === "verified").length;
-  const pending = state.items.filter((item) => item.status !== "verified").length;
-  document.getElementById("metric-total").textContent = state.items.length;
-  document.getElementById("metric-verified").textContent = verified;
-  document.getElementById("metric-pending").textContent = pending;
+  const stats = {
+    total: state.items.length,
+    verified: state.items.filter(item => item.status === "verified").length,
+    pending: state.items.filter(item => item.status !== "verified").length,
+    ready: state.items.filter(isVerificationComplete).length
+  };
+  document.querySelectorAll("[data-stat]").forEach(el => el.textContent = stats[el.dataset.stat]);
 }
-
+function verificationRow(item, compact = false) {
+  const status = item.status === "verified" ? "Verified" : "Pending";
+  const carrier = `<td class="carrier"><button class="carrier-link" type="button" aria-haspopup="dialog">${escapeHtml(item.carrierName)}</button><span>${compact ? "USDOT " + escapeHtml(item.dot) : "Record " + escapeHtml(String(item.id).slice(0, 8))}</span></td>`;
+  const identifiers = compact ? "" : `<td><b>${escapeHtml(item.dot)}</b><div class="sub">${escapeHtml(item.mc || "—")}</div></td><td>${escapeHtml(item.email)}<div class="sub">${escapeHtml(formatPhone(item.phone))}</div></td>`;
+  return `<tr data-id="${escapeAttribute(item.id)}">${carrier}${identifiers}<td><span class="badge ${status.toLowerCase()}"><i></i>${status}</span></td><td class="date-cell">${formatDate(item.createdAt)}</td></tr>`;
+}
 function renderTable() {
-  const items = state.items.filter((item) => {
+  const items = state.items.filter(item => {
     const haystack = `${item.carrierName} ${item.dot} ${item.mc} ${item.email} ${item.phone}`.toLowerCase();
-    return haystack.includes(state.query);
+    const matchesStatus = state.filter === "all" || (state.filter === "verified" ? item.status === "verified" : item.status !== "verified");
+    return haystack.includes(state.query) && matchesStatus;
   });
-
-  if (!items.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty">No verification requests found.</td></tr>';
-    return;
-  }
-
-  tbody.innerHTML = items.map((item) => `
-    <tr data-id="${escapeHtml(item.id)}">
-      <td class="carrier"><b>${escapeHtml(item.carrierName)}</b><span>${escapeHtml(item.id.slice(0, 8))}</span></td>
-      <td><b>${escapeHtml(item.dot)}</b><div class="sub">${escapeHtml(item.mc || "-")}</div></td>
-      <td>${escapeHtml(item.email)}<div class="sub">${formatPhone(item.phone)}</div></td>
-      <td><span class="badge ${item.status === "verified" ? "verified" : "pending"}"><i></i>${escapeHtml(item.status)}</span></td>
-      <td>${formatDate(item.createdAt)}</td>
-    </tr>
-  `).join("");
-
-  tbody.querySelectorAll("tr[data-id]").forEach((row) => {
-    row.addEventListener("click", () => openDetails(row.dataset.id));
-  });
+  document.getElementById("history-count").textContent = items.length;
+  tbody.innerHTML = items.length ? items.map(item => verificationRow(item)).join("") : '<tr><td colspan="5" class="empty">No verifications match. Try another search or filter.</td></tr>';
+  const recent = [...state.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+  document.getElementById("recent-body").innerHTML = recent.length ? recent.map(item => verificationRow(item, true)).join("") : '<tr><td colspan="3" class="empty">Your verification requests will appear here.</td></tr>';
+  document.querySelectorAll('tr[data-id]').forEach(row => row.addEventListener("click", () => openDetails(row.dataset.id)));
 }
 
 function renderManualResult(isBusy = false) {
@@ -426,10 +354,10 @@ function renderManualResult(isBusy = false) {
   const complete = verification && isVerificationComplete(verification);
   const canSend = carrier.email && carrier.phone && !isBusy;
   const badgeText = complete
-    ? `verified · ${relativeAge(verification.updatedAt || verification.createdAt)}`
+    ? `Verified · ${relativeAge(verification.updatedAt || verification.createdAt)}`
     : verification
-      ? "pending"
-      : "ready";
+      ? "Pending"
+      : "Ready to verify";
   const requestState = complete
     ? `completed ${relativeAge(verification.updatedAt || verification.createdAt)}`
     : verification
@@ -444,7 +372,7 @@ function renderManualResult(isBusy = false) {
           <h2>${escapeHtml(carrier.name)}</h2>
           <span>USDOT ${escapeHtml(carrier.dot)} · ${escapeHtml(carrier.mc || "No MC")}</span>
         </div>
-        <b class="badge ${complete ? "verified" : verification ? "pending" : "pending"}">${escapeHtml(badgeText)}</b>
+        <b class="badge ${complete ? "verified" : verification ? "pending" : "ready"}">${escapeHtml(badgeText)}</b>
       </header>
 
       <div class="manual-grid">
@@ -501,11 +429,11 @@ function renderManualChecks(verification) {
 }
 
 function renderManualLoading(message) {
-  return `<section class="panel empty-panel"><p class="eyebrow">Lookup in progress</p><h2>Loading carrier</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+  return `<section class="panel empty-panel loading-panel" role="status"><span class="loading-ring"></span><h2>Finding your carrier</h2><p class="muted">${escapeHtml(message)}</p></section>`;
 }
 
 function renderManualEmpty(titleText, message) {
-  return `<section class="panel empty-panel"><p class="eyebrow">Verification cockpit</p><h2>${escapeHtml(titleText)}</h2><p class="muted">${escapeHtml(message)}</p></section>`;
+  return `<section class="panel empty-panel"><p class="eyebrow">Carrier verification</p><h2>${escapeHtml(titleText)}</h2><p class="muted">${escapeHtml(message)}</p></section>`;
 }
 
 function riskCard(label, value, tone = "neutral") {
@@ -519,6 +447,7 @@ function setManualMessage(message, isError = false) {
 }
 
 function openDetails(id) {
+  detailsTrigger = document.activeElement;
   const item = state.items.find((entry) => entry.id === id);
   if (!item) return;
   const complete = item.emailVerified && item.phoneVerified && item.licenseUploaded && item.w9Uploaded && item.coiUploaded;
@@ -580,6 +509,8 @@ function openDetails(id) {
   `;
   details.classList.add("open");
   details.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  document.getElementById("close-details").focus();
 }
 
 function infoCard(label, value) {
@@ -652,7 +583,7 @@ function money(value) {
 function formatLookupError(error) {
   const message = error?.message || String(error);
   if (/failed to fetch|network/i.test(message)) {
-    return "Carrier lookup could not reach the verification API. Check the local server and Supabase function deployment.";
+    return "Unable to reach carrier lookup. Please try again in a moment.";
   }
   return message;
 }

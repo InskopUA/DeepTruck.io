@@ -3,227 +3,50 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>DeepTruck Shipper Console</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#f5f7fa">
+  <title>Workspace · DeepTruck Verify</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/admin/styles.css">
 </head>
-<body>
-  <section id="auth-screen" class="auth-screen">
-    <div class="auth-shell">
-      <div class="auth-brand">
-        <div class="auth-logo-row">
-          <span>DT</span>
-          <div>
-            <b>DeepTruck Verify</b>
-            <small>Carrier verification workspace</small>
-          </div>
-        </div>
-
-        <div class="auth-hero-copy">
-          <h1>Verify the carrier before the load moves.</h1>
-          <p>One identity checkpoint for the carrier, driver and documents before shipment information is released.</p>
-        </div>
-
-        <div class="auth-product-card">
-          <div class="auth-product-head">
-            <b>OMAX LLC</b>
-            <span>Ready to review</span>
-          </div>
-          <div class="auth-product-row"><span>Email</span><b>Verified</b></div>
-          <div class="auth-product-row"><span>SMS</span><b>Verified</b></div>
-          <div class="auth-product-row"><span>Driver</span><b>Received</b></div>
-        </div>
-
-        <div class="auth-workflow">
-          <div><span></span>Central Dispatch carrier profile</div>
-          <div><span></span>Listed email and phone check</div>
-          <div><span></span>Verification record for the team</div>
-        </div>
-      </div>
-
-      <div class="auth-card">
-        <div class="auth-tabs" role="tablist" aria-label="Account access">
-          <button id="login-tab" class="active" type="button" data-auth-mode="login">Sign In</button>
-          <button id="signup-tab" type="button" data-auth-mode="signup">Sign Up</button>
-        </div>
-
-        <form id="auth-form">
-          <div>
-            <p id="auth-kicker" class="eyebrow">Shipper login</p>
-            <h1 id="auth-title">Welcome back</h1>
-            <p class="auth-copy">Access carrier checks, documents, and verification history for your shipping team.</p>
-          </div>
-
-          <div id="signup-fields" class="signup-fields">
-            <label>Company name<input id="company-name" autocomplete="organization" placeholder="Maria Logistics"></label>
-            <label>Your name<input id="user-name" autocomplete="name" placeholder="Maria Ivanova"></label>
-          </div>
-
-          <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
-          <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
-
-          <button id="auth-submit" class="primary auth-submit" type="submit">Sign In</button>
-          <div id="auth-message" class="inline-message"></div>
-        </form>
-      </div>
-    </div>
-  </section>
-
+<body class="workspace-page">
+  <svg class="icon-sprite" aria-hidden="true"><symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol><symbol id="icon-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.7-6.4M3 4v5h5M12 7v5l3 2"/></symbol><symbol id="icon-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M7 15h3"/></symbol><symbol id="icon-settings" viewBox="0 0 24 24"><path d="m9 3-1 3-3 1-2 4 2 3 1 3 4 2 3-1 3-1 2-4-1-3-1-3-4-2Z"/><circle cx="12" cy="11" r="3"/></symbol><symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol><symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol><symbol id="icon-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7zM14 3v5h4M10 13h5M10 17h4"/></symbol><symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></symbol><symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol><symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5M6 7a7 7 0 0 1 12-1l2 6M4 12l2 6a7 7 0 0 0 12-1"/></symbol><symbol id="icon-logout" viewBox="0 0 24 24"><path d="M9 4H4v16h5M9 12h12m-4-4 4 4-4 4"/></symbol><symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol><symbol id="icon-building" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M10 21v-5h4v5"/></symbol><symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a3 3 0 0 1 5.6 1c0 2-3 2-3 4M12 17h.01"/></symbol><symbol id="icon-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol><symbol id="icon-extension" viewBox="0 0 24 24"><path d="M9 3v3H4v5h3a2 2 0 1 1 0 4H4v6h6v-3a2 2 0 1 1 4 0v3h6v-6h-3a2 2 0 1 1 0-4h3V6h-6V3a2.5 2.5 0 0 0-5 0Z"/></symbol></svg>
+  <div id="session-loading" class="session-loading" role="status"><img src="/admin/shield-mark.svg" width="40" height="45" alt=""><p id="session-message">Opening your workspace…</p></div>
   <div id="admin-app" class="app auth-hidden">
     <aside class="sidebar">
-      <div class="brand">
-        <span>DT</span>
-        <div>
-          <b>DeepTruck</b>
-          <small>Shipper console</small>
-        </div>
-      </div>
-      <nav>
-        <button class="active" data-view="verifications">Verifications</button>
-        <button data-view="history">History</button>
-        <button data-view="billing">Billing</button>
-        <button data-view="settings">Settings</button>
-      </nav>
-      <div class="sidebar-account">
-        <small>Signed in</small>
-        <b id="account-email">-</b>
-        <button id="logout-button" type="button">Logout</button>
-      </div>
+      <a class="brand" href="/" aria-label="DeepTruck home"><img src="/admin/shield-mark.svg" alt="" width="32" height="36"><span><b>DeepTruck <small>Verify</small></b></span></a>
+      <div class="workspace-label"><span class="workspace-icon"><svg aria-hidden="true"><use href="#icon-building"></use></svg></span><div><b id="workspace-company">Your workspace</b><small>Shipper workspace</small></div></div>
+      <p class="nav-label">Workspace</p>
+      <nav aria-label="Workspace navigation"><button type="button" data-view="verifications" data-label="Verifications" class="active" aria-current="page"><svg aria-hidden="true"><use href="#icon-grid"></use></svg><span>Verifications</span></button><button type="button" data-view="history" data-label="History"><svg aria-hidden="true"><use href="#icon-history"></use></svg><span>History</span></button><button type="button" data-view="billing" data-label="Billing"><svg aria-hidden="true"><use href="#icon-card"></use></svg><span>Billing</span></button><button type="button" data-view="settings" data-label="Settings"><svg aria-hidden="true"><use href="#icon-settings"></use></svg><span>Settings</span></button></nav>
+      <a class="sidebar-help" href="mailto:verify@deeptruck.io"><svg aria-hidden="true"><use href="#icon-help"></use></svg><span>Help & support</span><svg aria-hidden="true"><use href="#icon-arrow"></use></svg></a>
+      <div class="sidebar-account"><span class="avatar" data-account-initials>—</span><div><b data-account-name>Your account</b><small id="account-email">—</small></div><button id="logout-button" type="button" class="icon-button" aria-label="Sign out" title="Sign out"><svg aria-hidden="true"><use href="#icon-logout"></use></svg></button></div>
     </aside>
-
-    <main>
-      <header class="topbar">
-        <div>
-          <h1 id="page-title">Verifications</h1>
-          <p>Carrier lookup, verification requests, documents, and account-separated history.</p>
-        </div>
-        <form id="dot-form" class="topbar-search" onsubmit="window.searchCarrierFromDot && window.searchCarrierFromDot(event)">
-          <input id="dot-input" inputmode="numeric" placeholder="USDOT number">
-          <button id="dot-search-button" class="primary" type="submit" onclick="window.searchCarrierFromDot && window.searchCarrierFromDot(event)">Search</button>
-        </form>
-      </header>
-
-      <section id="verifications" class="view active">
-        <div id="verify-message" class="inline-message top-message"></div>
-
-        <div class="ops-strip">
-          <article><span>Lookup source</span><b>USDOT profile</b><small>carrier identity</small></article>
-          <article><span>Verification path</span><b>Email + SMS</b><small>listed contacts</small></article>
-          <article><span>Required documents</span><b>License / W-9 / COI</b><small>carrier upload</small></article>
-        </div>
-
-        <div id="manual-result" class="manual-result">
-          <section class="panel empty-panel">
-            <div>
-              <p class="eyebrow">Verification cockpit</p>
-              <h2>Carrier preview</h2>
-              <p class="muted">Search a USDOT number to load carrier identity, insurance, authority, and contact details.</p>
-            </div>
-            <div class="empty-signal-grid">
-              <article><span>Identity</span><b>FMCSA profile</b></article>
-              <article><span>Contact</span><b>Email + SMS</b></article>
-              <article><span>Documents</span><b>License / COI / W-9</b></article>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <section id="history" class="view">
-        <div class="metrics">
-          <article><span>Total</span><b id="metric-total">-</b><small>all requests</small></article>
-          <article><span>Verified</span><b id="metric-verified">-</b><small>completed checks</small></article>
-          <article><span>Pending</span><b id="metric-pending">-</b><small>waiting on carrier</small></article>
-          <article><span>Plan limit</span><b>50</b><small>requests included</small></article>
-        </div>
-
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h2>Verification history</h2>
-              <p>Carrier checks started from Central Dispatch or manual DOT lookup.</p>
-            </div>
-            <div class="table-tools">
-              <button type="button" class="filter-chip active">All</button>
-              <button type="button" class="filter-chip">Verified</button>
-              <button type="button" class="filter-chip">Pending</button>
-              <input id="search" placeholder="Search carrier, DOT, MC">
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Carrier</th>
-                  <th>DOT / MC</th>
-                  <th>Contact</th>
-                  <th>Status</th>
-                  <th>Started</th>
-                </tr>
-              </thead>
-              <tbody id="history-body">
-                <tr><td colspan="5" class="empty">Loading verifications...</td></tr>
-              </tbody>
-            </table>
-          </div>
+    <main class="workspace-main">
+      <header class="topbar"><a href="/">DeepTruck Verify</a><span class="breadcrumb-divider">/</span><span id="breadcrumb-page">Verifications</span><button class="profile-button" type="button" data-go-view="settings" aria-label="Open account settings"><span class="avatar" data-account-initials>—</span></button></header>
+      <div class="page-heading"><div><p class="eyebrow">Your workspace</p><h1 id="page-title">Verifications</h1><p id="page-description">Verify carrier contacts and keep every detail in one place.</p></div><button class="primary" id="new-verification-button" type="button" data-go-view="verifications" hidden><svg aria-hidden="true"><use href="#icon-search"></use></svg>New verification</button></div>
+      <div id="app-message" class="inline-message" role="status" aria-live="polite"></div>
+      <section id="verifications" class="view active" aria-label="Carrier verifications">
+        <div class="metrics"><article class="metric total"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-grid"></use></svg></span><span>Total verifications</span><b data-stat="total">—</b><small>All carrier requests</small></article><article class="metric verified"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-check"></use></svg></span><span>Verified</span><b data-stat="verified">—</b><small>Completed carrier checks</small></article><article class="metric pending"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-history"></use></svg></span><span>Pending</span><b data-stat="pending">—</b><small>Waiting on the carrier</small></article></div>
+        <section class="panel lookup-panel"><div class="lookup-heading"><span class="panel-icon"><svg aria-hidden="true"><use href="#icon-search"></use></svg></span><div><h2>Start a new verification</h2><p>Find a carrier by their USDOT number.</p></div></div>
+          <form id="dot-form" class="lookup-form"><label for="dot-input">USDOT number<span class="search-field"><svg aria-hidden="true"><use href="#icon-search"></use></svg><input id="dot-input" inputmode="numeric" autocomplete="off" required maxlength="8" placeholder="e.g. 4345567"></span></label><button id="dot-search-button" class="primary" type="submit">Search carrier</button></form>
+          <div id="verify-message" class="inline-message" role="status" aria-live="polite"></div>
         </section>
+        <div id="manual-result" class="manual-result"><section class="panel empty-panel"><div class="empty-state-icon"><img src="/admin/shield-mark.svg" width="44" height="50" alt=""></div><h2>Every check starts with a carrier</h2><p class="muted">Search above to review carrier details and start a verification.</p><div class="empty-signal-grid"><article><svg aria-hidden="true"><use href="#icon-building"></use></svg><div><b>Carrier profile</b><span>Identity & authority</span></div></article><article><svg aria-hidden="true"><use href="#icon-mail"></use></svg><div><b>Email & SMS</b><span>Listed contact verification</span></div></article><article><svg aria-hidden="true"><use href="#icon-doc"></use></svg><div><b>Driver documents</b><span>License, W-9 & insurance</span></div></article></div></section></div>
+        <section class="panel recent-panel"><div class="panel-head"><div><h2>Recent verifications</h2><p>Your latest carrier requests.</p></div><button class="text-button" type="button" data-go-view="history">View all <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></button></div><div class="table-wrap"><table><thead><tr><th>Carrier</th><th>Status</th><th>Started</th></tr></thead><tbody id="recent-body"><tr><td colspan="3" class="empty">Loading your verifications…</td></tr></tbody></table></div></section>
       </section>
-
-      <section id="billing" class="view">
-        <div class="split">
-          <section class="panel">
-            <h2>Billing</h2>
-            <p class="muted">Monthly plans include a fixed number of verification requests. Starter pauses at its limit; Shipper and Scale can add extra volume.</p>
-            <div class="billing-card">
-              <span>Current plan</span>
-              <b>Shipper</b>
-              <small>$49/mo includes 50 requests</small>
-            </div>
-            <button class="primary">Add payment method</button>
-          </section>
-          <section class="panel">
-            <h2>Plan</h2>
-            <div class="plan">
-              <b>Starter</b>
-              <span>$19/mo includes 5 requests</span>
-            </div>
-            <div class="plan">
-              <b>Shipper</b>
-              <span>$49/mo includes 50 requests</span>
-            </div>
-            <div class="plan muted-plan">
-              <b>Scale</b>
-              <span>$79/mo includes 100 requests</span>
-            </div>
-          </section>
-        </div>
+      <section id="history" class="view" aria-label="Verification history">
+        <div class="metrics history-metrics"><article class="metric total"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-grid"></use></svg></span><span>Total verifications</span><b data-stat="total" id="metric-total">—</b><small>All carrier requests</small></article><article class="metric verified"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-check"></use></svg></span><span>Verified</span><b data-stat="verified" id="metric-verified">—</b><small>Completed carrier checks</small></article><article class="metric pending"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-history"></use></svg></span><span>Pending</span><b data-stat="pending" id="metric-pending">—</b><small>Waiting on the carrier</small></article><article class="metric ready"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-doc"></use></svg></span><span>Ready for review</span><b data-stat="ready" id="metric-ready">—</b><small>All documents received</small></article></div>
+        <section class="panel history-panel"><div class="panel-head"><div><h2>All verifications <span id="history-count" class="count-pill">0</span></h2><p>Contacts, documents and the full verification record.</p></div><button id="refresh-history" class="secondary" type="button"><svg aria-hidden="true"><use href="#icon-refresh"></use></svg>Refresh</button></div><div class="table-tools"><div class="filter-group" aria-label="Filter verification status"><button type="button" data-filter="all" class="filter-chip active" aria-pressed="true">All</button><button type="button" data-filter="verified" class="filter-chip" aria-pressed="false">Verified</button><button type="button" data-filter="pending" class="filter-chip" aria-pressed="false">Pending</button></div><label class="search-field table-search" for="search"><svg aria-hidden="true"><use href="#icon-search"></use></svg><input id="search" type="search" aria-label="Search verification history" placeholder="Search carrier, USDOT or MC"></label></div><div class="table-wrap"><table><thead><tr><th>Carrier</th><th>USDOT / MC</th><th>Contact</th><th>Status</th><th>Started</th></tr></thead><tbody id="history-body"><tr><td colspan="5" class="empty">Loading verifications…</td></tr></tbody></table></div></section>
       </section>
-
-      <section id="settings" class="view">
-        <div class="split">
-          <section class="panel">
-            <h2>Account settings</h2>
-            <label>Company name<input id="settings-company" value=""></label>
-            <label>Notification email<input id="settings-email" value="" readonly></label>
-            <label>Request volume<input value="Shipper includes 50 monthly checks"></label>
-            <button id="save-account-button" class="primary">Save changes</button>
-            <div id="settings-message" class="inline-message"></div>
-          </section>
-          <section class="panel">
-            <h2>Extension</h2>
-            <p class="muted">Chrome extension is configured for Central Dispatch carrier profiles.</p>
-            <div class="status-line"><span></span> Connected</div>
-          </section>
-        </div>
+      <section id="billing" class="view" aria-label="Plans and billing">
+        <section class="panel billing-intro"><span class="panel-icon"><svg aria-hidden="true"><use href="#icon-card"></use></svg></span><div><h2>A plan for your shipping volume</h2><p>Every plan includes contact verification and one shared carrier record.</p></div></section>
+        <div class="plan-grid"><article class="panel plan-card "><div class="plan-heading"><h2>Starter</h2></div><p>For occasional carrier checks.</p><div class="plan-price">$19<small>/ month</small></div><div class="plan-volume"><b>5</b> verification requests / month</div><ul><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Email & SMS verification</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Driver document collection</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Verification history</li></ul><a class="secondary" href="mailto:verify@deeptruck.io?subject=Starter%20plan">Contact us about Starter</a></article><article class="panel plan-card featured-plan"><div class="plan-heading"><h2>Shipper</h2><span class="plan-label">Popular</span></div><p>For teams moving loads every day.</p><div class="plan-price">$49<small>/ month</small></div><div class="plan-volume"><b>50</b> verification requests / month</div><ul><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Email & SMS verification</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Driver document collection</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Verification history</li></ul><a class="primary" href="mailto:verify@deeptruck.io?subject=Shipper%20plan">Contact us about Shipper</a></article><article class="panel plan-card "><div class="plan-heading"><h2>Scale</h2></div><p>For growing teams and higher volume.</p><div class="plan-price">$79<small>/ month</small></div><div class="plan-volume"><b>100</b> verification requests / month</div><ul><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Email & SMS verification</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Driver document collection</li><li><svg aria-hidden="true"><use href="#icon-check"></use></svg>Verification history</li></ul><a class="secondary" href="mailto:verify@deeptruck.io?subject=Scale%20plan">Contact us about Scale</a></article></div><p class="billing-note">Need help with your plan? <a href="mailto:verify@deeptruck.io">Contact billing support</a>.</p>
       </section>
+      <section id="settings" class="view" aria-label="Account settings"><div class="split settings-grid"><section class="panel settings-panel"><div class="panel-head"><div><h2>Workspace details</h2><p>Manage your company and account information.</p></div></div><form id="settings-form"><label for="settings-company">Company name<input id="settings-company" autocomplete="organization" required maxlength="120" placeholder="Your company"></label><label for="settings-name">Your name<input id="settings-name" readonly></label><label for="settings-email">Email address<input id="settings-email" type="email" readonly></label><div class="settings-actions"><button id="save-account-button" class="primary" type="submit">Save changes</button><div id="settings-message" class="inline-message" role="status" aria-live="polite"></div></div></form></section><section class="panel extension-panel"><span class="panel-icon"><svg aria-hidden="true"><use href="#icon-extension"></use></svg></span><h2>Verify where you already work</h2><p class="muted">Use the DeepTruck browser extension to start a check from a Central Dispatch carrier profile.</p><div class="extension-steps"><div><span>1</span>Open the carrier profile</div><div><span>2</span>Start a DeepTruck verification</div><div><span>3</span>Review the record in your workspace</div></div><a class="text-button" href="/#features">Explore the workflow <svg aria-hidden="true"><use href="#icon-arrow"></use></svg></a></section></div></section>
     </main>
-
-    <div id="details" class="details" aria-hidden="true">
-      <section class="details-modal" role="dialog" aria-modal="true" aria-label="Verification details">
-        <button id="close-details" class="close-details">Close</button>
-        <div id="details-content"></div>
-      </section>
-    </div>
+    <div id="details" class="details" aria-hidden="true"><section class="details-modal" role="dialog" aria-modal="true" aria-label="Verification details" tabindex="-1"><button id="close-details" class="icon-button close-details" type="button" aria-label="Close verification details"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button><div id="details-content"></div></section></div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
+  <script src="/admin/auth-client.js"></script>
+  <script src="/admin/app.js"></script>
 </body>
 </html>

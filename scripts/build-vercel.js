@@ -35,8 +35,8 @@ copyDir(path.join(root, "verify-site"), publicDir);
 copyDir(path.join(root, "admin-site"), path.join(publicDir, "admin"));
 
 replaceInFile(path.join(publicDir, "index.html"), [
-  ["http://localhost:5174/index.html#signup", "/admin/#signup"],
-  ["http://localhost:5174/index.html", "/admin/"]
+  ["http://localhost:5174/index.html#signup", "/signup"],
+  ["http://localhost:5174/index.html", "/login"]
 ]);
 
 console.log("Built Vercel static output in public/");

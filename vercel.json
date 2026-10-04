@@ -13,6 +13,14 @@
     {
       "source": "/verify",
       "destination": "/verify.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/admin/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/admin/signup.html"
     }
   ]
 }

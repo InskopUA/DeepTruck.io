@@ -101,7 +101,9 @@ https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/carrier-verify
 Vercel should host only the public web UI:
 
 - `/` public landing page
-- `/admin` shipper admin console
+- `/login` sign-in page
+- `/signup` registration page
+- `/admin` authenticated shipper workspace
 - `/verify.html?id=...` carrier verification page
 - `/verify?id=...` same verification page through a clean URL rewrite
 
