@@ -30,7 +30,9 @@ body {
 
 body {
   background:
-    linear-gradient(180deg, #fbfcfa 0, var(--bg) 42%, #eef4f2 100%);
+    radial-gradient(900px 500px at 74% 6%, rgba(52, 120, 246, 0.18), transparent 62%),
+    radial-gradient(760px 520px at 14% 0%, rgba(82, 230, 216, 0.08), transparent 62%),
+    #070b12;
   color: var(--text);
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
@@ -53,28 +55,28 @@ input {
 }
 
 .auth-shell {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 28px 80px rgba(31, 42, 56, 0.13);
+  background: rgba(10, 17, 28, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  border-radius: 24px;
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.34);
   display: grid;
-  grid-template-columns: minmax(420px, 1.1fr) minmax(360px, 460px);
-  max-width: 980px;
-  min-height: 620px;
+  grid-template-columns: minmax(420px, 1fr) minmax(380px, 0.92fr);
+  max-width: 1120px;
+  min-height: 680px;
   overflow: hidden;
   width: 100%;
 }
 
 .auth-brand {
   background:
-    linear-gradient(135deg, rgba(36, 87, 255, 0.20), rgba(8, 127, 91, 0.20)),
-    var(--ink);
+    radial-gradient(520px 300px at 38% 58%, rgba(52, 120, 246, 0.22), transparent 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
   color: #fff;
   display: grid;
-  gap: 28px;
+  gap: 30px;
   grid-template-rows: auto 1fr auto auto;
   overflow: hidden;
-  padding: 34px;
+  padding: 38px;
   position: relative;
   min-width: 0;
 }
@@ -138,48 +140,70 @@ input {
 }
 
 .auth-hero-copy h1 {
-  font-size: 42px;
-  line-height: 1.02;
+  font-size: clamp(40px, 4.2vw, 58px);
+  letter-spacing: -0.055em;
+  line-height: 0.98;
   margin: 0;
-  max-width: 420px;
+  max-width: 520px;
 }
 
 .auth-hero-copy p:last-child {
-  color: #c8d0da;
-  font-size: 14px;
+  color: #aab5c4;
+  font-size: 15px;
   line-height: 1.6;
-  margin: 16px 0 0;
-  max-width: 410px;
+  margin: 20px 0 0;
+  max-width: 470px;
 }
 
-.auth-signal-grid {
+.auth-product-card {
+  background: rgba(9, 15, 25, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
   display: grid;
   gap: 10px;
-  grid-template-columns: 1fr 1fr;
+  padding: 18px;
   position: relative;
   z-index: 1;
 }
 
-.auth-signal-grid div {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 10px;
-  padding: 12px;
+.auth-product-head,
+.auth-product-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 
-.auth-signal-grid span {
-  color: #aeb7c4;
-  display: block;
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
+.auth-product-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  padding-bottom: 12px;
 }
 
-.auth-signal-grid b {
+.auth-product-head b {
   color: #fff;
-  display: block;
+  font-size: 18px;
+}
+
+.auth-product-head span {
+  background: rgba(111, 234, 159, 0.08);
+  border: 1px solid rgba(111, 234, 159, 0.18);
+  border-radius: 999px;
+  color: #8debad;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 9px;
+}
+
+.auth-product-row {
+  background: rgba(255, 255, 255, 0.024);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 13px;
+  color: #91a0b2;
   font-size: 13px;
-  margin-top: 6px;
+  padding: 13px;
+}
+
+.auth-product-row b {
+  color: #88e8aa;
 }
 
 .auth-workflow {
@@ -206,17 +230,17 @@ input {
 }
 
 .auth-card {
-  background: #fff;
+  background: rgba(247, 250, 255, 0.03);
   display: grid;
   align-content: center;
   min-width: 0;
-  padding: 42px;
+  padding: 52px;
 }
 
 .auth-tabs {
-  background: var(--soft);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
   display: grid;
   gap: 4px;
   grid-template-columns: 1fr 1fr;
@@ -227,8 +251,8 @@ input {
 .auth-tabs button {
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 6px;
-  color: var(--muted);
+  border-radius: 9px;
+  color: #95a4b6;
   cursor: pointer;
   font-size: 11px;
   font-weight: 800;
@@ -237,19 +261,21 @@ input {
 }
 
 .auth-tabs button.active {
-  background: #fff;
-  border-color: var(--line2);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(255, 255, 255, 0.72);
+  color: #101923;
 }
 
 .auth-card h1 {
-  font-size: 31px;
+  color: #f3f7fb;
+  font-size: 34px;
+  letter-spacing: -0.04em;
   line-height: 1.1;
   margin: 0;
 }
 
 .auth-copy {
-  color: var(--muted);
+  color: #9aa8ba;
   font-size: 13px;
   line-height: 1.45;
   margin: 9px 0 2px;
@@ -280,13 +306,16 @@ input {
 }
 
 .auth-card label {
-  color: #384252;
+  color: #c8d2de;
   font-size: 12px;
   margin-top: 15px;
 }
 
 .auth-card input {
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 10px;
+  color: #f3f7fb;
   font-size: 13px;
   font-weight: 720;
   min-height: 48px;
@@ -295,20 +324,20 @@ input {
 }
 
 .auth-card input::placeholder {
-  color: #8c95a3;
+  color: #707f93;
 }
 
 .auth-card .primary {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: linear-gradient(180deg, #7bb9ff, #4b8af9);
+  border-color: transparent;
   border-radius: 10px;
-  color: #fff;
+  color: #07111e;
   font-size: 13px;
 }
 
 .auth-card .primary:hover {
-  background: #253144;
-  border-color: #253144;
+  background: linear-gradient(180deg, #8ac1ff, #5b96ff);
+  border-color: transparent;
 }
 
 .app {

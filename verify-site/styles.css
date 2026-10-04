@@ -1359,7 +1359,7 @@ body.landing {
 
 .score-ring {
   aspect-ratio: 1;
-  background: conic-gradient(#62e6bd 0 82%, rgba(255, 255, 255, 0.12) 82% 100%);
+  background: conic-gradient(#62e6bd 0 100%, rgba(255, 255, 255, 0.12) 100% 100%);
   border-radius: 999px;
   display: grid;
   place-items: center;

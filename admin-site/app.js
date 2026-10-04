@@ -164,7 +164,7 @@ async function submitAuthForm() {
   if (!authClient) return;
   setAuthMessage("");
   authSubmit.disabled = true;
-  authSubmit.textContent = state.authMode === "signup" ? "Creating..." : "Logging in...";
+  authSubmit.textContent = state.authMode === "signup" ? "Signing up..." : "Signing in...";
 
   try {
     const email = authEmail.value.trim();
@@ -216,9 +216,9 @@ function renderAuthMode() {
   signupFields.classList.toggle("active", signup);
   companyName.required = signup;
   userName.required = signup;
-  authTitle.textContent = signup ? "Create shipper account" : "Welcome back";
-  authKicker.textContent = signup ? "Shipper signup" : "Shipper login";
-  authSubmit.textContent = signup ? "Create account" : "Login";
+  authTitle.textContent = signup ? "Create your DeepTruck account" : "Welcome back";
+  authKicker.textContent = signup ? "Sign Up" : "Sign In";
+  authSubmit.textContent = signup ? "Sign Up" : "Sign In";
   authPassword.autocomplete = signup ? "new-password" : "current-password";
 }
 

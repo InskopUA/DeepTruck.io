@@ -13,35 +13,37 @@
         <div class="auth-logo-row">
           <span>DT</span>
           <div>
-            <b>DeepTruck</b>
-            <small>Shipper console</small>
+            <b>DeepTruck Verify</b>
+            <small>Carrier verification workspace</small>
           </div>
         </div>
 
         <div class="auth-hero-copy">
-          <p class="eyebrow">Carrier verification workspace</p>
           <h1>Verify the carrier before the load moves.</h1>
-          <p>Search USDOT records, send identity checks, collect documents, and keep the shipper-side audit trail in one console.</p>
+          <p>One identity checkpoint for the carrier, driver and documents before shipment information is released.</p>
         </div>
 
-        <div class="auth-signal-grid">
-          <div><span>Email</span><b>Confirmed</b></div>
-          <div><span>SMS</span><b>Verified</b></div>
-          <div><span>License</span><b>Collected</b></div>
-          <div><span>COI / W-9</span><b>Tracked</b></div>
+        <div class="auth-product-card">
+          <div class="auth-product-head">
+            <b>OMAX LLC</b>
+            <span>Ready to review</span>
+          </div>
+          <div class="auth-product-row"><span>Email</span><b>Verified</b></div>
+          <div class="auth-product-row"><span>SMS</span><b>Verified</b></div>
+          <div class="auth-product-row"><span>Driver</span><b>Received</b></div>
         </div>
 
         <div class="auth-workflow">
           <div><span></span>Central Dispatch carrier profile</div>
-          <div><span></span>FMCSA contact verification</div>
-          <div><span></span>Shipper review history</div>
+          <div><span></span>Listed email and phone check</div>
+          <div><span></span>Verification record for the team</div>
         </div>
       </div>
 
       <div class="auth-card">
         <div class="auth-tabs" role="tablist" aria-label="Account access">
-          <button id="login-tab" class="active" type="button" data-auth-mode="login">Login</button>
-          <button id="signup-tab" type="button" data-auth-mode="signup">Create account</button>
+          <button id="login-tab" class="active" type="button" data-auth-mode="login">Sign In</button>
+          <button id="signup-tab" type="button" data-auth-mode="signup">Sign Up</button>
         </div>
 
         <form id="auth-form">
@@ -59,7 +61,7 @@
           <label>Email<input id="auth-email" type="email" autocomplete="email" required placeholder="you@company.com"></label>
           <label>Password<input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Minimum 6 characters"></label>
 
-          <button id="auth-submit" class="primary auth-submit" type="submit">Login</button>
+          <button id="auth-submit" class="primary auth-submit" type="submit">Sign In</button>
           <div id="auth-message" class="inline-message"></div>
         </form>
       </div>
