@@ -10,8 +10,7 @@ const types = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
-  ".svg": "image/svg+xml",
-  ".zip": "application/zip"
+  ".svg": "image/svg+xml"
 };
 
 http.createServer((req, res) => {
@@ -24,7 +23,6 @@ http.createServer((req, res) => {
   let pathname = url.pathname === "/" ? "/index.html" : url.pathname;
   if (pathname === "/admin/") pathname = "/admin/index.html";
   if (pathname === "/verify") pathname = "/verify.html";
-  if (pathname === "/extension") pathname = "/extension.html";
   if (pathname === "/login" || pathname === "/admin/login") pathname = "/admin/login.html";
   if (pathname === "/signup" || pathname === "/admin/signup") pathname = "/admin/signup.html";
   const filePath = path.normalize(path.join(root, pathname));

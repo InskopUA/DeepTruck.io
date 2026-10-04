@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const { packageExtension } = require("./package-extension");
 
 const root = path.resolve(__dirname, "..");
 const publicDir = path.join(root, "public");
@@ -34,11 +33,6 @@ function replaceInFile(file, replacements) {
 resetDir(publicDir);
 copyDir(path.join(root, "verify-site"), publicDir);
 copyDir(path.join(root, "admin-site"), path.join(publicDir, "admin"));
-
-// Ship only the extension's manifest and local assets, not the project workspace.
-const extensionDir = path.join(publicDir, "downloads");
-fs.mkdirSync(extensionDir, { recursive: true });
-packageExtension(root, path.join(extensionDir, "deeptruck-verify.zip"));
 
 replaceInFile(path.join(publicDir, "index.html"), [
   ["http://localhost:5174/index.html#signup", "/signup"],

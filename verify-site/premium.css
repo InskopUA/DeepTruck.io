@@ -3492,6 +3492,7 @@ body.premium-landing {
 .extension-copy p { color: #919ba9; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.7; margin: 24px 0 30px; max-width: 650px; }
 .extension-install.btn-primary { background: rgba(134, 181, 237, .065); border: 1px solid rgba(152, 190, 234, .45); border-radius: 8px; box-shadow: none; color: #c2d9f3; font-size: 15px; gap: 10px; padding: 13px 20px; }
 .extension-install.btn-primary:hover { background: rgba(134, 181, 237, .13); }
+.extension-install:disabled { cursor: default; }
 .extension-install:focus-visible { outline: 2px solid #9ac7fc; outline-offset: 5px; }
 .extension-mascot { --shield-look: -10; animation: extensionShieldLook 15s ease-in-out infinite; bottom: -92px; height: 535px; position: absolute; right: -36px; width: 514px; z-index: 1; }
 .extension-mascot .shield-artwork { display: block; height: 100%; overflow: visible; stroke: none; stroke-width: 1; width: 100%; }
