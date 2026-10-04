@@ -130,7 +130,7 @@
           <article><span>Total</span><b id="metric-total">-</b><small>all requests</small></article>
           <article><span>Verified</span><b id="metric-verified">-</b><small>completed checks</small></article>
           <article><span>Pending</span><b id="metric-pending">-</b><small>waiting on carrier</small></article>
-          <article><span>Overage</span><b>$0.50</b><small>per extra request</small></article>
+          <article><span>Plan limit</span><b>50</b><small>requests included</small></article>
         </div>
 
         <section class="panel">
@@ -169,7 +169,7 @@
         <div class="split">
           <section class="panel">
             <h2>Billing</h2>
-            <p class="muted">Monthly plans include a fixed number of verification requests. Extra requests are billed after the monthly limit.</p>
+            <p class="muted">Monthly plans include a fixed number of verification requests. Starter pauses at its limit; Shipper and Scale can add extra volume.</p>
             <div class="billing-card">
               <span>Current plan</span>
               <b>Shipper</b>
@@ -201,7 +201,7 @@
             <h2>Account settings</h2>
             <label>Company name<input id="settings-company" value=""></label>
             <label>Notification email<input id="settings-email" value="" readonly></label>
-            <label>Extra request price<input value="$0.50"></label>
+            <label>Request volume<input value="Shipper includes 50 monthly checks"></label>
             <button id="save-account-button" class="primary">Save changes</button>
             <div id="settings-message" class="inline-message"></div>
           </section>

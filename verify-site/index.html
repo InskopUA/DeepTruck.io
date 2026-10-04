@@ -6,10 +6,25 @@
   <meta name="theme-color" content="#070b12">
   <title>DeepTruck Verify</title>
   <meta name="description" content="Pre-load carrier identity checks for vehicle shipping teams.">
+  <meta property="og:title" content="DeepTruck Verify">
+  <meta property="og:description" content="Verify carrier identity before you release the load.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/og-deeptruck.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="premium.css">
 </head>
 <body class="premium-landing">
+  <svg class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M11 18h2"/></symbol>
+    <symbol id="icon-id" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M8 10h4M8 14h3M15 10h2M15 14h2"/></symbol>
+    <symbol id="icon-history" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 5v5h5M12 8v5l3 2"/></symbol>
+    <symbol id="icon-dashboard" viewBox="0 0 24 24"><path d="M4 5h7v6H4zM13 5h7v4h-7zM13 11h7v8h-7zM4 13h7v6H4z"/></symbol>
+    <symbol id="icon-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></symbol>
+  </svg>
   <div class="noise"></div>
   <div class="cursor-glow" id="cursorGlow"></div>
 
@@ -31,7 +46,7 @@
         <div class="nav-actions">
           <a class="btn btn-ghost" href="/admin/">Login</a>
           <a class="btn btn-primary" href="/admin/#signup">Create account</a>
-          <button class="hamburger" id="hamburger" type="button" aria-label="Open menu">Menu</button>
+          <button class="hamburger" id="hamburger" type="button" aria-label="Open menu" aria-expanded="false">Menu</button>
         </div>
       </nav>
     </div>
@@ -68,10 +83,10 @@
             <div class="app-content">
               <aside class="mock-sidebar">
                 <div class="side-logo"></div>
-                <div class="side-ico active">OK</div>
-                <div class="side-ico">Q</div>
-                <div class="side-ico">H</div>
-                <div class="side-ico">B</div>
+                <div class="side-ico active"><svg><use href="#icon-dashboard"></use></svg></div>
+                <div class="side-ico"><svg><use href="#icon-check"></use></svg></div>
+                <div class="side-ico"><svg><use href="#icon-history"></use></svg></div>
+                <div class="side-ico"><svg><use href="#icon-doc"></use></svg></div>
               </aside>
               <div class="main-ui">
                 <div class="ui-heading">
@@ -92,9 +107,9 @@
                   </div>
                 </div>
                 <div class="checks">
-                  <div class="check" data-check><span class="check-ico">@</span>Email confirmed<strong>Waiting</strong><span class="progress"></span></div>
-                  <div class="check" data-check><span class="check-ico">#</span>SMS code verified<strong>Waiting</strong><span class="progress"></span></div>
-                  <div class="check" data-check><span class="check-ico">ID</span>Driver license uploaded<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check><span class="check-ico"><svg><use href="#icon-mail"></use></svg></span>Email confirmed<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check><span class="check-ico"><svg><use href="#icon-phone"></use></svg></span>SMS code verified<strong>Waiting</strong><span class="progress"></span></div>
+                  <div class="check" data-check><span class="check-ico"><svg><use href="#icon-id"></use></svg></span>Driver license uploaded<strong>Waiting</strong><span class="progress"></span></div>
                 </div>
                 <div class="timeline">
                   <div class="tl-title">Verification timeline</div>
@@ -116,11 +131,11 @@
 
     <section class="trust-strip">
       <div class="container trust-inner reveal">
-        <div class="trust-item"><span class="mini-icon">CD</span>Central Dispatch workflow</div>
-        <div class="trust-item"><span class="mini-icon">@</span>Listed email check</div>
-        <div class="trust-item"><span class="mini-icon">#</span>SMS verification</div>
-        <div class="trust-item"><span class="mini-icon">ID</span>Driver documents</div>
-        <div class="trust-item"><span class="mini-icon">TS</span>Timestamped history</div>
+        <div class="trust-item"><span class="mini-icon"><svg><use href="#icon-dashboard"></use></svg></span>Central Dispatch workflow</div>
+        <div class="trust-item"><span class="mini-icon"><svg><use href="#icon-mail"></use></svg></span>Listed email check</div>
+        <div class="trust-item"><span class="mini-icon"><svg><use href="#icon-phone"></use></svg></span>SMS verification</div>
+        <div class="trust-item"><span class="mini-icon"><svg><use href="#icon-id"></use></svg></span>Driver documents</div>
+        <div class="trust-item"><span class="mini-icon"><svg><use href="#icon-history"></use></svg></span>Timestamped history</div>
       </div>
     </section>
 
@@ -129,7 +144,7 @@
         <div class="reveal">
           <div class="section-kicker">Product, not paperwork</div>
           <h2 class="section-title">One place to see who was checked, what passed, and what still needs attention.</h2>
-          <p class="section-copy">DeepTruck turns the carrier check into an operational record your team can scan in seconds instead of digging through screenshots, emails, texts, and spreadsheets.</p>
+          <p class="section-copy">A scan-ready verification queue for email, SMS, driver documents, and team review history.</p>
         </div>
         <div class="dash-shell reveal delay-1">
           <aside class="dash-side">
@@ -145,7 +160,7 @@
           <div class="dash-main">
             <div class="dash-head">
               <div><h3>Verification queue</h3><p>Review carrier identity before sharing sensitive load details.</p></div>
-              <button class="new-btn" type="button">+ New verification</button>
+              <span class="new-btn">New verification</span>
             </div>
             <div class="summary-grid">
               <div class="metric"><span>Verified</span><b class="green">12</b><small>ready to review</small></div>
@@ -153,7 +168,7 @@
               <div class="metric"><span>Documents</span><b>9</b><small>received</small></div>
               <div class="metric"><span>Today</span><b>16</b><small>requests</small></div>
             </div>
-            <div class="table-box">
+            <div class="table-box dashboard-table">
               <div class="table-toolbar"><div class="search">Search carrier or USDOT</div><div class="filter">Status</div><div class="filter">Date</div></div>
               <div class="table-row header"><div>Carrier</div><div>Status</div><div>Contact</div><div>Docs</div><div>Updated</div></div>
               <div class="table-row"><div class="entity"><b>OMAX LLC</b><small>USDOT 4345567 · MC1698436</small></div><div><span class="tag">Verified</span></div><div>Email + SMS</div><div>3 / 3</div><div>2m ago</div></div>
@@ -171,7 +186,7 @@
         <div class="center reveal">
           <div class="section-kicker">Built into the decision point</div>
           <h2 class="section-title">Three steps before the carrier receives sensitive load details.</h2>
-          <p class="section-copy">A lightweight checkpoint that fits the workflow your dispatch team already uses.</p>
+          <p class="section-copy">A lightweight checkpoint beside the dispatch tools your team already uses.</p>
         </div>
         <div class="workflow-grid">
           <article class="step reveal"><div class="step-no">01</div><h3>Read carrier profile</h3><p>The Chrome extension detects the USDOT on the Central Dispatch carrier profile and brings carrier contact data into the panel.</p><div class="step-ui"><div class="mini-row"><span>USDOT detected</span><strong>4345567</strong></div><div class="signal"><i style="width:100%"></i></div><div class="mini-row"><span>Carrier</span><strong>OMAX LLC</strong></div></div></article>
@@ -186,14 +201,14 @@
         <div class="reveal">
           <div class="section-kicker">Chrome extension</div>
           <h2 class="section-title">Verify where the dispatch decision already happens.</h2>
-          <p class="section-copy">No extra spreadsheet. No copying carrier data into another tool. Start the identity check directly from the carrier profile, then keep the verification record in DeepTruck.</p>
+          <p class="section-copy">Start the identity check from the carrier profile and keep the resulting record in DeepTruck.</p>
           <div class="section-actions"><a class="btn btn-primary btn-lg" href="#pricing">Create account</a><a class="btn btn-ghost btn-lg" href="#product">See dashboard</a></div>
         </div>
         <div class="browser reveal delay-1">
           <div class="browser-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="browser-url">centraldispatch.com / carrier / profile</div></div>
           <div class="browser-body">
             <div class="cd-page"><div class="cd-head"><b class="cd-title">Carrier Profile</b><span class="grey-btn"></span></div><div class="cd-company"><h4>OMAX LLC</h4><p>Active carrier profile</p><div class="cd-info"><div><span>USDOT</span><b>4345567</b></div><div><span>MC Number</span><b>MC1698436</b></div><div><span>Phone</span><b>(307) 441-5452</b></div><div><span>Email</span><b>info@omaxllc.net</b></div></div></div><div class="fake-lines"><i></i><i></i><i></i></div></div>
-            <aside class="ext-panel"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567</div><div class="found"><b>Listed contacts loaded</b>Email + phone ready for verification</div><button class="verify-btn" type="button">Start verification</button><p class="ext-note">DeepTruck adds an independent shipper-side identity checkpoint. It does not replace FMCSA or Central Dispatch.</p></aside>
+            <aside class="ext-panel"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567</div><div class="found"><b>Listed contacts loaded</b>Email + phone ready for verification</div><span class="verify-btn">Start verification</span><p class="ext-note">DeepTruck adds an independent shipper-side identity checkpoint. It does not replace FMCSA or Central Dispatch.</p></aside>
           </div>
         </div>
       </div>
@@ -201,9 +216,9 @@
 
     <section>
       <div class="container">
-        <div class="reveal"><div class="section-kicker">Everything in one verification record</div><h2 class="section-title">A safety layer designed around the exact moment your team decides to trust a carrier.</h2></div>
+        <div class="reveal"><div class="section-kicker">Verification record</div><h2 class="section-title">Documents and contact checks stay attached to the carrier request.</h2></div>
         <div class="bento">
-          <article class="bento-card large reveal"><h3>Documents, attached to the check</h3><p>Keep driver license, W-9 and certificate of insurance alongside the verification request.</p><div class="bento-visual"><div class="doc"><span class="doc-icon">ID</span><div><b>Driver license</b><br><small>Uploaded 2 min ago</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon">W9</span><div><b>W-9</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon">COI</span><div><b>Certificate of insurance</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div></div></article>
+          <article class="bento-card large reveal"><h3>Documents, attached to the check</h3><p>Keep driver license, W-9 and certificate of insurance alongside the verification request.</p><div class="bento-visual"><div class="doc"><span class="doc-icon"><svg><use href="#icon-id"></use></svg></span><div><b>Driver license</b><br><small>Uploaded 2 min ago</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon"><svg><use href="#icon-doc"></use></svg></span><div><b>W-9</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div><div class="doc"><span class="doc-icon"><svg><use href="#icon-doc"></use></svg></span><div><b>Certificate of insurance</b><br><small>PDF document</small></div><span class="doc-status">Received</span></div></div></article>
           <article class="bento-card reveal delay-1"><h3>Clear status at a glance</h3><p>Use consistent states instead of searching through messages.</p><div class="status-cloud"><span class="good">Verified</span><span>Pending</span><span>Review</span><span>Documents</span></div></article>
           <article class="bento-card reveal delay-2"><h3>Listed contacts</h3><p>Verification goes to the carrier contact used for the identity check.</p><div class="bento-visual compact"><div class="mini-row"><span>Email</span><strong>Confirmed</strong></div><div class="mini-row"><span>Phone</span><strong>SMS verified</strong></div></div></article>
           <article class="bento-card wide reveal delay-1"><h3>Timestamped verification history</h3><p>Keep a simple trail of what happened and when.</p><div class="bento-visual"><div class="history-line"><div class="h-event"><span class="h-dot"></span><div><b>Verification request created</b>10:42 AM · Dispatcher</div></div><div class="h-event"><span class="h-dot"></span><div><b>SMS code completed</b>10:45 AM · Listed phone</div></div><div class="h-event"><span class="h-dot"></span><div><b>Driver documents received</b>10:47 AM · Verification link</div></div></div></div></article>
@@ -213,7 +228,7 @@
 
     <section>
       <div class="container">
-        <div class="center reveal"><div class="section-kicker">One extra checkpoint</div><h2 class="section-title">A profile tells you who the carrier is. Verification helps confirm who is replying today.</h2></div>
+        <div class="center reveal"><div class="section-kicker">One extra checkpoint</div><h2 class="section-title">Confirm the contact path before the load is released.</h2></div>
         <div class="compare reveal delay-1">
           <div class="compare-col"><span class="compare-label">Without verification</span><h3>Trust the conversation.</h3><div class="flow-list"><div class="flow-row"><span class="flow-ico">1</span><div><strong>Open carrier profile</strong><span>Review marketplace information</span></div></div><div class="flow-row"><span class="flow-ico">2</span><div><strong>Receive a call or email</strong><span>Assume the sender controls the carrier identity</span></div></div><div class="flow-row"><span class="flow-ico">3</span><div><strong>Share load details</strong><span>No separate identity checkpoint</span></div></div></div></div>
           <div class="compare-col good-flow"><span class="compare-label">With DeepTruck</span><h3>Verify the identity trail.</h3><div class="flow-list"><div class="flow-row"><span class="flow-ico">1</span><div><strong>Read carrier profile</strong><span>USDOT and carrier details enter the verification flow</span></div></div><div class="flow-row"><span class="flow-ico">2</span><div><strong>Email + SMS challenge</strong><span>Check the listed contact path</span></div></div><div class="flow-row"><span class="flow-ico">3</span><div><strong>Collect driver documents</strong><span>Keep the request and uploads together</span></div></div><div class="flow-row"><span class="flow-ico">4</span><div><strong>Review before release</strong><span>Make the dispatch decision with a recorded checkpoint</span></div></div></div></div>
@@ -223,21 +238,22 @@
 
     <section id="pricing">
       <div class="container">
-        <div class="center reveal"><div class="section-kicker">Simple monthly plans</div><h2 class="section-title">Start small. Scale verification volume when your dispatch team adopts the workflow.</h2><p class="section-copy">Additional verification requests are billed at $0.50 per request after the included monthly volume. SMS and email verification included.</p></div>
+        <div class="center reveal"><div class="section-kicker">Simple monthly plans</div><h2 class="section-title">Start small. Scale verification volume when your dispatch team adopts the workflow.</h2><p class="section-copy">SMS and email verification are included. Starter pauses at its monthly limit; Shipper and Scale can add extra requests.</p></div>
         <div class="pricing-grid">
-          <article class="price-card reveal"><div class="plan">Starter</div><div class="price">$19<small>/mo</small></div><p class="price-desc">For small shippers that want a simple safety layer.</p><div class="features"><div>5 requests included</div><div>Email + SMS verification</div><div>Verification history</div></div><a class="btn btn-ghost" href="/admin/#signup">Start</a></article>
-          <article class="price-card featured reveal delay-1"><span class="recommended">Best fit</span><div class="plan">Shipper</div><div class="price">$49<small>/mo</small></div><p class="price-desc">For active shippers sending regular loads.</p><div class="features"><div>50 requests included</div><div>Email + SMS verification</div><div>Driver document collection</div></div><a class="btn btn-primary" href="/admin/#signup">Create account</a></article>
-          <article class="price-card reveal delay-2"><div class="plan">Scale</div><div class="price">$79<small>/mo</small></div><p class="price-desc">For teams that need more checks across multiple dispatchers.</p><div class="features"><div>100 requests included</div><div>Email + SMS verification</div><div>Team verification history</div></div><a class="btn btn-ghost" href="/admin/#signup">Upgrade</a></article>
+          <article class="price-card reveal"><div class="plan">Starter</div><div class="price">$19<small>/mo</small></div><p class="price-desc">For small shippers that want a simple safety layer.</p><div class="features"><div>5 requests included</div><div>Email + SMS verification</div><div>Upgrade after monthly limit</div></div><a class="btn btn-ghost" href="/admin/#signup">Start</a></article>
+          <article class="price-card featured reveal delay-1"><span class="recommended">Best fit</span><div class="plan">Shipper</div><div class="price">$49<small>/mo</small></div><p class="price-desc">For active shippers sending regular loads.</p><div class="features"><div>50 requests included</div><div>Email + SMS verification</div><div>Extra requests available</div></div><a class="btn btn-primary" href="/admin/#signup">Create account</a></article>
+          <article class="price-card reveal delay-2"><div class="plan">Scale</div><div class="price">$79<small>/mo</small></div><p class="price-desc">For teams that need more checks across multiple dispatchers.</p><div class="features"><div>100 requests included</div><div>Team verification history</div><div>Lower-volume overage terms</div></div><a class="btn btn-ghost" href="/admin/#signup">Upgrade</a></article>
         </div>
       </div>
     </section>
 
-    <section id="reviews">
+    <section id="reviews" class="product-proof">
       <div class="container">
-        <div class="reveal"><div class="section-kicker">Shipper feedback</div><h2 class="section-title">Built for the moment a dispatcher asks: "Can I trust this carrier?"</h2></div>
-        <div class="reviews">
-          <article class="quote-big reveal"><div class="quote-mark">"</div><blockquote>The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record.</blockquote><div class="quote-meta"><b>Independent shipper</b><span>Used before assigning a pickup</span></div></article>
-          <div class="quotes-small"><article class="quote-card reveal delay-1"><p>"We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is exactly the checkpoint we needed."</p><b>Auto transport desk</b><span>Multi-dispatcher workflow</span></article><article class="quote-card reveal delay-2"><p>"The extension fits where the decision already happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails."</p><b>Operations manager</b><span>Central Dispatch workflow</span></article></div>
+        <div class="center reveal"><div class="section-kicker">What the record answers</div><h2 class="section-title">A dispatcher should see the decision signals without reading a thread.</h2></div>
+        <div class="proof-grid">
+          <article class="proof-card reveal"><span><svg><use href="#icon-mail"></use></svg></span><h3>Was the listed email reached?</h3><p>Email status sits beside the carrier profile and request history.</p></article>
+          <article class="proof-card reveal delay-1"><span><svg><use href="#icon-phone"></use></svg></span><h3>Did the phone pass SMS?</h3><p>The SMS result stays tied to the same verification request.</p></article>
+          <article class="proof-card reveal delay-2"><span><svg><use href="#icon-doc"></use></svg></span><h3>Are documents attached?</h3><p>License, W-9, and COI are visible before release review.</p></article>
         </div>
       </div>
     </section>
@@ -246,16 +262,16 @@
       <div class="container faq">
         <div class="reveal"><div class="section-kicker">FAQ</div><h2 class="section-title">The common questions before adding verification to a load workflow.</h2><p class="section-copy">DeepTruck is an additional shipper-side identity layer, not a replacement for FMCSA or your marketplace workflow.</p></div>
         <div class="faq-list reveal delay-1">
-          <div class="faq-item open"><button class="faq-q" type="button">What does DeepTruck Verify check?<span class="faq-plus">+</span></button><div class="faq-a">It verifies carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button">Why not trust Central Dispatch alone?<span class="faq-plus">+</span></button><div class="faq-a">A marketplace profile is useful carrier information, but it does not by itself prove the person replying today controls the legitimate carrier identity. DeepTruck adds a separate verification checkpoint before release.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button">Does it replace FMCSA or Central Dispatch?<span class="faq-plus">+</span></button><div class="faq-a">No. DeepTruck works on top of the existing carrier profile and creates a shipper-side verification record for the specific carrier request.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button">Can my team see verification history?<span class="faq-plus">+</span></button><div class="faq-a">Yes. The shipper console keeps request history, status, timestamps, and uploaded documents for review.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button">What happens after the monthly limit?<span class="faq-plus">+</span></button><div class="faq-a">Additional verification requests are billed at $0.50 per request after the included monthly volume.</div></div>
+          <div class="faq-item open"><button class="faq-q" type="button" aria-expanded="true">What does DeepTruck Verify check?<span class="faq-plus">+</span></button><div class="faq-a">It verifies carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false">Why not trust Central Dispatch alone?<span class="faq-plus">+</span></button><div class="faq-a">A marketplace profile is useful carrier information, but it does not by itself prove the person replying today controls the legitimate carrier identity. DeepTruck adds a separate verification checkpoint before release.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false">Does it replace FMCSA or Central Dispatch?<span class="faq-plus">+</span></button><div class="faq-a">No. DeepTruck works on top of the existing carrier profile and creates a shipper-side verification record for the specific carrier request.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false">Can my team see verification history?<span class="faq-plus">+</span></button><div class="faq-a">Yes. The shipper console keeps request history, status, timestamps, and uploaded documents for review.</div></div>
+          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false">What happens after the monthly limit?<span class="faq-plus">+</span></button><div class="faq-a">Starter pauses at the included monthly limit. Shipper and Scale can add extra verification volume when dispatch activity is higher than usual.</div></div>
         </div>
       </div>
     </section>
 
-    <section class="final-cta"><div class="container"><div class="cta-box reveal"><div class="cta-content"><div class="section-kicker">Before the load moves</div><h2>Stop sending loads to unverified carriers.</h2><p>Add a fast identity checkpoint before your team shares sensitive pickup and shipment information.</p><div class="cta-actions"><a class="btn btn-primary btn-lg" href="/admin/#signup">Create account</a><a class="btn btn-ghost btn-lg" href="#extension">Install extension</a></div></div></div></div></section>
+    <section class="final-cta"><div class="container"><div class="cta-box reveal"><div class="cta-content"><div class="section-kicker">Before the load moves</div><h2>Verify carrier identity before you release the load.</h2><p>Add a fast identity checkpoint before your team shares sensitive pickup and shipment information.</p><div class="cta-actions"><a class="btn btn-primary btn-lg" href="/admin/#signup">Create account</a><a class="btn btn-ghost btn-lg" href="#extension">Install extension</a></div></div></div></div></section>
   </main>
 
   <footer>
@@ -272,8 +288,14 @@
   <script>
     const nav = document.getElementById("nav");
     const hamburger = document.getElementById("hamburger");
-    hamburger?.addEventListener("click", () => nav.classList.toggle("open"));
-    document.querySelectorAll(".nav-links a").forEach((link) => link.addEventListener("click", () => nav.classList.remove("open")));
+    hamburger?.addEventListener("click", () => {
+      const isOpen = nav.classList.toggle("open");
+      hamburger.setAttribute("aria-expanded", String(isOpen));
+    });
+    document.querySelectorAll(".nav-links a").forEach((link) => link.addEventListener("click", () => {
+      nav.classList.remove("open");
+      hamburger?.setAttribute("aria-expanded", "false");
+    }));
     window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.scrollY > 20), { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
@@ -290,8 +312,10 @@
       const item = button.parentElement;
       document.querySelectorAll(".faq-item").forEach((entry) => {
         if (entry !== item) entry.classList.remove("open");
+        entry.querySelector(".faq-q")?.setAttribute("aria-expanded", "false");
       });
       item.classList.toggle("open");
+      button.setAttribute("aria-expanded", String(item.classList.contains("open")));
     }));
 
     const checks = [...document.querySelectorAll("[data-check]")];
@@ -321,7 +345,7 @@
       }, 900 + index * 900));
     }
     setTimeout(runVerification, 650);
-    setInterval(runVerification, 8500);
+    document.getElementById("appWindow")?.addEventListener("click", runVerification);
 
     const stage = document.getElementById("productStage");
     const appWindow = document.getElementById("appWindow");

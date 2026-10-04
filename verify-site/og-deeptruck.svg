@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#73b5ff"/>
+      <stop offset=".52" stop-color="#3b78f7"/>
+      <stop offset="1" stop-color="#48d9d1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".78" cy=".15" r=".75">
+      <stop stop-color="#3478f6" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#070b12" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#070b12"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g transform="translate(86 82)">
+    <rect width="72" height="72" rx="18" fill="url(#mark)"/>
+    <path d="M30 25h28v28H30z" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M24 25v28" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <text x="86" y="230" fill="#f3f7fb" font-family="Inter, Arial, sans-serif" font-size="88" font-weight="800">DeepTruck Verify</text>
+  <text x="86" y="324" fill="#aab5c4" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="500">Verify carrier identity before you release the load.</text>
+  <g transform="translate(86 410)" fill="none" stroke="#233149">
+    <rect width="250" height="64" rx="16"/>
+    <rect x="280" width="250" height="64" rx="16"/>
+    <rect x="560" width="250" height="64" rx="16"/>
+  </g>
+  <text x="118" y="451" fill="#86e9aa" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">Email checked</text>
+  <text x="398" y="451" fill="#84b8ff" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">SMS verified</text>
+  <text x="678" y="451" fill="#dce6f1" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="700">Docs attached</text>
+</svg>

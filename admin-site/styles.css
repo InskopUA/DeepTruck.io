@@ -96,14 +96,24 @@ input {
 }
 
 .auth-logo-row span {
-  background: #fff;
+  background: linear-gradient(145deg, #73b5ff, #3b78f7 50%, #48d9d1);
   border-radius: 8px;
-  color: #18202b;
+  box-shadow: 0 0 26px rgba(68, 133, 255, 0.24);
+  color: transparent;
   display: grid;
-  font: 800 12px "SFMono-Regular", Consolas, monospace;
   height: 40px;
   place-items: center;
+  position: relative;
   width: 40px;
+}
+
+.auth-logo-row span::after {
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-left-width: 5px;
+  border-radius: 5px 8px 8px 5px;
+  content: "";
+  inset: 9px;
+  position: absolute;
 }
 
 .auth-logo-row b {
@@ -248,7 +258,8 @@ input {
 
 .eyebrow {
   color: var(--accent);
-  font: 800 10px "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
+  font-weight: 800;
   letter-spacing: 0;
   margin: 0 0 6px;
   text-transform: uppercase;
@@ -324,14 +335,24 @@ input {
 }
 
 .brand span {
-  background: #fff;
+  background: linear-gradient(145deg, #73b5ff, #3b78f7 50%, #48d9d1);
   border-radius: 8px;
-  color: var(--ink);
+  box-shadow: 0 0 20px rgba(68, 133, 255, 0.22);
+  color: transparent;
   display: grid;
-  font: 800 10px "SFMono-Regular", Consolas, monospace;
   height: 31px;
   place-items: center;
+  position: relative;
   width: 31px;
+}
+
+.brand span::after {
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-left-width: 4px;
+  border-radius: 4px 7px 7px 4px;
+  content: "";
+  inset: 7px;
+  position: absolute;
 }
 
 .brand b {
@@ -379,7 +400,8 @@ nav button.active {
 .sidebar-account small {
   color: var(--faint);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   margin-bottom: 5px;
   text-transform: uppercase;
 }
@@ -428,12 +450,6 @@ main {
   margin: 0;
 }
 
-.topbar h1::before {
-  color: var(--accent);
-  content: "./";
-  font-family: "SFMono-Regular", Consolas, monospace;
-}
-
 .topbar-search {
   align-items: center;
   display: grid;
@@ -445,7 +461,8 @@ main {
 }
 
 .topbar-search input {
-  font: 800 12px "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  font-weight: 780;
   min-height: 38px;
 }
 
@@ -530,7 +547,8 @@ main {
 
 .metrics span {
   color: var(--faint);
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -566,12 +584,6 @@ main {
   margin: 0 0 5px;
 }
 
-.panel h2::before {
-  color: var(--accent);
-  content: "./";
-  font-family: "SFMono-Regular", Consolas, monospace;
-}
-
 .panel p,
 .muted {
   color: var(--muted);
@@ -593,13 +605,18 @@ input {
 }
 
 .panel-head input {
-  font-family: "SFMono-Regular", Consolas, monospace;
   width: 260px;
 }
 
 input:focus {
   border-color: #9aaceb;
   box-shadow: 0 0 0 3px rgba(49, 94, 251, 0.08);
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(36, 87, 255, 0.15);
+  outline-offset: 2px;
 }
 
 .table-wrap {
@@ -616,7 +633,8 @@ table {
 th {
   background: #fbfcfd;
   color: var(--faint);
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-align: left;
   text-transform: uppercase;
 }
@@ -644,14 +662,15 @@ td {
 .carrier span,
 .sub {
   color: var(--muted);
-  font: 10px "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
 }
 
 .badge {
   border: 1px solid var(--line);
   border-radius: 5px;
   display: inline-flex;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   padding: 4px 6px;
 }
 
@@ -699,7 +718,8 @@ tr[data-id]:hover {
 .billing-card span {
   color: var(--faint);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -795,7 +815,8 @@ label {
 }
 
 .dot-form input {
-  font: 800 15px "SFMono-Regular", Consolas, monospace;
+  font-size: 15px;
+  font-weight: 800;
   min-height: 40px;
 }
 
@@ -854,7 +875,8 @@ label {
 .empty-signal-grid span {
   color: var(--accent);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -893,7 +915,7 @@ label {
 
 .manual-hero span {
   color: #aeb8c5;
-  font: 10px "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
 }
 
 .manual-grid,
@@ -923,7 +945,8 @@ label {
 .risk-card span {
   color: var(--faint);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -1037,7 +1060,8 @@ label {
 
 .eyebrow {
   color: var(--accent);
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   letter-spacing: 0.08em;
   margin: 0 0 7px;
   text-transform: uppercase;
@@ -1051,7 +1075,7 @@ label {
 
 .detail-hero span {
   color: var(--muted);
-  font: 10px "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
 }
 
 .detail-grid {
@@ -1071,7 +1095,8 @@ label {
 .info-card span {
   color: var(--faint);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -1094,18 +1119,14 @@ label {
 }
 
 .detail-section-title h3 {
-  font: 800 13px "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+  font-weight: 800;
   margin: 0;
-}
-
-.detail-section-title h3::before {
-  color: var(--accent);
-  content: "./";
 }
 
 .detail-section-title span {
   color: var(--muted);
-  font: 10px "SFMono-Regular", Consolas, monospace;
+  font-size: 10px;
 }
 
 .checks {
@@ -1130,7 +1151,8 @@ label {
 
 .checks b {
   color: var(--yellow);
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
 }
 
 .checks b.done {
@@ -1163,7 +1185,8 @@ label {
 .document-card span {
   color: var(--faint);
   display: block;
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
@@ -1391,7 +1414,8 @@ label {
 .table-tools .filter-chip,
 .activity-feed em {
   color: var(--faint);
-  font: 800 9px "SFMono-Regular", Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
