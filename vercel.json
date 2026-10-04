@@ -16,11 +16,11 @@
     },
     {
       "source": "/login",
-      "destination": "/admin/login.html"
+      "destination": "/admin/login"
     },
     {
       "source": "/signup",
-      "destination": "/admin/signup.html"
+      "destination": "/admin/signup"
     }
   ]
 }
