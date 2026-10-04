@@ -60,7 +60,55 @@
 
         <div class="hero-visual product-stage reveal visible delay-1" id="productStage">
           <div class="product-glow"></div>
-          <img class="hero-emblem" src="hero-verification.svg" alt="Glowing DeepTruck verification shield">
+          <div class="hero-emblem" role="img" aria-label="DeepTruck shield mascot">
+            <svg class="shield-artwork" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 500" fill="none" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="mascot-glass" x1="100" y1="40" x2="370" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#92c6ff" stop-opacity=".10"/><stop offset=".45" stop-color="#080c12" stop-opacity=".95"/><stop offset="1" stop-color="#79b9ff" stop-opacity=".04"/></linearGradient>
+                <linearGradient id="mascot-rim" x1="104" y1="66" x2="348" y2="402" gradientUnits="userSpaceOnUse"><stop stop-color="#eef6ff"/><stop offset=".25" stop-color="#87bcf5"/><stop offset=".48" stop-color="#d6ebff"/><stop offset=".73" stop-color="#578aca"/><stop offset="1" stop-color="#a2d3fb"/></linearGradient>
+                <linearGradient id="mascot-mesh" x1="90" y1="80" x2="355" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#b9dbff" stop-opacity=".45"/><stop offset=".5" stop-color="#76b0ee" stop-opacity=".15"/><stop offset="1" stop-color="#b6d4f7" stop-opacity=".34"/></linearGradient>
+                <radialGradient id="mascot-halo"><stop stop-color="#609be0" stop-opacity=".17"/><stop offset="1" stop-color="#609be0" stop-opacity="0"/></radialGradient>
+                <filter id="mascot-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"/></filter>
+                <filter id="mascot-soft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="17"/></filter>
+                <path id="mascot-shield" d="M240 58C198 88 157 105 112 111V231C112 318 171 376 240 410C309 376 368 318 368 231V111C323 105 282 88 240 58Z"/>
+                <clipPath id="mascot-clip"><use href="#mascot-shield"/></clipPath>
+                <linearGradient id="mascot-fade" x1="0" y1="340" x2="0" y2="494" gradientUnits="userSpaceOnUse"><stop stop-color="white"/><stop offset="1" stop-color="black"/></linearGradient>
+                <mask id="mascot-baseFade"><rect width="480" height="500" fill="white"/><rect y="340" width="480" height="160" fill="url(#mascot-fade)"/></mask>
+              </defs>
+              <ellipse cx="240" cy="252" rx="216" ry="235" fill="url(#mascot-halo)"/>
+              <g mask="url(#mascot-baseFade)">
+                <path d="M240 416L112 477M240 416L171 492M240 416L240 500M240 416L309 492M240 416L368 477M119 470Q240 444 361 470M150 487Q240 462 330 487" stroke="url(#mascot-mesh)" stroke-width=".8"/>
+                <use href="#mascot-shield" transform="translate(9 -7)" fill="#0c111a" stroke="#5989bf" stroke-opacity=".35" stroke-width="1.5"/>
+                <path d="M240 58L249 51M112 111L121 104M368 111L377 104M240 410L249 403" stroke="#bedaff" stroke-opacity=".6"/>
+                <use href="#mascot-shield" stroke="#91c4ff" stroke-width="10" opacity=".48" filter="url(#mascot-soft)"/>
+                <use href="#mascot-shield" fill="url(#mascot-glass)"/>
+                <g class="shield-mesh" clip-path="url(#mascot-clip)" stroke="url(#mascot-mesh)" stroke-width=".9">
+                  <path d="M96 112Q240 140 384 112M96 137Q240 169 384 137M96 163Q240 198 384 163M96 191Q240 228 384 191M96 220Q240 258 384 220M96 250Q240 288 384 250M96 280Q240 318 384 280M96 310Q240 347 384 310M96 340Q240 375 384 340M96 370Q240 402 384 370"/>
+                  <path d="M240 46V424M213 58Q195 242 220 413M186 72Q153 242 198 402M159 84Q119 245 176 389M132 97Q91 252 154 367M267 58Q285 242 260 413M294 72Q327 242 282 402M321 84Q361 245 304 389M348 97Q389 252 326 367"/>
+                  <path d="M104 125L335 361M104 158L313 389M104 192L284 416M135 96L368 330M166 80L368 294M197 64L368 258M376 125L145 361M376 158L167 389M376 192L196 416M345 96L112 330M314 80L112 294M283 64L112 258" opacity=".22"/>
+                </g>
+                <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="3" filter="url(#mascot-glow)"/>
+                <use href="#mascot-shield" stroke="url(#mascot-rim)" stroke-width="1.5"/>
+                <path d="M240 73C201 99 166 113 126 123V231C126 308 178 363 240 395C302 363 354 308 354 231V123C314 113 279 99 240 73Z" stroke="#9bc9fb" stroke-opacity=".25"/>
+                <g class="shield-face">
+                  <g class="shield-eyes">
+                    <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" fill="#090e16" fill-opacity=".94" stroke="url(#mascot-rim)" stroke-width="2.5"/>
+                    <path d="M158 183Q185 184 217 198M322 183Q295 184 263 198" stroke="#c8e3ff" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M158 183Q185 184 217 198V216C217 240 205 252 188 252C170 252 158 237 158 216Z M322 183Q295 184 263 198V216C263 240 275 252 292 252C310 252 322 237 322 216Z" stroke="#8bbfff" stroke-width="5" opacity=".5" filter="url(#mascot-glow)"/>
+                    <path d="M167 199Q188 201 208 211M166 216Q187 227 209 219M172 233Q188 243 203 232M313 199Q292 201 272 211M314 216Q293 227 271 219M308 233Q292 243 277 232" stroke="url(#mascot-mesh)" stroke-width=".8"/>
+                    <g class="shield-pupils">
+                      <ellipse cx="190" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                      <ellipse cx="290" cy="220" rx="8" ry="15" fill="#82b9f5" fill-opacity=".14" stroke="#b6d8ff" stroke-width="1.5"/>
+                      <path d="M190 211V224M290 211V224" stroke="#e4f2ff" stroke-width="3" stroke-linecap="round"/>
+                      <path d="M190 211V224M290 211V224" stroke="#8bbfff" stroke-width="7" opacity=".6" filter="url(#mascot-glow)"/>
+                    </g>
+                  </g>
+                </g>
+                <path d="M218 322L235 339L267 304" stroke="#bcdcff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M218 322L235 339L267 304" stroke="#8abef7" stroke-width="8" filter="url(#mascot-glow)"/>
+                <circle cx="112" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="368" cy="111" r="2.5" fill="#eaf5ff"/><circle cx="240" cy="58" r="2" fill="#f0f7ff"/>
+              </g>
+            </svg>
+          </div>
           <div class="app-window hero-product" id="appWindow">
             <div class="window-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="address-bar">app.deeptruck.io / verification / OMAX-4345567</div></div>
             <div class="app-content">
@@ -377,10 +425,12 @@
         const rect = stage.getBoundingClientRect();
         const x = (event.clientX - rect.left) / rect.width - 0.5;
         const y = (event.clientY - rect.top) / rect.height - 0.5;
-        appWindow.style.transform = `rotate(-7deg) rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
+        appWindow.style.setProperty("--card-yaw", `${x * 4}deg`);
+        appWindow.style.setProperty("--card-pitch", `${-y * 3}deg`);
       });
       stage.addEventListener("mouseleave", () => {
-        appWindow.style.transform = "";
+        appWindow.style.removeProperty("--card-yaw");
+        appWindow.style.removeProperty("--card-pitch");
       });
     }
   </script>

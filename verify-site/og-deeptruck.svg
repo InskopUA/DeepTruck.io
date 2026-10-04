@@ -1,10 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
   <defs>
-    <linearGradient id="mark" x1="0" y1="0" x2="1" y2="1">
-      <stop stop-color="#73b5ff"/>
-      <stop offset=".52" stop-color="#3b78f7"/>
-      <stop offset="1" stop-color="#48d9d1"/>
-    </linearGradient>
     <radialGradient id="glow" cx=".78" cy=".15" r=".75">
       <stop stop-color="#3478f6" stop-opacity=".35"/>
       <stop offset="1" stop-color="#070b12" stop-opacity="0"/>
@@ -12,10 +7,15 @@
   </defs>
   <rect width="1200" height="630" fill="#070b12"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
-  <g transform="translate(86 82)">
-    <rect width="72" height="72" rx="18" fill="url(#mark)"/>
-    <path d="M30 25h28v28H30z" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
-    <path d="M24 25v28" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+  <g transform="translate(86 78)" fill="none">
+  <defs>
+    <linearGradient id="logo-rim" x1="10" y1="4" x2="55" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#e4f2ff"/><stop offset=".45" stop-color="#8dbff6"/><stop offset="1" stop-color="#5c91d0"/></linearGradient>
+    <linearGradient id="logo-glass" x1="12" y1="8" x2="50" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#203448"/><stop offset="1" stop-color="#0b111a"/></linearGradient>
+  </defs>
+  <path d="M32 4C23 10 14 13 6 14V35C6 49 17 61 32 68C47 61 58 49 58 35V14C50 13 41 10 32 4Z" fill="url(#logo-glass)" stroke="url(#logo-rim)" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M15 27L27 30V35C27 41 24 44 21 44C17 44 15 40 15 35V27Z M49 27L37 30V35C37 41 40 44 43 44C47 44 49 40 49 35V27Z" fill="#090e16" stroke="#b6d9ff" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M22 33V37M42 33V37" stroke="#e4f2ff" stroke-width="2.3" stroke-linecap="round"/>
+  <path d="M26 52L31 57L39 48" stroke="#a9d1ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
   <text x="86" y="230" fill="#f3f7fb" font-family="Inter, Arial, sans-serif" font-size="88" font-weight="800">DeepTruck Verify</text>
   <text x="86" y="324" fill="#aab5c4" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="500">Verify carrier identity before you release the load.</text>
