@@ -12,7 +12,6 @@
   <meta property="og:image" content="/og-deeptruck.svg">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="premium.css">
 </head>
 <body class="premium-landing">
@@ -109,31 +108,30 @@
       <div class="feature-stage" id="feature-stage">
         <div class="container feature-stage-inner">
           <div class="feature-left">
-            <div class="feature-progress" aria-hidden="true"><span id="featureProgress"></span></div>
-            <button class="feature-item active" type="button" data-feature-index="0"><span>01</span><strong>Verify where your dispatchers already work.</strong><em>DeepTruck detects the USDOT on the carrier profile and starts the verification flow without rebuilding the carrier information manually.</em></button>
-            <button class="feature-item" type="button" data-feature-index="1"><span>02</span><strong>Check the contact path before sharing the load.</strong><em>Send verification through the carrier contact information used for the identity check and confirm the phone with SMS.</em></button>
-            <button class="feature-item" type="button" data-feature-index="2"><span>03</span><strong>Collect the driver and carrier documents in one request.</strong><em>Driver license, W-9 and certificate of insurance stay attached to the same verification record.</em></button>
-            <button class="feature-item" type="button" data-feature-index="3"><span>04</span><strong>See what passed and what still needs attention.</strong><em>Dispatchers can review email, phone, driver and document status before deciding whether to release shipment information.</em></button>
-            <button class="feature-item" type="button" data-feature-index="4"><span>05</span><strong>Keep the full verification trail.</strong><em>Each request keeps a timestamped record of the verification steps and document activity.</em></button>
-            <button class="feature-item" type="button" data-feature-index="5"><span>06</span><strong>Keep your dispatch team on the same page.</strong><em>Verification status and history stay available in the DeepTruck workspace so your team can review the same record.</em></button>
+            <button class="feature-item active" type="button" data-feature-index="0" aria-expanded="true" aria-controls="feature-description-0" style="order: 0"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-dashboard"></use></svg></span><strong>Carrier profiles</strong><em id="feature-description-0">DeepTruck detects the USDOT on the carrier profile and starts the verification flow without rebuilding the carrier information manually.</em></button>
+            <button class="feature-item" type="button" data-feature-index="1" aria-expanded="false" aria-controls="feature-description-1" style="order: 2"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-phone"></use></svg></span><strong>Contact verification</strong><em id="feature-description-1">Send verification through the carrier contact information used for the identity check and confirm the phone with SMS.</em></button>
+            <button class="feature-item" type="button" data-feature-index="2" aria-expanded="false" aria-controls="feature-description-2" style="order: 4"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-doc"></use></svg></span><strong>Driver & documents</strong><em id="feature-description-2">Driver license, W-9 and certificate of insurance stay attached to the same verification record.</em></button>
+            <button class="feature-item" type="button" data-feature-index="3" aria-expanded="false" aria-controls="feature-description-3" style="order: 6"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-check"></use></svg></span><strong>Release review</strong><em id="feature-description-3">Dispatchers can review email, phone, driver and document status before deciding whether to release shipment information.</em></button>
+            <button class="feature-item" type="button" data-feature-index="4" aria-expanded="false" aria-controls="feature-description-4" style="order: 8"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-history"></use></svg></span><strong>Verification history</strong><em id="feature-description-4">Each request keeps a timestamped record of the verification steps and document activity.</em></button>
+            <button class="feature-item" type="button" data-feature-index="5" aria-expanded="false" aria-controls="feature-description-5" style="order: 10"><span class="feature-icon" aria-hidden="true"><svg><use href="#icon-team"></use></svg></span><strong>Team workspace</strong><em id="feature-description-5">Verification status and history stay available in the DeepTruck workspace so your team can review the same record.</em></button>
           </div>
-          <div class="feature-right" aria-live="polite">
-            <article class="feature-visual active" data-feature-panel="0">
+          <div class="feature-right">
+            <article class="feature-visual active" data-feature-panel="0" style="order: 1">
               <div class="browser feature-browser"><div class="browser-top"><span class="mac-dot"></span><span class="mac-dot"></span><span class="mac-dot"></span><div class="browser-url">centraldispatch.com / carrier / profile</div></div><div class="browser-body"><div class="cd-page"><div class="cd-head"><b class="cd-title">Carrier Profile</b><span class="grey-btn"></span></div><div class="cd-company"><h4>OMAX LLC</h4><p>Active carrier profile</p><div class="cd-info"><div><span>USDOT</span><b>4345567</b></div><div><span>MC Number</span><b>MC1698436</b></div><div><span>Phone</span><b>(307) 441-5452</b></div><div><span>Email</span><b>info@omaxllc.net</b></div></div></div><div class="fake-lines"><i></i><i></i><i></i></div></div><aside class="ext-panel feature-panel-slide"><div class="ext-brand"><span class="brand-mark mini"></span>DeepTruck Verify</div><div class="found"><b>Carrier detected</b>OMAX LLC<br>USDOT 4345567<br>MC1698436</div><span class="verify-btn">Start verification</span></aside></div></div>
             </article>
-            <article class="feature-visual" data-feature-panel="1">
+            <article class="feature-visual" data-feature-panel="1" style="order: 3">
               <div class="demo-surface contact-demo"><div class="demo-head"><span class="brand-mark mini"></span><div><b>Listed contact verification</b><small>OMAX LLC</small></div></div><div class="path-grid"><div class="path-card"><svg><use href="#icon-mail"></use></svg><span>Email</span><b>Verification sent</b><small>info@omaxllc.net</small></div><div class="path-line"></div><div class="path-card done"><svg><use href="#icon-check"></use></svg><span>Email</span><b>Confirmed</b><small>Carrier contact opened link</small></div><div class="path-card"><svg><use href="#icon-phone"></use></svg><span>Phone</span><b>SMS challenge</b><small>(307) 441-5452</small></div><div class="path-line"></div><div class="path-card done"><svg><use href="#icon-check"></use></svg><span>Phone</span><b>Verified</b><small>Code completed</small></div></div></div>
             </article>
-            <article class="feature-visual" data-feature-panel="2">
+            <article class="feature-visual" data-feature-panel="2" style="order: 5">
               <div class="demo-surface document-demo"><div class="demo-head"><span class="brand-mark mini"></span><div><b>Document request</b><small>Attached to OMAX LLC verification</small></div></div><div class="document-stack"><div class="document-row received"><span><svg><use href="#icon-id"></use></svg></span><div><b>Driver License</b><small>Image uploaded</small></div><strong>Received</strong></div><div class="document-row received"><span><svg><use href="#icon-doc"></use></svg></span><div><b>W-9</b><small>PDF document</small></div><strong>Received</strong></div><div class="document-row pending"><span><svg><use href="#icon-doc"></use></svg></span><div><b>Certificate of Insurance</b><small>Carrier upload request</small></div><strong>Pending</strong></div></div></div>
             </article>
-            <article class="feature-visual" data-feature-panel="3">
+            <article class="feature-visual" data-feature-panel="3" style="order: 7">
               <div class="demo-surface status-demo"><div class="demo-head"><span class="brand-mark mini"></span><div><b>Verification detail</b><small>Review before release</small></div><strong class="ready-label">Ready to review</strong></div><div class="status-list"><div><span><svg><use href="#icon-mail"></use></svg>Email</span><b>Verified</b></div><div><span><svg><use href="#icon-phone"></use></svg>Phone</span><b>Verified</b></div><div><span><svg><use href="#icon-id"></use></svg>Driver</span><b>Received</b></div><div><span><svg><use href="#icon-doc"></use></svg>Documents</span><b>Received</b></div></div><div class="review-banner">READY TO REVIEW</div></div>
             </article>
-            <article class="feature-visual" data-feature-panel="4">
+            <article class="feature-visual" data-feature-panel="4" style="order: 9">
               <div class="demo-surface history-demo"><div class="demo-head"><span class="brand-mark mini"></span><div><b>Verification history</b><small>Timestamped activity</small></div></div><div class="timeline-large"><div><time>10:42</time><span></span><p><b>Verification request created</b>Dispatcher started the request</p></div><div><time>10:44</time><span></span><p><b>Email confirmed</b>Carrier contact opened the link</p></div><div><time>10:45</time><span></span><p><b>SMS completed</b>Listed phone passed challenge</p></div><div><time>10:47</time><span></span><p><b>Driver documents received</b>License and W-9 uploaded</p></div><div><time>10:48</time><span></span><p><b>Ready to review</b>Record moved to final state</p></div></div></div>
             </article>
-            <article class="feature-visual" data-feature-panel="5">
+            <article class="feature-visual" data-feature-panel="5" style="order: 11">
               <div class="demo-surface queue-demo"><div class="demo-head"><span class="brand-mark mini"></span><div><b>Verification queue</b><small>Product demo</small></div></div><div class="queue-table"><div class="queue-row header"><span>Carrier</span><span>Status</span><span>Contact</span></div><div class="queue-row"><span><b>OMAX LLC</b><small>USDOT 4345567</small></span><span class="tag">Verified</span><span>Email + SMS</span></div><div class="queue-row"><span><b>Carrier #2187</b><small>USDOT 2910841</small></span><span class="tag pending">Pending</span><span>Email sent</span></div><div class="queue-row"><span><b>Carrier #2194</b><small>USDOT 3819020</small></span><span class="tag review">Review</span><span>SMS verified</span></div></div></div>
             </article>
           </div>
@@ -278,40 +276,54 @@
     setTimeout(runVerification, 650);
     heroWindow?.addEventListener("click", runVerification);
 
-    const featureSection = document.querySelector("[data-feature-scroll]");
-    const featureIntro = document.querySelector(".feature-intro");
-    const featureStage = document.getElementById("feature-stage");
     const featureItems = [...document.querySelectorAll("[data-feature-index]")];
     const featurePanels = [...document.querySelectorAll("[data-feature-panel]")];
-    const progressBar = document.getElementById("featureProgress");
-    let activeFeature = 0;
+    const featureList = document.querySelector(".feature-left");
+    const featureDesktop = matchMedia("(min-width: 900px)");
+    const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let activeFeature = -1;
     function setFeature(index) {
-      const clamped = Math.max(0, Math.min(featureItems.length - 1, index));
-      if (clamped === activeFeature) return;
-      activeFeature = clamped;
-      featureItems.forEach((item, itemIndex) => item.classList.toggle("active", itemIndex === activeFeature));
-      featurePanels.forEach((panel, panelIndex) => panel.classList.toggle("active", panelIndex === activeFeature));
+      if (index === activeFeature) return;
+      activeFeature = index;
+      featureItems.forEach((item, itemIndex) => {
+        const active = itemIndex === index;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-expanded", String(active || !featureDesktop.matches));
+      });
+      featurePanels.forEach((panel, panelIndex) => panel.classList.toggle("active", panelIndex === index));
     }
     function updateFeatureFromScroll() {
-      if (!featureSection || matchMedia("(max-width: 899px)").matches) return;
-      const introHeight = matchMedia("(max-width: 899px)").matches ? (featureIntro?.offsetHeight || 0) : 0;
-      const start = featureSection.offsetTop + introHeight;
-      const distance = Math.max(1, featureSection.offsetHeight - innerHeight - introHeight);
-      const progress = Math.max(0, Math.min(1, (scrollY - start) / distance));
-      const stepSize = 1 / featureItems.length;
-      setFeature(Math.min(featureItems.length - 1, Math.floor(progress / stepSize)));
-      if (progressBar) progressBar.style.height = `${Math.max(8, progress * 100)}%`;
+      if (!featureList || !featureDesktop.matches) return;
+      // Use the actual preview positions: no artificial scroll runway or wheel capture.
+      const line = parseFloat(getComputedStyle(featureList).top) + Math.min(180, innerHeight * 0.25);
+      let index = 0;
+      featurePanels.forEach((panel, panelIndex) => {
+        if (panel.getBoundingClientRect().top <= line) index = panelIndex;
+      });
+      setFeature(index);
     }
-    window.addEventListener("scroll", updateFeatureFromScroll, { passive: true });
-    window.addEventListener("resize", updateFeatureFromScroll);
-    featureItems.forEach((item) => item.addEventListener("click", () => {
-      if (matchMedia("(max-width: 899px)").matches) return;
-      const index = Number(item.dataset.featureIndex);
-      const introHeight = matchMedia("(max-width: 899px)").matches ? (featureIntro?.offsetHeight || 0) : 0;
-      const start = featureSection.offsetTop + introHeight;
-      const distance = Math.max(1, featureSection.offsetHeight - innerHeight - introHeight);
-      scrollTo({ top: start + (distance * (index / featureItems.length)) + 2, behavior: "smooth" });
+    let featureFrame = 0;
+    function scheduleFeatureUpdate() {
+      if (featureFrame) return;
+      featureFrame = requestAnimationFrame(() => {
+        featureFrame = 0;
+        updateFeatureFromScroll();
+      });
+    }
+    window.addEventListener("scroll", scheduleFeatureUpdate, { passive: true });
+    window.addEventListener("resize", scheduleFeatureUpdate);
+    window.addEventListener("pageshow", scheduleFeatureUpdate);
+    featureDesktop.addEventListener("change", () => {
+      activeFeature = -1;
+      setFeature(0);
+      scheduleFeatureUpdate();
+    });
+    featureItems.forEach((item, index) => item.addEventListener("click", () => {
+      const top = featurePanels[index].getBoundingClientRect().top + scrollY;
+      const offset = featureDesktop.matches ? parseFloat(getComputedStyle(featureList).top) : 104;
+      scrollTo({ top: top - offset, behavior: reducedMotion.matches ? "instant" : "smooth" });
     }));
+    setFeature(0);
     updateFeatureFromScroll();
 
     const stage = document.getElementById("productStage");
