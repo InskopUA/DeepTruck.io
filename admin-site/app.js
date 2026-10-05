@@ -27,10 +27,10 @@ let detailsTrigger = null;
 let openingLogin = false;
 
 const pageCopy = {
-  verifications: ["Verifications", "Verify carrier contacts and keep every detail in one place."],
-  history: ["Verification history", "Your carrier checks, documents and shared records."],
-  billing: ["Plans & billing", "Choose the right verification volume for your team."],
-  settings: ["Account settings", "Make this workspace yours."]
+  verifications: "Verifications",
+  history: "Verification history",
+  billing: "Plans & billing",
+  settings: "Account settings"
 };
 function setView(view, updateAddress = true) {
   const selected = pageCopy[view] ? view : "verifications";
@@ -41,11 +41,9 @@ function setView(view, updateAddress = true) {
     else button.removeAttribute("aria-current");
   });
   views.forEach(section => section.classList.toggle("active", section.id === selected));
-  title.textContent = pageCopy[selected][0];
-  document.getElementById("page-description").textContent = pageCopy[selected][1];
-  document.getElementById("breadcrumb-page").textContent = selected === "history" ? "History" : pageCopy[selected][0];
+  title.textContent = pageCopy[selected];
   document.getElementById("new-verification-button").hidden = selected !== "history";
-  document.title = `${pageCopy[selected][0]} · DeepTruck Verify`;
+  document.title = `${pageCopy[selected]} · DeepTruck Verify`;
   if (updateAddress) {
     const hash = selected === "verifications" ? "" : `#${selected}`;
     if (location.hash !== hash) history.pushState(null, "", `${location.pathname}${location.search}${hash}`);

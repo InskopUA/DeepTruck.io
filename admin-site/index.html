@@ -21,8 +21,13 @@
       <div class="sidebar-account"><span class="avatar" data-account-initials>—</span><div><b data-account-name>Your account</b><small id="account-email">—</small></div><button id="logout-button" type="button" class="icon-button" aria-label="Sign out" title="Sign out"><svg aria-hidden="true"><use href="#icon-logout"></use></svg></button></div>
     </aside>
     <main class="workspace-main">
-      <header class="topbar"><a href="/">DeepTruck Verify</a><span class="breadcrumb-divider">/</span><span id="breadcrumb-page">Verifications</span><button class="profile-button" type="button" data-go-view="settings" aria-label="Open account settings"><span class="avatar" data-account-initials>—</span></button></header>
-      <div class="page-heading"><div><p class="eyebrow">Your workspace</p><h1 id="page-title">Verifications</h1><p id="page-description">Verify carrier contacts and keep every detail in one place.</p></div><button class="primary" id="new-verification-button" type="button" data-go-view="verifications" hidden><svg aria-hidden="true"><use href="#icon-search"></use></svg>New verification</button></div>
+      <header class="page-heading">
+        <h1 id="page-title">Verifications</h1>
+        <div class="page-actions">
+          <button class="primary" id="new-verification-button" type="button" data-go-view="verifications" aria-label="New verification" title="New verification" hidden><svg aria-hidden="true"><use href="#icon-search"></use></svg><span>New verification</span></button>
+          <button class="profile-button" type="button" data-go-view="settings" aria-label="Open account settings"><span class="avatar" data-account-initials>—</span></button>
+        </div>
+      </header>
       <div id="app-message" class="inline-message" role="status" aria-live="polite"></div>
       <section id="verifications" class="view active" aria-label="Carrier verifications">
         <div class="metrics"><article class="metric total"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-grid"></use></svg></span><span>Total verifications</span><b data-stat="total">—</b><small>All carrier requests</small></article><article class="metric verified"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-check"></use></svg></span><span>Verified</span><b data-stat="verified">—</b><small>Completed carrier checks</small></article><article class="metric pending"><span class="metric-icon"><svg aria-hidden="true"><use href="#icon-history"></use></svg></span><span>Pending</span><b data-stat="pending">—</b><small>Waiting on the carrier</small></article></div>
