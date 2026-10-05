@@ -3744,6 +3744,47 @@ body.premium-landing {
   .hero-visual .hero-product { transition: none; }
 }
 
+/* Two compact, continuous dealership rows. Duplicate groups form an exact loop. */
+.premium-landing .dealer-section { background: transparent; padding: 46px 0 40px; }
+.dealer-heading { margin-bottom: 34px; position: relative; text-align: center; }
+.dealer-heading h2 { color: #939eae; font-size: 11px; font-weight: 500; letter-spacing: .23em; line-height: 1.6; margin: 0; text-transform: uppercase; }
+.dealer-toggle { align-items: center; background: transparent; border: 1px solid rgba(154, 190, 234, .14); border-radius: 8px; color: #9ba9bb; cursor: pointer; display: flex; height: 30px; justify-content: center; position: absolute; right: 0; top: -6px; width: 30px; }
+.dealer-toggle:hover { border-color: rgba(154, 190, 234, .4); color: #d0e2f6; }
+.dealer-toggle:focus-visible { outline: 2px solid #9ac7fc; outline-offset: 4px; }
+.dealer-toggle svg { fill: none; height: 14px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 14px; }
+.dealer-marquee { display: grid; gap: 25px; mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); overflow: hidden; }
+.dealer-row { overflow: hidden; }
+.dealer-track { animation: dealerScroll var(--dealer-duration, 90s) linear infinite; animation-delay: var(--dealer-delay, -12s); display: flex; width: max-content; will-change: transform; }
+.dealer-row:nth-child(2) .dealer-track { animation-direction: reverse; }
+.dealer-group { align-items: center; display: flex; flex-shrink: 0; gap: 46px; padding-right: 46px; }
+.dealer-name { align-items: center; color: #a9b3c1; display: inline-flex; flex-shrink: 0; font-size: 17px; font-weight: 500; gap: 13px; line-height: 1.4; white-space: nowrap; }
+.dealer-monogram { align-items: center; background: #111c29; border: 1px solid rgba(149, 187, 230, .2); border-radius: 50%; color: #a4caef; display: inline-flex; font-size: 13px; font-weight: 600; height: 46px; letter-spacing: -.04em; justify-content: center; width: 46px; }
+.dealer-tone-1 { background: #18212a; border-color: #303c4a; color: #becbdb; }
+.dealer-tone-2 { background: #10171e; border-color: #2b3f52; color: #91b1d2; }
+.dealer-tone-3 { background: #18283b; border-color: #334d6c; color: #bdd9f5; }
+.dealer-tone-4 { background: #191d23; border-color: #39414b; color: #b7c0cc; }
+.dealer-offscreen .dealer-track, .dealer-paused .dealer-track,
+.dealer-marquee:hover .dealer-track { animation-play-state: paused; }
+@keyframes dealerScroll { to { transform: translateX(-50%); } }
+@media (max-width: 760px) {
+  .premium-landing .dealer-section { padding: 30px 0 26px; }
+  .dealer-heading { margin-bottom: 28px; padding: 0 32px; }
+  .dealer-heading h2 { font-size: 10px; letter-spacing: .18em; }
+  .dealer-toggle { height: 28px; top: -6px; width: 28px; }
+  .dealer-marquee { gap: 20px; }
+  .dealer-group { gap: 30px; padding-right: 30px; }
+  .dealer-name { font-size: 14px; gap: 10px; }
+  .dealer-monogram { font-size: 11px; height: 38px; width: 38px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dealer-toggle { display: none; }
+  .dealer-marquee { mask-image: none; margin: 0 auto; max-width: 1760px; width: 84.5%; }
+  .dealer-track { animation: none; width: 100%; will-change: auto; }
+  .dealer-group { flex-wrap: wrap; gap: 20px 30px; padding: 0; width: 100%; }
+  .dealer-group[aria-hidden="true"] { display: none; }
+  .dealer-name { white-space: normal; }
+}
+
 /* Install the extension from the same workflow the feature previews describe. */
 .premium-landing .extension-section { background: transparent; border: 0; padding: 100px 0; }
 .extension-card { align-items: center; background: radial-gradient(ellipse at 85% 65%, rgba(90, 140, 195, .065), transparent 50%), #0b0e12; border: 1px solid rgba(255, 255, 255, .09); border-radius: 30px; display: flex; min-height: 450px; overflow: hidden; padding: 68px 64px; position: relative; }
