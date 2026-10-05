@@ -3758,11 +3758,10 @@ body.premium-landing {
 .dealer-row:nth-child(2) .dealer-track { animation-direction: reverse; }
 .dealer-group { align-items: center; display: flex; flex-shrink: 0; gap: 46px; padding-right: 46px; }
 .dealer-name { align-items: center; color: #a9b3c1; display: inline-flex; flex-shrink: 0; font-size: 17px; font-weight: 500; gap: 13px; line-height: 1.4; white-space: nowrap; }
-.dealer-monogram { align-items: center; background: #111c29; border: 1px solid rgba(149, 187, 230, .2); border-radius: 50%; color: #a4caef; display: inline-flex; font-size: 13px; font-weight: 600; height: 46px; letter-spacing: -.04em; justify-content: center; width: 46px; }
-.dealer-tone-1 { background: #18212a; border-color: #303c4a; color: #becbdb; }
-.dealer-tone-2 { background: #10171e; border-color: #2b3f52; color: #91b1d2; }
-.dealer-tone-3 { background: #18283b; border-color: #334d6c; color: #bdd9f5; }
-.dealer-tone-4 { background: #191d23; border-color: #39414b; color: #b7c0cc; }
+.dealer-brand { align-items: center; background: #111922; border: 1px solid rgba(149, 187, 230, .18); border-radius: 50%; display: inline-flex; flex-shrink: 0; height: 46px; justify-content: center; width: 46px; }
+.dealer-brand img { display: block; filter: brightness(0) invert(1); height: 32px; object-fit: contain; opacity: .78; width: 32px; }
+.dealer-brand-bmw img, .dealer-brand-volkswagen img, .dealer-brand-mercedesbenz img { height: 29px; width: 29px; }
+.dealer-brand-audi img, .dealer-brand-chrysler img { height: 34px; width: 34px; }
 .dealer-offscreen .dealer-track, .dealer-paused .dealer-track,
 .dealer-marquee:hover .dealer-track { animation-play-state: paused; }
 @keyframes dealerScroll { to { transform: translateX(-50%); } }
@@ -3774,7 +3773,10 @@ body.premium-landing {
   .dealer-marquee { gap: 20px; }
   .dealer-group { gap: 30px; padding-right: 30px; }
   .dealer-name { font-size: 14px; gap: 10px; }
-  .dealer-monogram { font-size: 11px; height: 38px; width: 38px; }
+  .dealer-brand { height: 38px; width: 38px; }
+  .dealer-brand img { height: 26px; width: 26px; }
+  .dealer-brand-bmw img, .dealer-brand-volkswagen img, .dealer-brand-mercedesbenz img { height: 24px; width: 24px; }
+  .dealer-brand-audi img, .dealer-brand-chrysler img { height: 29px; width: 29px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .dealer-toggle { display: none; }
