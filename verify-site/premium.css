@@ -2902,37 +2902,113 @@ body.premium-landing {
   padding-top: 92px !important;
 }
 
+.reviews-heading {
+  text-align: center;
+}
+
+.reviews-heading .section-title {
+  margin-inline: auto;
+  max-width: 900px;
+}
+
+.reviews-controls {
+  display: flex;
+  justify-content: flex-end;
+  margin: 24px 0 10px;
+}
+
+.reviews-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--premium-line);
+  border-radius: 8px;
+  color: #a2adbc;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 12px !important;
+  gap: 7px;
+  padding: 8px 11px;
+}
+
+.reviews-toggle:hover { border-color: rgba(152, 190, 234, .3); }
+.reviews-toggle:focus-visible { outline: 2px solid var(--premium-blue); outline-offset: 4px; }
+
+.reviews-wall {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  height: 740px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 12%, #000 86%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 12%, #000 86%, transparent);
+  overflow: hidden;
+}
+
+.review-column { min-width: 0; }
+.review-track { animation: reviewScroll var(--review-duration, 82s) linear infinite; animation-delay: var(--review-delay, -17s); will-change: transform; }
+.review-column:nth-child(2) .review-track { animation-direction: reverse; }
+.review-group { display: grid; gap: 22px; padding-bottom: 22px; }
+.review-card {
+  background: linear-gradient(145deg, rgba(122, 159, 207, .075), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 22px;
+  min-height: 218px;
+  padding: 27px;
+}
+.review-card-head { align-items: flex-start; display: flex; gap: 18px; justify-content: space-between; }
+.review-card h3 { color: #e5e9ef; font-size: 17px; font-weight: 550; letter-spacing: -.025em; line-height: 1.4; margin: 0 0 5px; }
+.review-card-head > div > span { color: #8794a5; font-size: 12px; line-height: 1.5; }
+.review-avatar { align-items: center; background: rgba(102, 168, 255, .065); border: 1px solid rgba(152, 190, 234, .14); border-radius: 12px; color: #a2c6f3; display: flex; flex: 0 0 40px; height: 40px; justify-content: center; width: 40px; }
+.review-avatar svg { height: 19px; width: 19px; }
+.review-card blockquote { color: #abb5c3; font-size: 15px; letter-spacing: -.01em; line-height: 1.75; margin: 28px 0 0; }
+.reviews-offscreen .review-track,
+.reviews-paused .review-track,
+.reviews-wall:hover .review-track,
+.reviews-wall:focus-within .review-track { animation-play-state: paused; }
+@keyframes reviewScroll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
 .faq-section {
   padding: 102px 0 116px !important;
 }
 
 .faq-heading {
-  margin: 0 auto 44px;
-  max-width: 900px;
+  margin: 0 auto 56px;
+  max-width: 1200px;
   text-align: center;
 }
+
+.faq-heading h2 { color: #e5e6e8; font-size: clamp(36px, 4.2vw, 62px); font-weight: 600; letter-spacing: -.045em; line-height: 1.15; margin: 0; max-width: none; }
+.faq-heading p { color: #a3aab5; font-size: clamp(15px, 1.4vw, 20px); max-width: 1000px; }
 
 .faq-simple {
   background: transparent;
   border: 0;
   border-radius: 0;
   margin: 0 auto;
-  max-width: 980px;
+  display: grid;
+  gap: 14px;
+  max-width: 1200px;
+  overflow: visible;
 }
 
-.faq-simple .faq-item {
-  border-bottom: 1px solid var(--premium-line);
-}
-
-.faq-simple .faq-item:first-child {
-  border-top: 1px solid var(--premium-line);
+.faq-simple .faq-item,
+.faq-simple .faq-item:first-child,
+.faq-simple .faq-item:last-child {
+  background: rgba(255, 255, 255, .008);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: background .25s, border-color .25s;
 }
 
 .faq-simple .faq-q {
   background: transparent;
-  color: #edf4fb;
-  font-size: 17px;
-  padding: 24px 0;
+  color: #dce1e7;
+  font-size: 18px;
+  font-weight: 600;
+  gap: 24px;
+  line-height: 1.5;
+  padding: 27px 30px;
+  transition: color .25s;
 }
 
 .faq-simple .faq-q:hover {
@@ -2940,18 +3016,66 @@ body.premium-landing {
 }
 
 .faq-simple .faq-item.open .faq-q {
-  background: rgba(255, 255, 255, 0.035);
+  background: transparent;
+  color: #a5cbfa;
 }
 
+.faq-simple .faq-item.open { background: rgba(134, 181, 237, .025); border-color: rgba(152, 190, 234, .19); }
+.faq-chevron { color: #99a4b3; flex: 0 0 20px; height: 20px !important; transition: transform .3s, color .3s; width: 20px !important; }
+.faq-item.open .faq-chevron { color: #a5cbfa; transform: rotate(180deg); }
+
 .faq-simple .faq-a {
-  color: #96a5b7;
-  font-size: 14px;
-  max-width: 780px;
-  padding-left: 0;
+  display: grid;
+  grid-template-rows: 0fr;
+  max-height: none;
+  max-width: none;
+  opacity: 0;
+  padding: 0;
+  transition: grid-template-rows .35s ease, opacity .25s ease;
 }
 
 .faq-simple .faq-item.open .faq-a {
-  padding-bottom: 24px;
+  grid-template-rows: 1fr;
+  max-height: none;
+  opacity: 1;
+  padding: 0;
+}
+
+.faq-answer-inner { min-height: 0; overflow: hidden; }
+.faq-answer-inner p { color: #a3aebc; font-size: 16px; line-height: 1.8; margin: 0; padding: 0 30px 28px; }
+
+@media (max-width: 1000px) {
+  .reviews-wall { gap: 16px; height: 670px; }
+  .review-group { gap: 16px; padding-bottom: 16px; }
+  .review-card { padding: 22px; }
+  .review-card h3 { font-size: 15px; }
+  .review-card blockquote { font-size: 14px; }
+}
+@media (min-width: 560px) and (max-width: 899px) {
+  .reviews-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .review-column:nth-child(3) { display: none; }
+}
+@media (max-width: 760px) {
+  .reviews-section { padding-top: 60px !important; }
+  .faq-section { padding: 68px 0 76px !important; }
+  .faq-heading { margin-bottom: 32px; }
+  .faq-heading h2 { font-size: clamp(32px, 7vw, 44px); }
+  .faq-simple { gap: 12px; }
+  .faq-simple .faq-q { font-size: 15px; gap: 16px; padding: 22px 20px; }
+  .faq-answer-inner p { font-size: 14px; padding: 0 20px 22px; }
+}
+@media (max-width: 559px) {
+  .reviews-wall { grid-template-columns: 1fr; height: 620px; }
+  .review-column:nth-child(n+2) { display: none; }
+  .review-card { min-height: 0; padding: 25px; }
+  .review-card h3 { font-size: 17px; }
+  .review-card blockquote { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reviews-wall { height: auto; -webkit-mask-image: none; mask-image: none; overflow: visible; }
+  .review-track { animation: none; will-change: auto; }
+  .review-group[aria-hidden="true"], .reviews-controls { display: none; }
+  .faq-simple .faq-a, .faq-chevron { transition: none; }
 }
 
 @media (max-width: 760px) {

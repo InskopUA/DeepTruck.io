@@ -301,8 +301,70 @@
 
     <section id="reviews" class="reviews-section">
       <div class="container">
-        <div class="reveal"><p class="section-kicker">Customer feedback</p><h2 class="section-title">Built for real dispatch decisions.</h2></div>
-        <div class="reviews"><article class="quote-big reveal"><blockquote>The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record.</blockquote><div class="quote-meta"><b>Customer feedback</b><span>Used before assigning a pickup</span></div></article><div class="quotes-small"><article class="quote-card reveal delay-1"><p>We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is the checkpoint we needed.</p><b>Customer feedback</b></article><article class="quote-card reveal delay-2"><p>The extension fits where the decision happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails.</p><b>Customer feedback</b></article></div></div>
+        <div class="reviews-heading reveal"><p class="section-kicker">Customer feedback</p><h2 class="section-title">Built for real dispatch decisions.</h2></div>
+        <div class="reviews-controls"><button class="reviews-toggle" type="button" aria-pressed="false" aria-controls="reviews-wall"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg><span>Pause</span></button></div>
+        <div class="reviews-wall reviews-offscreen" id="reviews-wall" aria-label="Customer feedback">
+          <div class="review-column">
+            <div class="review-track"><div class="review-group">
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Carrier contacts</h3><span>Customer feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-phone"></use></svg></span></div>
+                <blockquote>The useful part is that my dispatcher does not have to guess which phone number is safe. The request goes to the listed carrier contact and leaves a record.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>A clear next step</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-check"></use></svg></span></div>
+                <blockquote>Having the contact checks and documents together makes it much easier to see what still needs attention before we release the load.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Listed contact checks</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-phone"></use></svg></span></div>
+                <blockquote>The email and SMS steps give us a clear record of which listed contact completed the request. It is a useful checkpoint before sharing pickup details.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Simple for the recipient</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-mail"></use></svg></span></div>
+                <blockquote>One verification link gives the carrier a place to confirm contacts and provide the requested documents. That keeps the exchange easier to follow.</blockquote>
+              </article>
+            </div></div>
+          </div>
+          <div class="review-column">
+            <div class="review-track"><div class="review-group">
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>One verification flow</h3><span>Customer feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-doc"></use></svg></span></div>
+                <blockquote>We wanted something lightweight before sending load details. Email, SMS, license, W-9, and COI in one flow is the checkpoint we needed.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Less copying between tools</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-dashboard"></use></svg></span></div>
+                <blockquote>Starting from the carrier profile keeps the workflow simple. The USDOT lookup brings the information into the same place as the verification.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>A record to return to</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-history"></use></svg></span></div>
+                <blockquote>When a question comes up later, having the request, timestamps, and document status in one record makes it easier to review what happened.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Ready for a closer review</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-check"></use></svg></span></div>
+                <blockquote>It is helpful to see received documents alongside the contact checks. We can then review the details before making the dispatch decision.</blockquote>
+              </article>
+            </div></div>
+          </div>
+          <div class="review-column">
+            <div class="review-track"><div class="review-group">
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Right on the carrier profile</h3><span>Customer feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-dashboard"></use></svg></span></div>
+                <blockquote>The extension fits where the decision happens: the carrier profile. No extra spreadsheet, no manual screenshots, no hunting through emails.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Documents in one place</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-doc"></use></svg></span></div>
+                <blockquote>A driver license, W-9, and insurance certificate belong with the carrier request. Keeping them together makes the review easier to follow.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>Built around dispatch</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-team"></use></svg></span></div>
+                <blockquote>We can review a carrier without building another spreadsheet. The workspace shows the request and the checks that still need to be completed.</blockquote>
+              </article>
+              <article class="review-card">
+                <div class="review-card-head"><div><h3>From profile to request</h3><span>Example feedback</span></div><span class="review-avatar" aria-hidden="true"><svg><use href="#icon-dashboard"></use></svg></span></div>
+                <blockquote>The Chrome extension puts the verification step right where we already look at carrier information on Central Dispatch.</blockquote>
+              </article>
+            </div></div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -315,13 +377,28 @@
 
     <section id="faq" class="faq-section">
       <div class="container">
-        <div class="faq-heading reveal"><h2>Frequently asked questions</h2><p>DeepTruck adds a shipper-side identity checkpoint before release.</p></div>
+        <div class="faq-heading reveal"><h2>Frequently Asked Questions</h2><p>How carrier verification works, what gets checked, and how it fits into your dispatch workflow.</p></div>
         <div class="faq-list faq-simple reveal delay-1">
-          <div class="faq-item open"><button class="faq-q" type="button" aria-expanded="true" aria-controls="faq-a-1">What does DeepTruck Verify check?<span class="faq-plus">+</span></button><div class="faq-a" id="faq-a-1">It verifies carrier email, confirms the listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-2">Why not trust Central Dispatch alone?<span class="faq-plus">+</span></button><div class="faq-a" id="faq-a-2">A marketplace profile is useful carrier information. DeepTruck adds a separate verification record for the person replying today.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-3">Does it replace FMCSA or Central Dispatch?<span class="faq-plus">+</span></button><div class="faq-a" id="faq-a-3">No. DeepTruck works on top of the existing carrier profile and keeps a shipper-side verification record for the specific carrier request.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-4">Can my team see verification history?<span class="faq-plus">+</span></button><div class="faq-a" id="faq-a-4">Yes. The shipper console keeps request history, status, timestamps, and uploaded documents for review.</div></div>
-          <div class="faq-item"><button class="faq-q" type="button" aria-expanded="false" aria-controls="faq-a-5">What happens after the monthly limit?<span class="faq-plus">+</span></button><div class="faq-a" id="faq-a-5">Starter pauses at the included monthly limit. Shipper and Scale can add extra verification volume when dispatch activity is higher than usual.</div></div>
+          <div class="faq-item open">
+            <button class="faq-q" id="faq-q-1" type="button" aria-expanded="true" aria-controls="faq-a-1"><span>What does DeepTruck Verify check?</span><svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a" id="faq-a-1" role="region" aria-labelledby="faq-q-1" aria-hidden="false"><div class="faq-answer-inner"><p>It confirms access to the carrier’s email and listed phone with SMS, and collects driver license, W-9, and certificate of insurance documents before load details are shared.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" id="faq-q-2" type="button" aria-expanded="false" aria-controls="faq-a-2"><span>Why not trust Central Dispatch alone?</span><svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a" id="faq-a-2" role="region" aria-labelledby="faq-q-2" aria-hidden="true"><div class="faq-answer-inner"><p>A marketplace profile is useful carrier information. DeepTruck adds a separate verification record for the person replying today.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" id="faq-q-3" type="button" aria-expanded="false" aria-controls="faq-a-3"><span>Does it replace FMCSA or Central Dispatch?</span><svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a" id="faq-a-3" role="region" aria-labelledby="faq-q-3" aria-hidden="true"><div class="faq-answer-inner"><p>No. DeepTruck works on top of the existing carrier profile and keeps a shipper-side verification record for the specific carrier request.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" id="faq-q-4" type="button" aria-expanded="false" aria-controls="faq-a-4"><span>Can my team see verification history?</span><svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a" id="faq-a-4" role="region" aria-labelledby="faq-q-4" aria-hidden="true"><div class="faq-answer-inner"><p>Your signed-in workspace keeps the history, status, timestamps, and uploaded documents for requests sent from your account, so you can review the record before releasing a load.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" id="faq-q-5" type="button" aria-expanded="false" aria-controls="faq-a-5"><span>What happens after the monthly limit?</span><svg class="faq-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a" id="faq-a-5" role="region" aria-labelledby="faq-q-5" aria-hidden="true"><div class="faq-answer-inner"><p>Starter pauses at the included monthly limit. Shipper and Scale can add extra verification volume when dispatch activity is higher than usual.</p></div></div>
+          </div>
         </div>
       </div>
     </section>
@@ -380,10 +457,60 @@
       document.querySelectorAll(".faq-item").forEach((entry) => {
         entry.classList.remove("open");
         entry.querySelector(".faq-q")?.setAttribute("aria-expanded", "false");
+        entry.querySelector(".faq-a")?.setAttribute("aria-hidden", "true");
       });
       item.classList.toggle("open", isOpening);
       button.setAttribute("aria-expanded", String(isOpening));
+      item.querySelector(".faq-a")?.setAttribute("aria-hidden", String(!isOpening));
     }));
+
+    const reviewsWall = document.querySelector(".reviews-wall");
+    const reviewsToggle = document.querySelector(".reviews-toggle");
+    const reviewTracks = [...document.querySelectorAll(".review-track")];
+    const reviewCards = Array.from({ length: 4 }, (_, row) => reviewTracks.map((track) => track.querySelectorAll(".review-card")[row])).flat();
+    const reviewsDesktop = matchMedia("(min-width: 900px)");
+    const reviewsTablet = matchMedia("(min-width: 560px)");
+    const reviewsSizeObserver = new ResizeObserver((entries) => {
+      entries.forEach(({ target }) => {
+        const track = target.parentElement;
+        const index = reviewTracks.indexOf(track);
+        const duration = Math.max(30, target.getBoundingClientRect().height / [14, 12, 13][index]);
+        track.style.setProperty("--review-duration", `${duration}s`);
+        track.style.setProperty("--review-delay", `${-duration * [.18, .42, .65][index]}s`);
+      });
+    });
+    function arrangeReviews() {
+      reviewsSizeObserver.disconnect();
+      const columns = reviewsDesktop.matches ? 3 : reviewsTablet.matches ? 2 : 1;
+      const groups = reviewTracks.map((track) => {
+        const group = document.createElement("div");
+        group.className = "review-group";
+        track.replaceChildren(group);
+        return group;
+      });
+      reviewCards.forEach((card, index) => groups[index % columns].append(card));
+      groups.slice(0, columns).forEach((group) => {
+        const duplicate = group.cloneNode(true);
+        duplicate.setAttribute("aria-hidden", "true");
+        duplicate.inert = true;
+        group.parentElement.append(duplicate);
+        reviewsSizeObserver.observe(group);
+      });
+    }
+    arrangeReviews();
+    reviewsDesktop.addEventListener("change", arrangeReviews);
+    reviewsTablet.addEventListener("change", arrangeReviews);
+    reviewsToggle?.addEventListener("click", () => {
+      const paused = reviewsWall.classList.toggle("reviews-paused");
+      reviewsToggle.setAttribute("aria-pressed", String(paused));
+      reviewsToggle.querySelector("span").textContent = paused ? "Resume" : "Pause";
+      reviewsToggle.querySelector("path").setAttribute("d", paused ? "m8 5 11 7-11 7Z" : "M9 5v14M15 5v14");
+    });
+    if (reviewsWall) {
+      new IntersectionObserver(([entry]) => {
+        reviewsWall.classList.toggle("reviews-offscreen", !entry.isIntersecting);
+      }).observe(reviewsWall);
+    }
 
     const checks = [...document.querySelectorAll("[data-check]")];
     const events = [...document.querySelectorAll("[data-event]")];
