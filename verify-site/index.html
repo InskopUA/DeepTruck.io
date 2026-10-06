@@ -15,6 +15,7 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="/theme.css">
+  <link rel="stylesheet" href="/tracking-feature.css">
 </head>
 <body class="premium-landing">
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
@@ -26,6 +27,8 @@
     <symbol id="icon-dashboard" viewBox="0 0 24 24"><path d="M4 5h7v6H4zM13 5h7v4h-7zM13 11h7v8h-7zM4 13h7v6H4z"/></symbol>
     <symbol id="icon-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></symbol>
     <symbol id="icon-team" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
   </svg>
   <div class="noise"></div>
 
@@ -35,6 +38,7 @@
         <a class="brand" href="#top"><span class="brand-mark"></span><span>DeepTruck <small>Verify</small></span></a>
         <div class="nav-links" id="navLinks">
           <a href="#features">Features</a>
+          <a href="#driver-tracking">Tracking</a>
           <a href="#reviews">Reviews</a>
           <a href="#pricing">Pricing</a>
           <a href="#faq">FAQ</a>
@@ -229,7 +233,6 @@
     <section class="dealer-section" id="dealerships" aria-labelledby="dealer-heading">
       <div class="container dealer-heading">
         <h2 id="dealer-heading">Dealerships using DeepTruck</h2>
-        <button class="dealer-toggle" type="button" aria-label="Pause dealership animation" aria-pressed="false" aria-controls="dealer-marquee"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg></button>
       </div>
       <div class="dealer-marquee dealer-offscreen" id="dealer-marquee">
         <div class="dealer-row"><div class="dealer-track"><div class="dealer-group">
@@ -334,10 +337,53 @@
       </div>
     </section>
 
+    <section id="driver-tracking" class="tracking-section" aria-labelledby="tracking-title">
+      <div class="container tracking-layout">
+        <div class="tracking-copy reveal">
+          <p class="section-kicker">DeepTruck Driver</p>
+          <h2 id="tracking-title">More visibility.<br>Safer vehicle transport.</h2>
+          <p class="tracking-lead">Verify the carrier. Follow the load. Our driver app brings location sharing into your workspace, helping your team keep control from pickup to delivery.</p>
+          <div class="tracking-benefits">
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-phone"/></svg></span><div><h3>Know who is sharing</h3><p>Invite the driver by phone. They sign in and accept the load in DeepTruck Driver.</p></div></div>
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-pin"/></svg></span><div><h3>See when an update needs attention</h3><p>Review the latest position, GPS accuracy and update time alongside the load.</p></div></div>
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-shield"/></svg></span><div><h3>Keep access tied to the load</h3><p>The driver chooses when to share. Access ends when the load is completed or expires.</p></div></div>
+          </div>
+          <a class="btn btn-primary tracking-cta" href="/signup">Start tracking loads <span aria-hidden="true">↗</span></a>
+        </div>
+        <figure class="tracking-preview reveal delay-1" aria-labelledby="tracking-preview-caption">
+          <figcaption id="tracking-preview-caption">Your workspace. Their driver app. One shared load.</figcaption>
+          <div class="tracking-board">
+            <div class="tracking-board-heading"><div><span class="tracking-demo-label">Product preview</span><h3>Vehicle transport</h3></div><span class="tracking-live"><i></i>Sharing</span></div>
+            <div class="tracking-map" role="img" aria-label="Illustrated route from pickup to delivery with the driver's latest shared position">
+              <svg class="tracking-map-art" viewBox="0 0 540 270" fill="none" aria-hidden="true">
+                <path class="tracking-map-land" d="M0 0h335l-25 56 25 36-29 46 14 45-46 35-26 52H0Z"/>
+                <g class="tracking-map-roads"><path d="m-20 68 209 13 55-105M-20 212l139-54 81 45 107-29 55 44M72-20l42 94-12 69 55 132M230-20l30 55 71 19 89-14M193 0l-38 51 36 76 79 11 106 22M0 126l124 5 83-50 139 27M30 270l107-61 61-84 83-15 38-85"/></g>
+                <path class="tracking-map-route-base" d="M82 214 137 184 166 138 198 112 220 76 240 52"/>
+                <path class="tracking-map-route" d="M82 214 137 184 166 138 198 112 220 76 240 52"/>
+                <circle class="tracking-map-endpoint" cx="82" cy="214" r="6"/><circle class="tracking-map-endpoint" cx="240" cy="52" r="6"/>
+                <circle class="tracking-map-halo" cx="166" cy="138" r="22"/><circle class="tracking-map-driver" cx="166" cy="138" r="8"/>
+              </svg>
+              <span class="tracking-map-pickup">Miami, FL</span><span class="tracking-map-delivery">Atlanta, GA</span>
+            </div>
+            <div class="tracking-update"><span><svg aria-hidden="true"><use href="#icon-pin"/></svg>Updated · 30 sec ago</span><small>GPS accuracy · approx. 8 m</small></div>
+          </div>
+          <div class="tracking-phone" aria-label="DeepTruck Driver app preview">
+            <div class="tracking-phone-camera" aria-hidden="true"></div>
+            <div class="tracking-phone-brand"><span class="brand-mark mini" aria-hidden="true"></span><span>DeepTruck <small>Driver</small></span></div>
+            <div class="tracking-phone-status"><i></i>Location sharing on</div>
+            <h3>Your load</h3><p class="tracking-phone-dealer">Demo dealership</p>
+            <div class="tracking-phone-route"><div><span>Pickup</span><b>Miami, FL</b></div><div><span>Delivery</span><b>Atlanta, GA</b></div></div>
+            <span class="tracking-phone-pause">Pause tracking</span>
+            <p class="tracking-phone-consent">You control sharing for this load.</p>
+            <div class="tracking-phone-home" aria-hidden="true"></div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
     <section id="reviews" class="reviews-section">
       <div class="container">
         <div class="reviews-heading reveal"><p class="section-kicker">Customer feedback</p><h2 class="section-title">Built for real dispatch decisions.</h2></div>
-        <div class="reviews-controls"><button class="reviews-toggle" type="button" aria-pressed="false" aria-controls="reviews-wall"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg><span>Pause</span></button></div>
         <div class="reviews-wall reviews-offscreen" id="reviews-wall" aria-label="Customer feedback">
           <div class="review-column">
             <div class="review-track"><div class="review-group">
@@ -448,7 +494,7 @@
           <a class="btn btn-primary btn-lg footer-cta" href="/signup">Sign Up</a>
         </div>
         <nav class="footer-links" aria-label="Footer">
-          <div class="footer-col"><b>Product</b><a href="#features">Features</a><a href="#extension">Chrome extension</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
+          <div class="footer-col"><b>Product</b><a href="#features">Features</a><a href="#extension">Chrome extension</a><a href="#driver-tracking">Driver tracking</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a></div>
           <div class="footer-col"><b>Account</b><a href="/login">Sign In</a><a href="/signup">Sign Up</a></div>
           <div class="footer-col"><b>Legal</b><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:verify@deeptruck.io">Contact us</a></div>
         </nav>
@@ -505,7 +551,6 @@
     }));
 
     const dealerMarquee = document.getElementById("dealer-marquee");
-    const dealerToggle = document.querySelector(".dealer-toggle");
     const dealerTracks = [...document.querySelectorAll(".dealer-track")];
     const dealerSizeObserver = new ResizeObserver((entries) => {
       entries.forEach(({ target }) => {
@@ -524,12 +569,6 @@
       track.append(duplicate);
       dealerSizeObserver.observe(group);
     });
-    dealerToggle?.addEventListener("click", () => {
-      const paused = dealerMarquee.classList.toggle("dealer-paused");
-      dealerToggle.setAttribute("aria-pressed", String(paused));
-      dealerToggle.setAttribute("aria-label", `${paused ? "Resume" : "Pause"} dealership animation`);
-      dealerToggle.querySelector("path").setAttribute("d", paused ? "m8 5 11 7-11 7Z" : "M9 5v14M15 5v14");
-    });
     if (dealerMarquee) {
       new IntersectionObserver(([entry]) => {
         dealerMarquee.classList.toggle("dealer-offscreen", !entry.isIntersecting);
@@ -537,7 +576,6 @@
     }
 
     const reviewsWall = document.querySelector(".reviews-wall");
-    const reviewsToggle = document.querySelector(".reviews-toggle");
     const reviewTracks = [...document.querySelectorAll(".review-track")];
     const reviewCards = Array.from({ length: 4 }, (_, row) => reviewTracks.map((track) => track.querySelectorAll(".review-card")[row])).flat();
     const reviewsDesktop = matchMedia("(min-width: 900px)");
@@ -572,12 +610,6 @@
     arrangeReviews();
     reviewsDesktop.addEventListener("change", arrangeReviews);
     reviewsTablet.addEventListener("change", arrangeReviews);
-    reviewsToggle?.addEventListener("click", () => {
-      const paused = reviewsWall.classList.toggle("reviews-paused");
-      reviewsToggle.setAttribute("aria-pressed", String(paused));
-      reviewsToggle.querySelector("span").textContent = paused ? "Resume" : "Pause";
-      reviewsToggle.querySelector("path").setAttribute("d", paused ? "m8 5 11 7-11 7Z" : "M9 5v14M15 5v14");
-    });
     if (reviewsWall) {
       new IntersectionObserver(([entry]) => {
         reviewsWall.classList.toggle("reviews-offscreen", !entry.isIntersecting);

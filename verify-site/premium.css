@@ -2911,29 +2911,8 @@ body.premium-landing {
   max-width: 900px;
 }
 
-.reviews-controls {
-  display: flex;
-  justify-content: flex-end;
-  margin: 24px 0 10px;
-}
-
-.reviews-toggle {
-  align-items: center;
-  background: transparent;
-  border: 1px solid var(--premium-line);
-  border-radius: 8px;
-  color: #a2adbc;
-  cursor: pointer;
-  display: inline-flex;
-  font-size: 12px !important;
-  gap: 7px;
-  padding: 8px 11px;
-}
-
-.reviews-toggle:hover { border-color: rgba(152, 190, 234, .3); }
-.reviews-toggle:focus-visible { outline: 2px solid var(--premium-blue); outline-offset: 4px; }
-
 .reviews-wall {
+  margin-top: 36px;
   display: grid;
   gap: 22px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2960,10 +2939,7 @@ body.premium-landing {
 .review-avatar { align-items: center; background: rgba(102, 168, 255, .065); border: 1px solid rgba(152, 190, 234, .14); border-radius: 12px; color: #a2c6f3; display: flex; flex: 0 0 40px; height: 40px; justify-content: center; width: 40px; }
 .review-avatar svg { height: 19px; width: 19px; }
 .review-card blockquote { color: #abb5c3; font-size: 15px; letter-spacing: -.01em; line-height: 1.75; margin: 28px 0 0; }
-.reviews-offscreen .review-track,
-.reviews-paused .review-track,
-.reviews-wall:hover .review-track,
-.reviews-wall:focus-within .review-track { animation-play-state: paused; }
+.reviews-offscreen .review-track { animation-play-state: paused; }
 @keyframes reviewScroll { from { transform: translateY(0); } to { transform: translateY(-50%); } }
 
 .faq-section {
@@ -3083,7 +3059,7 @@ body.premium-landing {
 @media (prefers-reduced-motion: reduce) {
   .reviews-wall { height: auto; -webkit-mask-image: none; mask-image: none; overflow: visible; }
   .review-track { animation: none; will-change: auto; }
-  .review-group[aria-hidden="true"], .reviews-controls { display: none; }
+  .review-group[aria-hidden="true"] { display: none; }
   .faq-simple .faq-a, .faq-chevron { transition: none; }
 }
 
@@ -3757,10 +3733,6 @@ body.premium-landing {
 .premium-landing .dealer-section { background: transparent; padding: 46px 0 40px; }
 .dealer-heading { margin-bottom: 34px; position: relative; text-align: center; }
 .dealer-heading h2 { color: #939eae; font-size: 11px; font-weight: 500; letter-spacing: .23em; line-height: 1.6; margin: 0; text-transform: uppercase; }
-.dealer-toggle { align-items: center; background: transparent; border: 1px solid rgba(154, 190, 234, .14); border-radius: 8px; color: #9ba9bb; cursor: pointer; display: flex; height: 30px; justify-content: center; position: absolute; right: 0; top: -6px; width: 30px; }
-.dealer-toggle:hover { border-color: rgba(154, 190, 234, .4); color: #d0e2f6; }
-.dealer-toggle:focus-visible { outline: 2px solid #9ac7fc; outline-offset: 4px; }
-.dealer-toggle svg { fill: none; height: 14px; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; width: 14px; }
 .dealer-marquee { display: grid; gap: 25px; mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent); overflow: hidden; }
 .dealer-row { overflow: hidden; }
 .dealer-track { animation: dealerScroll var(--dealer-duration, 90s) linear infinite; animation-delay: var(--dealer-delay, -12s); display: flex; width: max-content; will-change: transform; }
@@ -3771,14 +3743,12 @@ body.premium-landing {
 .dealer-brand img { display: block; filter: brightness(0) invert(1); height: 32px; object-fit: contain; opacity: .78; width: 32px; }
 .dealer-brand-bmw img, .dealer-brand-volkswagen img, .dealer-brand-mercedesbenz img { height: 29px; width: 29px; }
 .dealer-brand-audi img, .dealer-brand-chrysler img { height: 34px; width: 34px; }
-.dealer-offscreen .dealer-track, .dealer-paused .dealer-track,
-.dealer-marquee:hover .dealer-track { animation-play-state: paused; }
+.dealer-offscreen .dealer-track { animation-play-state: paused; }
 @keyframes dealerScroll { to { transform: translateX(-50%); } }
 @media (max-width: 760px) {
   .premium-landing .dealer-section { padding: 30px 0 26px; }
   .dealer-heading { margin-bottom: 28px; padding: 0 32px; }
   .dealer-heading h2 { font-size: 10px; letter-spacing: .18em; }
-  .dealer-toggle { height: 28px; top: -6px; width: 28px; }
   .dealer-marquee { gap: 20px; }
   .dealer-group { gap: 30px; padding-right: 30px; }
   .dealer-name { font-size: 14px; gap: 10px; }
@@ -3788,7 +3758,6 @@ body.premium-landing {
   .dealer-brand-audi img, .dealer-brand-chrysler img { height: 29px; width: 29px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .dealer-toggle { display: none; }
   .dealer-marquee { mask-image: none; margin: 0 auto; max-width: 1760px; width: 84.5%; }
   .dealer-track { animation: none; width: 100%; will-change: auto; }
   .dealer-group { flex-wrap: wrap; gap: 20px 30px; padding: 0; width: 100%; }

@@ -1,0 +1,106 @@
+.tracking-section {
+  --tracking-panel: #10161f;
+  --tracking-soft: #182332;
+  --tracking-muted: #a5b2c3;
+  --tracking-map-bg: #132433;
+  --tracking-land: #162d39;
+  --tracking-roads: #36505e;
+  --tracking-route: #8ebaff;
+  --tracking-green: #99d6b2;
+}
+.premium-landing .tracking-section { padding: 36px 0 100px; }
+.tracking-layout { align-items: center; display: grid; gap: clamp(40px, 5vw, 80px); grid-template-columns: minmax(0, .94fr) minmax(0, 1.06fr); }
+.tracking-copy h2 { font-size: clamp(32px, 3.1vw, 50px); font-weight: 600; letter-spacing: -.045em; line-height: 1.16; margin: 0; }
+.tracking-lead { color: var(--tracking-muted); font-size: 16px; line-height: 1.75; margin: 24px 0 30px; max-width: 550px; }
+.tracking-benefits { display: grid; gap: 22px; margin-bottom: 32px; }
+.tracking-benefits > div { align-items: start; display: flex; gap: 14px; }
+.tracking-benefit-icon { align-items: center; background: var(--tracking-soft); border: 1px solid var(--premium-line); border-radius: 9px; color: var(--premium-blue); display: flex; flex: 0 0 34px; height: 34px; justify-content: center; }
+.tracking-benefit-icon svg { height: 18px; width: 18px; }
+.tracking-benefits h3 { font-size: 14px; font-weight: 600; line-height: 1.5; margin: 0 0 4px; }
+.tracking-benefits p { color: var(--tracking-muted); font-size: 13px; line-height: 1.65; margin: 0; }
+.tracking-cta { border-radius: 8px; gap: 16px; padding: 13px 18px; }
+.tracking-section .tracking-cta { color: #07111e; }
+.tracking-preview { margin: 0; min-height: 470px; padding-top: 40px; padding-bottom: 90px; position: relative; }
+.tracking-preview::before { background: radial-gradient(ellipse, rgba(73, 129, 207, .16), transparent 70%); content: ""; inset: 0; pointer-events: none; position: absolute; }
+.tracking-preview figcaption { color: var(--tracking-muted); font-size: 12px; line-height: 1.6; margin-bottom: 16px; position: relative; }
+.tracking-board { background: var(--tracking-panel); border: 1px solid var(--premium-line-strong); border-radius: 18px; box-shadow: 0 18px 60px rgba(0, 0, 0, .25); overflow: hidden; position: relative; }
+.tracking-board-heading { align-items: center; display: flex; gap: 12px; justify-content: space-between; padding: 18px 20px; }
+.tracking-demo-label { color: var(--tracking-muted); display: block; font-size: 9px; letter-spacing: .08em; margin-bottom: 6px; text-transform: uppercase; }
+.tracking-board h3 { font-size: 17px; font-weight: 600; letter-spacing: -.02em; margin: 0; }
+.tracking-live { align-items: center; background: var(--tracking-soft); border-radius: 5px; color: var(--tracking-green); display: inline-flex; font-size: 10px; gap: 6px; padding: 6px 8px; white-space: nowrap; }
+.tracking-live i, .tracking-phone-status i { background: currentColor; border-radius: 50%; flex: 0 0 5px; height: 5px; width: 5px; }
+.tracking-map { background: var(--tracking-map-bg); border-block: 1px solid var(--premium-line); height: 260px; overflow: hidden; position: relative; }
+.premium-landing .tracking-map-art { height: 100%; stroke: none; stroke-width: 1; width: 100%; }
+.tracking-map-land { fill: var(--tracking-land); }
+.tracking-map-roads { stroke: var(--tracking-roads); stroke-width: 2; }
+.tracking-map-route-base { stroke: var(--tracking-route); stroke-opacity: .12; stroke-width: 16; }
+.tracking-map-route { stroke: var(--tracking-route); stroke-width: 3; }
+.tracking-map-endpoint { fill: var(--tracking-panel); stroke: var(--tracking-route); stroke-width: 3; }
+.tracking-map-halo { fill: var(--tracking-route); fill-opacity: .18; }
+.tracking-map-driver { fill: var(--tracking-route); stroke: var(--tracking-panel); stroke-width: 3; }
+.tracking-map-pickup, .tracking-map-delivery { color: var(--tracking-muted); font-size: 10px; position: absolute; }
+.tracking-map-pickup { bottom: 9%; left: 12%; }
+.tracking-map-delivery { left: 40%; top: 10%; }
+.tracking-update { display: grid; gap: 7px; padding: 18px 20px; }
+.tracking-update > span { align-items: center; display: flex; font-size: 11px; gap: 6px; }
+.tracking-update svg { color: var(--premium-blue); height: 14px; width: 14px; }
+.tracking-update small { color: var(--tracking-muted); font-size: 9px; }
+.tracking-phone { --tracking-panel: #fff; --tracking-soft: #edf3fb; --tracking-muted: #506178; --tracking-route: #286bc0; --tracking-green: #23734d; --premium-line: rgba(39, 65, 98, .19); background: var(--tracking-panel); color: #182638; border: 5px solid #283342; border-radius: 28px; bottom: 0; box-shadow: 0 8px 15px rgba(0, 0, 0, .20), 0 28px 65px rgba(0, 0, 0, .25); padding: 26px 14px 20px; position: absolute; right: 14px; width: 188px; }
+.tracking-phone-camera { background: #91a1b5; border-radius: 8px; height: 5px; left: calc(50% - 18px); position: absolute; top: 10px; width: 36px; }
+.tracking-phone-brand { align-items: center; display: flex; font-size: 11px; font-weight: 600; gap: 5px; letter-spacing: -.025em; margin-bottom: 24px; }
+.tracking-phone-brand .brand-mark { background-image: url("shield-mark-light.svg"); filter: none; height: 21px; width: 18px; }
+.tracking-phone-brand small { color: var(--tracking-muted); display: block; font-size: 8px; font-weight: 400; letter-spacing: 0; margin-top: 2px; }
+.tracking-phone-status { align-items: center; color: var(--tracking-green); display: flex; font-size: 9px; gap: 5px; margin-bottom: 15px; }
+.tracking-phone h3 { font-size: 20px; font-weight: 600; letter-spacing: -.035em; margin: 0 0 5px; }
+.tracking-phone-dealer { color: var(--tracking-muted); font-size: 9px; margin: 0; }
+.tracking-phone-route { border: 1px solid var(--premium-line); border-radius: 9px; display: grid; gap: 15px; margin: 16px 0; padding: 13px 11px; }
+.tracking-phone-route > div { border-left: 2px solid var(--tracking-route); padding-left: 9px; }
+.tracking-phone-route span { color: var(--tracking-muted); display: block; font-size: 8px; margin-bottom: 5px; }
+.tracking-phone-route b { font-size: 11px; font-weight: 500; }
+.tracking-phone-pause { background: var(--tracking-soft); border: 1px solid var(--premium-line); border-radius: 6px; display: block; font-size: 10px; padding: 9px 5px; text-align: center; }
+.tracking-phone-consent { color: var(--tracking-muted); font-size: 8px; line-height: 1.6; margin: 10px 0; text-align: center; }
+.tracking-phone-home { background: var(--tracking-muted); border-radius: 3px; height: 3px; margin: 15px auto -9px; opacity: .5; width: 44px; }
+
+html[data-theme="light"] .tracking-section {
+  --tracking-panel: #fff;
+  --tracking-soft: #edf3fb;
+  --tracking-muted: #506178;
+  --tracking-map-bg: #e7eef8;
+  --tracking-land: #e1eced;
+  --tracking-roads: #c0d0d9;
+  --tracking-route: #286bc0;
+  --tracking-green: #23734d;
+}
+html[data-theme="light"] .tracking-board { box-shadow: var(--light-shadow-raised); }
+html[data-theme="light"] .tracking-phone { border-color: #ced9e7; box-shadow: 0 4px 8px rgba(29, 49, 77, .12), 0 24px 50px rgba(29, 49, 77, .20); }
+html[data-theme="light"] .tracking-phone-camera { background: #91a1b5; }
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .tracking-layout { gap: 36px; }
+  .tracking-phone { right: 0; width: 170px; }
+  .tracking-update { padding-left: 16px; }
+}
+@media (max-width: 760px) {
+  .premium-landing .tracking-section { padding: 20px 0 60px; }
+  .tracking-layout { gap: 24px; grid-template-columns: 1fr; }
+  .tracking-copy h2 { font-size: clamp(30px, 6.7vw, 44px); }
+  .tracking-lead { font-size: 14px; margin: 20px 0 26px; }
+  .tracking-benefits { gap: 18px; margin-bottom: 26px; }
+  .tracking-preview { margin: 0 auto; max-width: 540px; min-height: 440px; padding-top: 10px; width: 100%; }
+  .tracking-preview figcaption { font-size: 11px; }
+  .tracking-board-heading { padding: 15px 16px; }
+  .tracking-board h3 { font-size: 15px; }
+  .tracking-map { height: 220px; }
+  .tracking-map-delivery { left: 24%; top: 8%; }
+  .tracking-phone { bottom: 0; right: 10px; width: 162px; }
+  .tracking-phone-brand { margin-bottom: 17px; }
+  .tracking-phone-route { gap: 12px; padding: 10px 8px; }
+  .tracking-update { padding: 16px; }
+}
+@media (max-width: 380px) {
+  .tracking-live { font-size: 9px; padding: 5px 6px; }
+  .tracking-board-heading { gap: 8px; padding-inline: 13px; }
+  .tracking-phone { right: 0; width: 150px; padding-inline: 10px; }
+  .tracking-update > span { font-size: 10px; }
+  .tracking-update small { font-size: 8px; }
+}

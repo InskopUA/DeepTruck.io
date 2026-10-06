@@ -42,8 +42,8 @@ html[data-theme="dark"] .timeline-large p { color: #a3adbc; }
 html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
 
 :root[data-theme="light"] {
-  --premium-bg: #edf2f7;
-  --premium-bg-soft: #e5edf6;
+  --premium-bg: #dfe5ec;
+  --premium-bg-soft: #d7e0ea;
   --premium-panel: #ffffff;
   --premium-panel-2: #edf3fa;
   --premium-text: #182638;
@@ -51,7 +51,7 @@ html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
   --premium-muted-2: #617187;
   --premium-line: rgba(39, 65, 98, .19);
   --premium-line-strong: rgba(39, 65, 98, .32);
-  --premium-blue: #286bc0;
+  --premium-blue: #245fad;
   --premium-blue-2: #286bc0;
   --premium-cyan: #087e84;
   --premium-green: #23734d;
@@ -157,7 +157,7 @@ html[data-theme="light"] .hero-orbit-card { box-shadow: var(--light-shadow-raise
 html[data-theme="light"] .feature-visual .demo-surface,
 html[data-theme="light"] .feature-browser,
 html[data-theme="light"] .feature-video { box-shadow: none; }
-html[data-theme="light"] .hero-visual .product-glow { background: radial-gradient(ellipse, rgba(70, 133, 213, .32), rgba(70, 133, 213, .09) 58%, transparent 78%); inset: 8% 25%; }
+html[data-theme="light"] .hero-visual .product-glow { background: radial-gradient(ellipse, rgba(255, 255, 255, .95), rgba(255, 255, 255, .40) 58%, transparent 78%); inset: 8% 25%; }
 html[data-theme="light"] .hero-orbit-card svg { color: #456b98; }
 html[data-theme="light"] .window-top,
 html[data-theme="light"] .identity-card,
@@ -191,10 +191,6 @@ html[data-theme="light"] .hero-activity-card i { background: #23734d; }
 html[data-theme="light"] .feature-icon { background: linear-gradient(145deg, #fff, #e5edf8); color: #456b98; box-shadow: 0 2px 4px rgba(29, 49, 77, .06); }
 html[data-theme="light"] .feature-item.active .feature-icon { background: #e2edfc; border-color: #9cbbe3; }
 html[data-theme="light"] .review-avatar { background: #edf4fd; border-color: #bed0e8; color: #286bc0; }
-html[data-theme="light"] .reviews-toggle,
-html[data-theme="light"] .dealer-toggle { background: #fff; color: #526379; border-color: var(--premium-line-strong); }
-html[data-theme="light"] .reviews-toggle:hover,
-html[data-theme="light"] .dealer-toggle:hover { color: #245fad; border-color: #8badd7; }
 html[data-theme="light"] .dealer-brand { background: #edf3fa; border-color: #d5e0ee; }
 html[data-theme="light"] .dealer-brand img { filter: brightness(0) saturate(100%); opacity: .72; }
 html[data-theme="light"] .price-card:hover { border-color: var(--premium-line-strong); }
@@ -209,11 +205,18 @@ html[data-theme="light"] .faq-simple .faq-item.open:hover { background: #e3edfc;
 html[data-theme="light"] .faq-simple .faq-item.open .faq-q,
 html[data-theme="light"] .faq-item.open .faq-chevron { color: #245fad; }
 html[data-theme="light"] .faq-chevron { color: #617187; }
-html[data-theme="light"] .extension-card { background: radial-gradient(ellipse at 85% 65%, rgba(75, 138, 210, .18), transparent 55%), #fff; border-color: var(--premium-line); box-shadow: var(--light-shadow-raised); }
+html[data-theme="light"] .extension-card { background: radial-gradient(ellipse at 85% 65%, #fff, transparent 55%), linear-gradient(135deg, #fff, #edf2f8); border-color: var(--premium-line); box-shadow: var(--light-shadow-raised); }
 html[data-theme="light"] .footer-wordmark span { background-image: linear-gradient(180deg, #8497ae, #b4c2d3 65%, #d8e2ed); }
 html[data-theme="light"] .theme-toggle { background: #fff; }
 
 /* Preserve the dark glass mascot while giving its blue rim definition on white. */
+html[data-theme="light"] [id$="mascot-halo"] stop { stop-color: #fff; }
+html[data-theme="light"] [id$="mascot-halo"] stop:first-child { stop-opacity: .8; }
+html[data-theme="light"] .hero-emblem { animation-name: heroShieldFloat, heroShieldWhiteGlow, heroShieldLook; }
+@keyframes heroShieldWhiteGlow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(255, 255, 255, .22)); }
+  50% { filter: drop-shadow(0 0 22px rgba(255, 255, 255, .5)); }
+}
 html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(1) { stop-color: #3979c9; }
 html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(2) { stop-color: #4d94df; }
 html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(3) { stop-color: #719dd0; }

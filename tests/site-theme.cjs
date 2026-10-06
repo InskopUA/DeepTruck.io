@@ -58,6 +58,18 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
   return [selector, [css.fontFamily, css.fontSize, css.fontWeight, css.lineHeight, css.letterSpacing]];
 })));
 
+function serveStatic(route) {
+  let pathname = new URL(route.request().url()).pathname;
+  if (pathname === '/') pathname = '/index.html';
+  if (['/privacy', '/terms'].includes(pathname)) pathname += '.html';
+  if (['/login', '/signup'].includes(pathname)) pathname = '/admin' + pathname + '.html';
+  const base = pathname.startsWith('/admin/') ? adminRoot : root;
+  const file = path.resolve(base, '.' + (base === adminRoot ? pathname.slice(6) : pathname));
+  if (!file.startsWith(base + path.sep) || !fs.existsSync(file)) return route.fulfill({status: 404});
+  const types = {'.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.jpg': 'image/jpeg'};
+  return route.fulfill({contentType: types[path.extname(file)] || 'application/octet-stream', body: fs.readFileSync(file)});
+}
+
 (async () => {
   const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
   const browser = await chromium.launch({headless: true, executablePath});
@@ -74,17 +86,7 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
         signUp: () => new Promise(resolve => { window.finishAuthRequest = error => resolve({data: {session: null}, error: error ? {message: 'Please try again.'} : null}); })
       }})};
     `}));
-    await context.route(origin + '/**', route => {
-      let pathname = new URL(route.request().url()).pathname;
-      if (pathname === '/') pathname = '/index.html';
-      if (['/privacy', '/terms'].includes(pathname)) pathname += '.html';
-      if (['/login', '/signup'].includes(pathname)) pathname = '/admin' + pathname + '.html';
-      const base = pathname.startsWith('/admin/') ? adminRoot : root;
-      const file = path.resolve(base, '.' + (base === adminRoot ? pathname.slice(6) : pathname));
-      if (!file.startsWith(base + path.sep) || !fs.existsSync(file)) return route.fulfill({status: 404});
-      const types = {'.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.jpg': 'image/jpeg'};
-      return route.fulfill({contentType: types[path.extname(file)] || 'application/octet-stream', body: fs.readFileSync(file)});
-    });
+    await context.route(origin + '/**', serveStatic);
     const page = await context.newPage();
     const errors = []; page.on('pageerror', error => errors.push(error.message));
     for (const width of [1440, 1024, 768, 390, 320]) {
@@ -102,6 +104,14 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
         await page.evaluate(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')));
         assert.equal(await page.locator('html').getAttribute('data-theme'), theme);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${width} ${theme}: horizontal overflow`);
+        assert.equal(await page.locator('.dealer-toggle, .reviews-toggle').count(), 0, 'marquee pause controls removed');
+        for (const selector of ['.tracking-copy', '.tracking-board', '.tracking-phone']) {
+          const bounds = await page.locator(selector).boundingBox();
+          assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= width, `${selector} ${width}px stays inside the screen`);
+        }
+        const destination = await page.locator('.tracking-map-delivery').boundingBox(), phone = await page.locator('.tracking-phone').boundingBox();
+        const covered = destination.x < phone.x + phone.width && destination.x + destination.width > phone.x && destination.y < phone.y + phone.height && destination.y + destination.height > phone.y;
+        assert.equal(covered, false, 'phone preview must not obscure the map destination label');
         const violations = await contrast(page); reports.push({page: '/', width, theme, violations});
         if (theme === 'dark') originalType = await typography(page);
         else assert.deepEqual(await typography(page), originalType, 'theme preserves typography');
@@ -111,6 +121,7 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
           await page.evaluate(() => window.scrollTo({top: 0, behavior: 'instant'}));
           await page.screenshot({path: `/private/tmp/deeptruck-hero-${theme}-${width}.png`});
           await page.locator('.extension-card').screenshot({path: `/private/tmp/deeptruck-extension-${theme}-${width}.png`});
+          await page.locator('.tracking-layout').screenshot({path: `/private/tmp/deeptruck-tracking-feature-${theme}-${width}.png`});
         }
         assert.deepEqual(violations, [], `${width}px ${theme} theme contrast`);
         if (theme === 'light') {
@@ -121,7 +132,7 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
           }
         }
         // Hover states must stay readable too, including the filled pricing CTA.
-        for (const selector of ['.hero-actions .btn-primary', '.price-card.featured .btn-primary', '.faq-q', '.theme-toggle']) {
+        for (const selector of ['.hero-actions .btn-primary', '.tracking-cta', '.price-card.featured .btn-primary', '.faq-q', '.theme-toggle']) {
           await page.locator(selector).first().hover(); await page.waitForTimeout(350);
           assert.deepEqual(await contrast(page), [], `${width}px ${theme} ${selector} hover contrast`);
         }
@@ -160,7 +171,7 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
         await page.goto(origin + route);
         await page.waitForFunction(() => !document.getElementById('auth-submit').disabled);
         assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
-        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(237, 242, 247)');
+        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(223, 229, 236)');
         assert.equal(await page.locator('[data-theme-logo]').getAttribute('src'), '/shield-mark-light.svg');
         assert.deepEqual(await contrast(page), [], `${width}px ${route} empty form and placeholders`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${route} ${width}: overflow`);
@@ -193,6 +204,25 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
     await page.getByRole('switch', {name: 'Light theme'}).click();
     await second.waitForFunction(() => document.documentElement.dataset.theme === 'dark');
     assert.deepEqual(errors, []);
+    // Normal motion keeps advancing while the pointer is over either marquee.
+    const motion = await browser.newContext({viewport: {width: 1440, height: 900}, reducedMotion: 'no-preference'});
+    await motion.route(origin + '/**', serveStatic);
+    const moving = await motion.newPage(); await moving.goto(origin);
+    for (const theme of ['dark', 'light']) {
+      if (theme === 'light') await moving.getByRole('switch', {name: 'Light theme'}).click();
+      for (const [container, track] of [['.dealer-marquee', '.dealer-track'], ['.reviews-wall', '.review-track']]) {
+        await moving.locator(container).scrollIntoViewIfNeeded();
+        await moving.waitForFunction(selector => getComputedStyle(document.querySelector(selector)).animationPlayState === 'running', track);
+        await moving.locator(container).hover();
+        const before = await moving.locator(track).first().evaluate(el => el.getAnimations()[0].currentTime);
+        await moving.waitForTimeout(250);
+        const after = await moving.locator(track).first().evaluate(el => ({time: el.getAnimations()[0].currentTime, state: getComputedStyle(el).animationPlayState}));
+        assert.equal(after.state, 'running', `${theme} ${container} keeps moving on hover`);
+        assert.ok(after.time > before + 100, 'animation actually advanced under the pointer');
+      }
+    }
+    await motion.close();
+    console.log('PASS dealership and review animations keep moving on hover in both themes');
     const blocked = await browser.newContext();
     await blocked.addInitScript(() => {
       Storage.prototype.getItem = () => { throw new Error('Storage unavailable'); };
