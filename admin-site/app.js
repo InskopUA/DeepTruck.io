@@ -177,12 +177,10 @@ function showAuth() {
 function renderAccount() {
   const metadata = state.user?.user_metadata || {};
   const name = metadata.full_name || [metadata.first_name, metadata.last_name].filter(Boolean).join(" ") || state.user?.email?.split("@")[0] || "Your account";
-  const company = metadata.company_name || metadata.dealership_name || "Your workspace";
   accountEmail.textContent = state.user?.email || "";
   document.querySelectorAll("[data-account-name]").forEach(el => el.textContent = name);
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
   document.querySelectorAll("[data-account-initials]").forEach(el => el.textContent = initials);
-  document.getElementById("workspace-company").textContent = company;
   settingsEmail.textContent = state.user?.email || "";
   settingsCompany.value = metadata.company_name || metadata.dealership_name || "";
   document.getElementById("settings-name").textContent = name;
