@@ -1,0 +1,225 @@
+/* Theme changes only the palette. Typography, layout and motion stay in premium.css. */
+.theme-toggle {
+  align-items: center;
+  background: rgba(134, 181, 237, .04);
+  border: 1px solid var(--premium-line-strong);
+  border-radius: 8px;
+  color: var(--premium-text);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 12px;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+}
+.theme-toggle:hover { border-color: var(--premium-blue); }
+.theme-toggle:focus-visible { outline: 2px solid var(--premium-blue); outline-offset: 4px; }
+.theme-toggle svg { height: 16px; width: 16px; }
+.theme-toggle .theme-sun { display: none; }
+.theme-toggle[aria-checked="true"] .theme-sun { display: block; }
+.theme-toggle[aria-checked="true"] .theme-moon { display: none; }
+.theme-switch { background: #334055; border-radius: 12px; height: 18px; padding: 3px; width: 30px; }
+.theme-switch::after { background: #f3f7fb; border-radius: 50%; content: ""; display: block; height: 12px; width: 12px; }
+.theme-toggle[aria-checked="true"] .theme-switch { background: #286bc0; }
+.theme-toggle[aria-checked="true"] .theme-switch::after { transform: translateX(12px); }
+.footer-bottom { flex-wrap: wrap; }
+.feature-visual > .demo-surface { opacity: 1; }
+
+/* Keep fine print readable in the existing dark palette as well. */
+html[data-theme="dark"] .address-bar,
+html[data-theme="dark"] .tiny,
+html[data-theme="dark"] .kv span,
+html[data-theme="dark"] .demo-head small,
+html[data-theme="dark"] .path-card span,
+html[data-theme="dark"] .path-card small,
+html[data-theme="dark"] .document-row small,
+html[data-theme="dark"] .queue-row small,
+html[data-theme="dark"] .queue-row.header,
+html[data-theme="dark"] .hero-activity-card time,
+html[data-theme="dark"] .timeline-large p { color: #a3adbc; }
+html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
+
+:root[data-theme="light"] {
+  --premium-bg: #f8fafc;
+  --premium-bg-soft: #f1f5fa;
+  --premium-panel: #ffffff;
+  --premium-panel-2: #edf3fa;
+  --premium-text: #202c3d;
+  --premium-muted: #58697e;
+  --premium-muted-2: #617187;
+  --premium-line: rgba(39, 65, 98, .14);
+  --premium-line-strong: rgba(39, 65, 98, .24);
+  --premium-blue: #286bc0;
+  --premium-blue-2: #286bc0;
+  --premium-cyan: #087e84;
+  --premium-green: #23734d;
+  --premium-amber: #8b5b15;
+  --premium-red: #ad394c;
+  --premium-shadow: 0 24px 70px rgba(39, 65, 98, .10);
+}
+
+/* Navigation and calls to action. */
+html[data-theme="light"] .nav { background: rgba(248, 250, 252, .90); border-color: var(--premium-line); box-shadow: 0 10px 35px rgba(39, 65, 98, .08); }
+html[data-theme="light"] .nav.scrolled { background: rgba(248, 250, 252, .97); border-color: var(--premium-line-strong); }
+html[data-theme="light"] .brand-mark,
+html[data-theme="light"] .side-logo { background-image: url("shield-mark-light.svg"); filter: none; }
+html[data-theme="light"] .nav-links a { color: #526379; }
+html[data-theme="light"] .nav-links a:hover { background: #eaf0f8; color: var(--premium-text); }
+html[data-theme="light"] .btn-ghost { background: #fff; color: #34465e; }
+html[data-theme="light"] .btn-ghost:hover { background: #edf3fa; }
+html[data-theme="light"] .btn-primary { background: linear-gradient(180deg, #3276c9, #245fad); color: #fff; box-shadow: 0 8px 24px rgba(40, 107, 192, .15); }
+html[data-theme="light"] .hero-centered .btn-primary,
+html[data-theme="light"] .nav .btn-primary,
+html[data-theme="light"] .footer-cta.btn-primary,
+html[data-theme="light"] .extension-install.btn-primary,
+html[data-theme="light"] .legal-page .legal-signup { background: #edf4fd; border-color: #9bbce4; box-shadow: none; color: #245fad; }
+html[data-theme="light"] .hero-centered .btn-primary:hover,
+html[data-theme="light"] .nav .btn-primary:hover,
+html[data-theme="light"] .footer-cta.btn-primary:hover,
+html[data-theme="light"] .extension-install.btn-primary:hover,
+html[data-theme="light"] .legal-page .legal-signup:hover { background: #deebfc; }
+html[data-theme="light"] .hero-centered .btn-ghost { background: transparent; color: #465b75; }
+html[data-theme="light"] .hamburger { background: #edf3fa; }
+
+/* Titles and secondary text, including all product demonstration panels. */
+html[data-theme="light"] .hero-centered h1,
+html[data-theme="light"] .faq-heading h2,
+html[data-theme="light"] .demo-head b,
+html[data-theme="light"] .path-card b,
+html[data-theme="light"] .document-row b,
+html[data-theme="light"] .queue-row b,
+html[data-theme="light"] .timeline-large b,
+html[data-theme="light"] .review-card h3,
+html[data-theme="light"] .ui-title,
+html[data-theme="light"] .kv b,
+html[data-theme="light"] .extension-copy h2,
+html[data-theme="light"] .price { color: var(--premium-text); }
+html[data-theme="light"] .hero-centered .lead,
+html[data-theme="light"] .lead,
+html[data-theme="light"] .section-copy,
+html[data-theme="light"] .faq-heading p,
+html[data-theme="light"] .faq-answer-inner p,
+html[data-theme="light"] .review-card blockquote,
+html[data-theme="light"] .extension-copy p,
+html[data-theme="light"] .feature-item em,
+html[data-theme="light"] .price-desc,
+html[data-theme="light"] .price small,
+html[data-theme="light"] .plan,
+html[data-theme="light"] .features div,
+html[data-theme="light"] .hero-proof,
+html[data-theme="light"] .dealer-heading h2,
+html[data-theme="light"] .dealer-name,
+html[data-theme="light"] .footer-left p,
+html[data-theme="light"] .footer-col b,
+html[data-theme="light"] .footer-col a,
+html[data-theme="light"] .footer-bottom { color: var(--premium-muted); }
+html[data-theme="light"] .section-kicker,
+html[data-theme="light"] .hero-proof svg,
+html[data-theme="light"] .feature-item.active .feature-icon,
+html[data-theme="light"] .path-card svg,
+html[data-theme="light"] .document-row > span,
+html[data-theme="light"] .status-list svg,
+html[data-theme="light"] .timeline-large time,
+html[data-theme="light"] .footer-col a:hover,
+html[data-theme="light"] .footer-bottom a:hover { color: var(--premium-blue); }
+html[data-theme="light"] .tiny,
+html[data-theme="light"] .ui-sub,
+html[data-theme="light"] .kv span,
+html[data-theme="light"] .check strong,
+html[data-theme="light"] .address-bar,
+html[data-theme="light"] .orbit-label,
+html[data-theme="light"] .hero-orbit-card small,
+html[data-theme="light"] .hero-activity-card time,
+html[data-theme="light"] .demo-head small,
+html[data-theme="light"] .path-card span,
+html[data-theme="light"] .path-card small,
+html[data-theme="light"] .document-row small,
+html[data-theme="light"] .queue-row small,
+html[data-theme="light"] .queue-row.header,
+html[data-theme="light"] .timeline-large p,
+html[data-theme="light"] .review-card-head > div > span { color: var(--premium-muted); }
+
+/* Light surfaces keep the original borders, depth and blue accents. */
+html[data-theme="light"] .hero-visual .hero-product,
+html[data-theme="light"] .hero-orbit-card,
+html[data-theme="light"] .demo-surface,
+html[data-theme="light"] .feature-visual .demo-surface,
+html[data-theme="light"] .review-card,
+html[data-theme="light"] .price-card { background: #fff; border-color: var(--premium-line); box-shadow: 0 12px 40px rgba(39, 65, 98, .07); color: var(--premium-text); }
+html[data-theme="light"] .hero-orbit-card svg { color: #456b98; }
+html[data-theme="light"] .window-top,
+html[data-theme="light"] .identity-card,
+html[data-theme="light"] .check,
+html[data-theme="light"] .hero-documents-card > div,
+html[data-theme="light"] .path-card,
+html[data-theme="light"] .document-row,
+html[data-theme="light"] .status-list div,
+html[data-theme="light"] .queue-row { background: #f5f8fc; color: #465b75; }
+html[data-theme="light"] .queue-row.header { background: transparent; }
+html[data-theme="light"] .status-pill { background: #fff4df; border-color: #e4c99c; color: #855612; }
+html[data-theme="light"] .completion-mark,
+html[data-theme="light"] .completion-mark.complete,
+html[data-theme="light"] .path-card.done,
+html[data-theme="light"] .review-banner,
+html[data-theme="light"] .status-pill.ready,
+html[data-theme="light"] .ready-label,
+html[data-theme="light"] .tag { background: #ecf7f0; border-color: #b9dbc7; color: #23734d; }
+html[data-theme="light"] .completion-mark b,
+html[data-theme="light"] .completion-mark small,
+html[data-theme="light"] .check.done strong,
+html[data-theme="light"] .hero-documents-card small,
+html[data-theme="light"] .document-row.received strong,
+html[data-theme="light"] .status-list b,
+html[data-theme="light"] .features div::before { color: #23734d; }
+html[data-theme="light"] .document-row.pending strong { color: #855612; }
+html[data-theme="light"] .tag.pending { background: #fff4df; color: #855612; border-color: #e4c99c; }
+html[data-theme="light"] .tag.review { background: #edf4fd; color: #245fad; border-color: #b6cdea; }
+html[data-theme="light"] .check-ico { background: #e7f3ed; border-color: #b9dbc7; }
+html[data-theme="light"] .hero-activity-card i { background: #23734d; }
+html[data-theme="light"] .feature-icon { background: #f0f4fa; color: #456b98; }
+html[data-theme="light"] .review-avatar { background: #edf4fd; border-color: #bed0e8; color: #286bc0; }
+html[data-theme="light"] .reviews-toggle,
+html[data-theme="light"] .dealer-toggle { background: #fff; color: #526379; border-color: var(--premium-line-strong); }
+html[data-theme="light"] .reviews-toggle:hover,
+html[data-theme="light"] .dealer-toggle:hover { color: #245fad; border-color: #8badd7; }
+html[data-theme="light"] .dealer-brand { background: #edf3fa; border-color: #d5e0ee; }
+html[data-theme="light"] .dealer-brand img { filter: brightness(0) saturate(100%); opacity: .72; }
+html[data-theme="light"] .price-card:hover { border-color: var(--premium-line-strong); }
+html[data-theme="light"] .price-card.featured { background: linear-gradient(180deg, #edf4ff, #fff); border-color: #a7c4e9; box-shadow: 0 20px 60px rgba(40, 107, 192, .09); }
+html[data-theme="light"] .recommended { background: #286bc0; color: #fff; }
+html[data-theme="light"] .faq-simple .faq-item { background: #fff; border-color: var(--premium-line); }
+html[data-theme="light"] .faq-simple .faq-q { color: var(--premium-text); }
+html[data-theme="light"] .faq-simple .faq-q:hover { background: #f0f5fc; }
+html[data-theme="light"] .faq-simple .faq-item.open { background: #f0f5fc; border-color: #b6cdea; }
+html[data-theme="light"] .faq-simple .faq-item.open .faq-q,
+html[data-theme="light"] .faq-item.open .faq-chevron { color: #245fad; }
+html[data-theme="light"] .faq-chevron { color: #617187; }
+html[data-theme="light"] .extension-card { background: radial-gradient(ellipse at 85% 65%, rgba(75, 138, 210, .10), transparent 50%), #fff; border-color: var(--premium-line); }
+html[data-theme="light"] .footer-wordmark span { background-image: linear-gradient(180deg, #8497ae, #b4c2d3 65%, #d8e2ed); }
+html[data-theme="light"] .theme-toggle { background: #fff; }
+
+/* Preserve the dark glass mascot while giving its blue rim definition on white. */
+html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(1) { stop-color: #3979c9; }
+html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(2) { stop-color: #4d94df; }
+html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(3) { stop-color: #719dd0; }
+html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(4) { stop-color: #245c9b; }
+html[data-theme="light"] [id$="mascot-rim"] stop:nth-child(5) { stop-color: #3979c9; }
+
+/* Legal pages follow the same saved preference. */
+html[data-theme="light"] .legal-page { --legal-muted: #58697e; }
+html[data-theme="light"] .legal-intro h1,
+html[data-theme="light"] .legal-document h2,
+html[data-theme="light"] .legal-document strong { color: var(--premium-text); }
+html[data-theme="light"] .legal-meta,
+html[data-theme="light"] .legal-toc-title,
+html[data-theme="light"] .legal-toc a,
+html[data-theme="light"] .legal-document p,
+html[data-theme="light"] .legal-document li,
+html[data-theme="light"] .legal-footer p,
+html[data-theme="light"] .legal-footer nav a { color: var(--premium-muted); }
+html[data-theme="light"] .legal-document a,
+html[data-theme="light"] .legal-toc a:hover,
+html[data-theme="light"] .legal-footer nav a[aria-current="page"] { color: #245fad; }
+html[data-theme="light"] .legal-note { background: #edf4fd; border-color: #b6cdea; }

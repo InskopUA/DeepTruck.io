@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090b0e">
+  <script src="/theme.js"></script>
   <title>DeepTruck Verify</title>
   <meta name="description" content="Verify carrier identity before load details are released.">
   <meta property="og:title" content="DeepTruck Verify">
@@ -13,6 +14,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="premium.css">
+  <link rel="stylesheet" href="/theme.css">
 </head>
 <body class="premium-landing">
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
@@ -454,6 +456,11 @@
       <div class="footer-wordmark" aria-hidden="true"><span>DeepTruck</span></div>
       <div class="footer-bottom">
         <p>© 2026 DeepTruck. All rights reserved.</p>
+        <button class="theme-toggle" type="button" role="switch" aria-label="Light theme" aria-checked="false" data-theme-toggle>
+          <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15a8 8 0 0 1-11-11A8 8 0 1 0 20 15Z"/></svg>
+          <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
+          <span data-theme-label>Dark</span><span class="theme-switch" aria-hidden="true"></span>
+        </button>
         <div class="footer-bottom-links"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="mailto:verify@deeptruck.io">verify@deeptruck.io</a></div>
       </div>
     </div>
