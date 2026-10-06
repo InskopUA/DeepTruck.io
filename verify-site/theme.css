@@ -152,8 +152,11 @@ html[data-theme="light"] .feature-visual .demo-surface,
 html[data-theme="light"] .review-card,
 html[data-theme="light"] .price-card { background: #fff; border-color: var(--premium-line); box-shadow: var(--light-shadow-soft); color: var(--premium-text); }
 html[data-theme="light"] .hero-visual .hero-product,
-html[data-theme="light"] .hero-orbit-card,
-html[data-theme="light"] .feature-visual .demo-surface { box-shadow: var(--light-shadow-raised); }
+html[data-theme="light"] .hero-orbit-card { box-shadow: var(--light-shadow-raised); }
+/* Scrolling previews sit next to each other; exterior shadows stain their gaps. */
+html[data-theme="light"] .feature-visual .demo-surface,
+html[data-theme="light"] .feature-browser,
+html[data-theme="light"] .feature-video { box-shadow: none; }
 html[data-theme="light"] .hero-visual .product-glow { background: radial-gradient(ellipse, rgba(70, 133, 213, .32), rgba(70, 133, 213, .09) 58%, transparent 78%); inset: 8% 25%; }
 html[data-theme="light"] .hero-orbit-card svg { color: #456b98; }
 html[data-theme="light"] .window-top,

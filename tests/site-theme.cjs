@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '../verify-site');
+const adminRoot = path.resolve(__dirname, '../admin-site');
 const origin = 'https://deeptruck.test';
 
 // Inspect rendered text against its composited background, including translucent
@@ -19,9 +20,10 @@ async function contrast(page) {
     const ratio = (a, b) => { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
     const failures = [];
     for (const el of document.body.querySelectorAll('*')) {
-      const text = [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent.trim()).filter(Boolean).join(' ');
+      const input = el.matches('input');
+      const text = input ? el.value ? 'Entered input value' : el.placeholder : [...el.childNodes].filter(n => n.nodeType === Node.TEXT_NODE).map(n => n.textContent.trim()).filter(Boolean).join(' ');
       if (!text || el.closest('svg, [inert], .faq-a[aria-hidden="true"], script, style') || !el.getClientRects().length) continue;
-      const style = getComputedStyle(el);
+      const style = getComputedStyle(el, input && !el.value ? '::placeholder' : null);
       if (style.visibility === 'hidden' || parse(style.color)[3] === 0) continue;
       const chain = []; let opacity = 1;
       for (let node = el; node; node = node.parentElement) { chain.push(getComputedStyle(node)); opacity *= Number(getComputedStyle(node).opacity); }
@@ -62,12 +64,24 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
   const reports = [];
   try {
     const context = await browser.newContext({reducedMotion: 'reduce'});
+    // Exercise the real auth forms with a local SDK stub; no accounts or emails
+    // are created, and tests cannot send credentials to the live service.
+    await context.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2', route => route.fulfill({contentType: 'application/javascript', body: `
+      window.supabase = {createClient: () => ({auth: {
+        getSession: async () => ({data: {session: null}}),
+        onAuthStateChange: () => {},
+        signInWithPassword: () => new Promise(resolve => { window.finishAuthRequest = error => resolve({data: {session: null}, error: error ? {message: 'Invalid email or password.'} : null}); }),
+        signUp: () => new Promise(resolve => { window.finishAuthRequest = error => resolve({data: {session: null}, error: error ? {message: 'Please try again.'} : null}); })
+      }})};
+    `}));
     await context.route(origin + '/**', route => {
       let pathname = new URL(route.request().url()).pathname;
       if (pathname === '/') pathname = '/index.html';
       if (['/privacy', '/terms'].includes(pathname)) pathname += '.html';
-      const file = path.resolve(root, '.' + pathname);
-      if (!file.startsWith(root + path.sep) || !fs.existsSync(file)) return route.fulfill({status: 404});
+      if (['/login', '/signup'].includes(pathname)) pathname = '/admin' + pathname + '.html';
+      const base = pathname.startsWith('/admin/') ? adminRoot : root;
+      const file = path.resolve(base, '.' + (base === adminRoot ? pathname.slice(6) : pathname));
+      if (!file.startsWith(base + path.sep) || !fs.existsSync(file)) return route.fulfill({status: 404});
       const types = {'.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.jpg': 'image/jpeg'};
       return route.fulfill({contentType: types[path.extname(file)] || 'application/octet-stream', body: fs.readFileSync(file)});
     });
@@ -99,6 +113,13 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
           await page.locator('.extension-card').screenshot({path: `/private/tmp/deeptruck-extension-${theme}-${width}.png`});
         }
         assert.deepEqual(violations, [], `${width}px ${theme} theme contrast`);
+        if (theme === 'light') {
+          assert.equal(await page.locator('.feature-visual .demo-surface').first().evaluate(el => getComputedStyle(el).boxShadow), 'none', 'scrolling slides do not cast shadows into their gaps');
+          if (width === 1440) {
+            await page.locator('[data-feature-index="4"]').click(); await page.waitForTimeout(350);
+            await page.screenshot({path: '/private/tmp/deeptruck-feature-gap-light.png'});
+          }
+        }
         // Hover states must stay readable too, including the filled pricing CTA.
         for (const selector of ['.hero-actions .btn-primary', '.price-card.featured .btn-primary', '.faq-q', '.theme-toggle']) {
           await page.locator(selector).first().hover(); await page.waitForTimeout(350);
@@ -122,8 +143,39 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
         await page.getByRole('switch', {name: 'Light theme'}).focus(); await page.keyboard.press('Space');
         assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'keyboard theme switch');
       }
-      console.log(`PASS ${width}px: landing, legal pages, contrast, navigation and saved theme`);
+      for (const route of ['/login', '/signup']) {
+        await page.goto(origin + route);
+        await page.waitForFunction(() => !document.getElementById('auth-submit').disabled);
+        assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
+        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(237, 242, 247)');
+        assert.equal(await page.locator('[data-theme-logo]').getAttribute('src'), '/shield-mark-light.svg');
+        assert.deepEqual(await contrast(page), [], `${width}px ${route} empty form and placeholders`);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${route} ${width}: overflow`);
+        if (route === '/signup') {
+          await page.locator('#first-name').fill('Test'); await page.locator('#last-name').fill('Driver'); await page.locator('#company-name').fill('Fixture company');
+        }
+        await page.locator('#auth-email').fill('fixture@example.test'); await page.locator('#auth-password').fill('fixture-password');
+        await page.locator('#password-toggle').click(); assert.equal(await page.locator('#auth-password').getAttribute('type'), 'text');
+        await page.locator('#password-toggle').click(); assert.equal(await page.locator('#auth-password').getAttribute('type'), 'password');
+        await page.locator('#auth-submit').click(); assert.equal(await page.locator('#auth-submit').isDisabled(), true);
+        assert.deepEqual(await contrast(page), [], `${route} submitting state`);
+        await page.evaluate(() => window.finishAuthRequest(true)); await page.waitForFunction(() => document.getElementById('auth-message').classList.contains('error'));
+        assert.deepEqual(await contrast(page), [], `${route} error state`);
+        if ([1440, 390].includes(width)) await page.screenshot({path: `/private/tmp/deeptruck-${route.slice(1)}-light-${width}.png`, fullPage: true});
+        if (route === '/signup') {
+          await page.locator('#auth-submit').click(); await page.evaluate(() => window.finishAuthRequest(false));
+          await page.waitForFunction(() => document.getElementById('auth-message').textContent.includes('Check your email'));
+          assert.deepEqual(await contrast(page), [], `${route} confirmation state`);
+        }
+        // The same auth page still honors an explicitly chosen dark theme.
+        await page.evaluate(() => localStorage.setItem('deeptruck.theme', 'dark')); await page.reload();
+        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(9, 11, 14)');
+        assert.equal(await page.locator('[data-theme-logo]').getAttribute('src'), '/shield-mark.svg');
+        await page.evaluate(() => localStorage.setItem('deeptruck.theme', 'light'));
+      }
+      console.log(`PASS ${width}px: landing, legal and auth pages, contrast, navigation and saved theme`);
     }
+    await page.goto(origin);
     const second = await context.newPage(); await second.goto(origin);
     await page.getByRole('switch', {name: 'Light theme'}).click();
     await second.waitForFunction(() => document.documentElement.dataset.theme === 'dark');

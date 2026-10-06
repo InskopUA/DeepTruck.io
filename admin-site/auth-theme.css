@@ -1,0 +1,28 @@
+/* Auth inherits the public site's saved theme without changing form layout. */
+html[data-theme="light"] .auth-page {
+  --text: var(--premium-text);
+  --muted: var(--premium-muted);
+  --line: var(--premium-line);
+  --line2: #bdcbdc;
+  background: var(--premium-bg);
+  color-scheme: light;
+}
+html[data-theme="light"] .auth-logo { color: var(--premium-text); }
+html[data-theme="light"] .auth-logo img { filter: none; }
+html[data-theme="light"] .auth-logo small { color: var(--premium-muted); }
+html[data-theme="light"] .auth-card { background: #fff; border-color: var(--premium-line); box-shadow: var(--light-shadow-raised); }
+html[data-theme="light"] .auth-card input { background: #f7faff; border-color: #bdcbdc; color: var(--premium-text); }
+html[data-theme="light"] .auth-card input::placeholder { color: #64748a; opacity: 1; }
+html[data-theme="light"] .auth-card input:focus { border-color: #286bc0; box-shadow: 0 0 0 3px rgba(40, 107, 192, .12); }
+html[data-theme="light"] .auth-card input:-webkit-autofill { -webkit-text-fill-color: var(--premium-text); caret-color: var(--premium-text); box-shadow: inset 0 0 0 1000px #f7faff; }
+html[data-theme="light"] .password-field button { color: #526a88; }
+html[data-theme="light"] .password-field button:hover { background: #e6eef9; color: #245fad; }
+html[data-theme="light"] .auth-submit { background: linear-gradient(180deg, #286ac0, #1f56a4); border-color: #215aab; color: #fff; box-shadow: 0 2px 3px rgba(24, 58, 105, .15), 0 8px 20px rgba(40, 107, 192, .22); }
+html[data-theme="light"] .auth-submit:hover { background: linear-gradient(180deg, #235eac, #19498c); }
+html[data-theme="light"] .auth-submit:disabled { background: #dce7f6; border-color: #c5d4e8; color: #47607f; opacity: 1; box-shadow: none; }
+html[data-theme="light"] .auth-card .inline-message:not(:empty) { background: #ecf7f0; color: #23734d; }
+html[data-theme="light"] .auth-card .inline-message.error { background: #fff0ee; color: #a63c35; }
+html[data-theme="light"] .auth-footer a { color: #245fad; }
+html[data-theme="light"] .auth-footer a:hover { color: #19498c; }
+html[data-theme="light"] .auth-home { color: var(--premium-muted); }
+html[data-theme="light"] .auth-home:hover { color: var(--premium-text); }
