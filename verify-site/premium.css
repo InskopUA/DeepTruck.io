@@ -3011,8 +3011,17 @@ body.premium-landing {
   transition: color .25s;
 }
 
-.faq-simple .faq-q:hover {
+.faq-simple .faq-item:hover {
   background: rgba(255, 255, 255, 0.025);
+}
+
+.faq-simple .faq-q:hover { background: transparent; }
+
+/* Highlight and keyboard focus belong to the whole accordion card. */
+.faq-simple .faq-q:focus-visible { outline: none; }
+.faq-simple .faq-item:has(.faq-q:focus-visible) {
+  outline: 2px solid var(--premium-blue);
+  outline-offset: 3px;
 }
 
 .faq-simple .faq-item.open .faq-q {

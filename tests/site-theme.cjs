@@ -92,7 +92,7 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
       await page.goto(origin);
       // Reveal every section and expose all responsive panels for contrast auditing.
       await page.evaluate(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')));
-      await page.locator('.faq-q').first().click();
+      if (await page.locator('.faq-q').first().getAttribute('aria-expanded') !== 'true') await page.locator('.faq-q').first().click();
       await page.waitForTimeout(350);
       let originalType;
       for (const theme of ['dark', 'light']) {
@@ -125,6 +125,19 @@ const typography = page => page.evaluate(() => Object.fromEntries(['.hero h1', '
           await page.locator(selector).first().hover(); await page.waitForTimeout(350);
           assert.deepEqual(await contrast(page), [], `${width}px ${theme} ${selector} hover contrast`);
         }
+        const question = page.locator('.faq-q').first(), card = page.locator('.faq-item').first();
+        await question.hover(); await page.waitForTimeout(350);
+        assert.equal(await question.evaluate(el => getComputedStyle(el).backgroundColor), 'rgba(0, 0, 0, 0)', 'header cannot cover the open card highlight or left accent');
+        const cardColor = await card.evaluate(el => getComputedStyle(el).backgroundColor);
+        await page.locator('.faq-answer-inner p').first().hover(); await page.waitForTimeout(350);
+        assert.equal(await card.evaluate(el => getComputedStyle(el).backgroundColor), cardColor, 'hovering header or answer highlights the same full card');
+        if (theme === 'light' && [1440, 390].includes(width)) await card.screenshot({path: `/private/tmp/deeptruck-faq-hover-${width}.png`});
+        await question.focus(); await page.keyboard.press('Tab'); await page.keyboard.press('Shift+Tab');
+        assert.equal(await question.evaluate(el => getComputedStyle(el).outlineStyle), 'none', 'no focus outline across the header/answer seam');
+        assert.equal(await card.evaluate(el => getComputedStyle(el).outlineStyle), 'solid', 'keyboard focus outlines the full card');
+        await question.click(); assert.equal(await question.getAttribute('aria-expanded'), 'false');
+        await question.click(); assert.equal(await question.getAttribute('aria-expanded'), 'true');
+        await page.waitForTimeout(350);
       }
       await page.reload(); assert.equal(await page.locator('html').getAttribute('data-theme'), 'light', 'theme survives reload');
       if (width < 761) {
