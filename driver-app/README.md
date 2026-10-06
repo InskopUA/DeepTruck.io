@@ -9,15 +9,26 @@ driver side of the Tracking workspace, not a browser GPS implementation.
   platform Keychain/Keystore, split into small chunks.
 - Invitations found by verified phone number, including after installing
   the app without preserving the original SMS link.
-- Consent for each load, followed by a separate Start sharing action.
+- One Accept & start tracking action per invitation, with an optional accept-for-later action. Consent identifies the dealer and expiry before the button.
 - Multiple simultaneous loads for different dealers; one location task.
-- Pause/resume per load, complete per load, emergency stop for all loads.
+- Compact Loads / History / Profile navigation, pause/resume per load, delivery completion and pause-all controls.
+- Guided Always / background permission setup, continuation of the chosen load after returning from Settings, and no launch when the guide is cancelled.
 - Background location on both platforms, visible Android foreground
   notification and iOS location indicator.
 - SQLite offline queue capped at 720 points and 24 hours. Stable point IDs
   prevent duplicates when retrying after a lost server response.
 - Deep links: `deeptruck-driver://loads?invite=<load UUID>`.
 - A custom development client and internal APK build configuration.
+
+## Location freshness
+
+The foreground refresh checks for a real GPS fix about once a minute while local tracking is enabled, including when the phone is stationary. Native tracking uses a zero-distance filter and throttles stored points; an existing native task receives upgraded options after a reload. Actual GPS timestamps are retained. Tracking control and queue metadata use Keychain access after first unlock so a locked-screen task can read them. iOS background callbacks are scheduled by the OS and are not a guaranteed one-minute timer.
+
+Permissions alone do not start collection. A phone must have an authenticated session, explicit local start consent and an unexpired active load. New capture is blocked after pausing, expiration or a switch to a different driver.
+
+## Interface checks
+
+From the repository root, run `npm test`, `npm run test:driver-ui` and `npm run test:driver-preview`. Preview checks render the actual native screen components with a web renderer at phone sizes; they do not replace a real-device background GPS test. The web and test renderers are development dependencies only.
 
 ## Local setup
 

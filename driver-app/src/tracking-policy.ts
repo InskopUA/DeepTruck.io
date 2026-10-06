@@ -9,3 +9,9 @@ export function validPoint(point:Point,now:number) {
     Number.isFinite(point.accuracy) && point.accuracy>=0 && point.accuracy<=10000 &&
     Number.isFinite(Date.parse(point.capturedAt)) && Date.parse(point.capturedAt)<=now && Date.parse(point.capturedAt)>now-86400000;
 }
+
+export const CAPTURE_INTERVAL_MS = 60000;
+export function captureDue(lastCapture: string | null, now: number) {
+  const last = lastCapture ? Date.parse(lastCapture) : NaN;
+  return !Number.isFinite(last) || now - last >= CAPTURE_INTERVAL_MS;
+}

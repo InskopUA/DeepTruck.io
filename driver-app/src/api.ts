@@ -12,7 +12,7 @@ export async function api<T>(path:string,data?:unknown):Promise<T> {
   if(!response.ok || value.error) throw new ApiError(response.status,typeof value.error==='string' ? value.error : 'Could not connect. Please try again.');
   if(typeof value.serverNow==='string') {
     const offset=Date.parse(value.serverNow)-Date.now();
-    if(Number.isFinite(offset)) await SecureStore.setItemAsync('dt.clock-offset',String(offset));
+    if(Number.isFinite(offset)) await SecureStore.setItemAsync('dt.tracking.v2.clock-offset',String(offset),{keychainAccessible:SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY});
   }
   return value as T;
 }

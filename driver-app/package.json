@@ -28,6 +28,10 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.0",
+    "@types/react-test-renderer": "^19.3.0",
+    "react-dom": "^19.2.0",
+    "react-native-web": "^0.21.3",
+    "react-test-renderer": "^19.2.0",
     "typescript": "~5.9.2"
   }
 }
