@@ -5,7 +5,9 @@
   const labels = {pending:'Awaiting driver',accepted:'Ready to start',active:'Sharing location',paused:'Sharing paused',completed:'Completed',cancelled:'Cancelled',declined:'Declined',expired:'Expired'};
   const closed = status => ['completed','cancelled','declined','expired'].includes(status);
   let context, items = [], selected = '', timer, loading = false, map, marker, trail, mappedLoad = '', requestId = '', saving = false, owner = '';
-  let routePoints = [], pointLoad = '', pointRequest = 0, actionBusy = false;
+  let routePoints = [], pointLoad = '', pointRequest = 0, actionBusy = false, actionItem = '';
+  const needsAttention = v => !closed(statusOf(v)) && (v.invitationStatus === 'failed' || statusOf(v) === 'paused' || (statusOf(v) === 'pending' && Date.now()-Date.parse(v.createdAt)>86400000) || (statusOf(v) === 'active' && (!v.latestLocation || Date.now()-Date.parse(v.latestLocation.capturedAt)>300000)));
+  function syncFilters() { document.querySelectorAll('[data-tracking-filter]').forEach(button => { const active = button.dataset.trackingFilter === $('tracking-filter').value; button.classList.toggle('active', active); button.setAttribute('aria-pressed',String(active)); }); }
   const date = value => value ? new Date(value).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : 'Not specified';
   const localDate = value => new Date(value.getTime()-value.getTimezoneOffset()*60000).toISOString().slice(0,16);
   const statusOf = item => !closed(item.status) && Date.parse(item.expiresAt) <= Date.now() ? 'expired' : item.status;
@@ -33,15 +35,21 @@
   function render() {
     $('tracking-active-count').textContent = items.filter(v=>statusOf(v)==='active').length;
     $('tracking-pending-count').textContent = items.filter(v=>statusOf(v)==='pending').length;
-    $('tracking-completed-count').textContent = items.filter(v=>statusOf(v)==='completed').length;
+    $('tracking-completed-count').textContent = items.filter(v=>closed(statusOf(v))).length;
+    $('tracking-open-count').textContent = items.filter(v=>!closed(statusOf(v))).length;
+    $('tracking-attention-count').textContent = items.filter(needsAttention).length; syncFilters();
     const filter = $('tracking-filter').value, query = $('tracking-search').value.trim().toLowerCase();
-    const visible = items.filter(v=>(filter==='all' || (filter==='open' ? !closed(statusOf(v)):statusOf(v)===filter)) && [v.title,v.driverName,v.carrierName,v.driverPhone].some(s=>s.toLowerCase().includes(query)));
-    if (!visible.some(v=>v.id===selected)) selected = visible[0]?.id || '';
-    $('tracking-list').innerHTML = visible.length ? visible.map(v=>`<button type="button" class="panel tracking-card ${v.id===selected?'selected':''}" data-tracking-select="${escape(v.id)}" aria-pressed="${v.id===selected}"><div class="tracking-card-top"><b>${escape(v.title)}</b><span class="tracking-status ${escape(statusOf(v))}">${escape(labels[statusOf(v)])}</span></div><span class="tracking-driver">${escape(v.driverName)} <small>${escape(v.carrierName)}</small></span><span class="tracking-route">${escape(v.deliveryAddress || 'Delivery address not specified')}</span><span class="tracking-freshness ${statusOf(v)==='active'?'active':''} ${statusOf(v)==='active' && (!v.latestLocation || Date.now()-Date.parse(v.latestLocation.capturedAt)>300000)?'delayed':''}"><i></i>${escape(freshness(v))}</span></button>`).join('') : `<section class="panel empty-panel"><span class="panel-icon"><svg aria-hidden="true"><use href="#icon-tracking"></use></svg></span><h2>${items.length?'No matching loads':'Your deliveries, in view'}</h2><p>${items.length?'Try another search or filter.':'Create a load and invite its driver to share location.'}</p>${items.length?'':'<button class="primary" type="button" data-tracking-create>Create your first tracking</button>'}</section>`;
+    const visible = items.filter(v=>(filter==='all' || (filter==='open' ? !closed(statusOf(v)) : filter==='closed' ? closed(statusOf(v)) : filter==='attention' ? needsAttention(v) : statusOf(v)===filter)) && [v.title,v.driverName,v.carrierName,v.driverPhone].some(s=>String(s || '').toLowerCase().includes(query)));
+    if (!visible.some(v=>v.id===selected)) { selected = visible[0]?.id || ''; document.querySelector('.tracking-layout').classList.remove('mobile-detail'); }
+    const listScroll = $('tracking-list').scrollTop, focused = document.activeElement?.dataset.trackingSelect;
+    $('tracking-list').innerHTML = visible.length ? visible.map(v=>`<button type="button" class="tracking-card ${v.id===selected?'selected':''}" data-tracking-select="${escape(v.id)}" aria-pressed="${v.id===selected}"><div class="tracking-card-top"><b>${escape(v.title)}</b><span class="tracking-status ${escape(statusOf(v))}">${escape(labels[statusOf(v)])}</span></div><span class="tracking-driver">${escape(v.driverName)} <small>${escape(v.carrierName)}</small></span><span class="tracking-route">${escape(v.deliveryAddress || 'Delivery address not specified')}</span><span class="tracking-freshness ${statusOf(v)==='active'?'active':''} ${statusOf(v)==='active' && (!v.latestLocation || Date.now()-Date.parse(v.latestLocation.capturedAt)>300000)?'delayed':''}"><i></i>${escape(v.invitationStatus==='failed' && !closed(statusOf(v)) ? 'SMS delivery failed' : freshness(v))}</span></button>`).join('') : `<section class="panel empty-panel"><span class="panel-icon"><svg aria-hidden="true"><use href="#icon-tracking"></use></svg></span><h2>${items.length?'No matching loads':'Your deliveries, in view'}</h2><p>${items.length?'Try another search or filter.':'Create a load and invite its driver to share location.'}</p>${items.length?'':'<button class="primary" type="button" data-tracking-create>Create your first tracking</button>'}</section>`;
+    $('tracking-list').scrollTop = listScroll;
+    if (focused) $('tracking-list').querySelector(`[data-tracking-select="${focused}"]`)?.focus({preventScroll:true});
     renderDetail();
   }
   function renderDetail() {
     const item = items.find(v=>v.id===selected);
+    if (actionItem !== selected) { message('',false,'tracking-action-message'); actionItem = selected; }
     $('tracking-map').hidden = true; $('tracking-map-note').hidden = true;
     if (!item) { $('tracking-detail-meta').innerHTML = ''; $('tracking-detail-content').innerHTML = '<h2>Track your deliveries</h2><p>Select a load to view its driver and location.</p>'; return; }
     const status = statusOf(item);
@@ -85,7 +93,7 @@
       const data = await api('/loads');
       if (context.getSession()?.user.id!==user) return;
       items = data.items;
-      if (manual) message('Tracking refreshed.');
+      message(''); if (manual) window.workspaceToast('Tracking refreshed.');
       render();
       if (selected && items.find(v=>v.id===selected)?.latestLocation) loadPoints(selected);
     } catch (e) {
@@ -99,21 +107,22 @@
     load(); clearInterval(timer);
     timer = setInterval(()=>{if ($('tracking').classList.contains('active') && !document.hidden) load();},15000);
   }
-  function updateCarriers() {
-    const value = $('tracking-carrier')?.value;
+  function updateCarriers(preferredId = '') {
+    const value = preferredId || $('tracking-carrier')?.value;
     if (!$('tracking-carrier')) return;
-    const verified = context.getVerifications().filter(v=>v.emailVerified&&v.phoneVerified&&v.licenseUploaded&&v.w9Uploaded&&v.coiUploaded);
+    const seen = new Set();
+    const verified = context.getVerifications().filter(v=>v.emailVerified&&v.phoneVerified&&v.licenseUploaded&&v.w9Uploaded&&v.coiUploaded).sort((a,b)=>Number(b.id===value)-Number(a.id===value)).filter(v=>{if(seen.has(v.dot))return false;seen.add(v.dot);return true;});
     $('tracking-carrier').innerHTML = '<option value="">Choose a completed verification</option>' + verified.map(v=>`<option value="${escape(v.id)}">${escape(v.carrierName)} · USDOT ${escape(v.dot)}</option>`).join('');
     if (verified.some(v=>v.id===value)) $('tracking-carrier').value = value;
-    $('tracking-carrier-hint').textContent = verified.length?'Use the driver’s own phone number, which may differ from the carrier’s office number.':'Complete a carrier verification first. You can create tracking from its history card.';
+    $('tracking-carrier-hint').textContent = verified.length?'Use the driver’s own phone number, which may differ from the carrier’s office number.':'Complete a carrier verification first. Create tracking from its carrier details.';
     $('tracking-create-submit').disabled = !verified.length;
   }
   function openCreate(verificationId = '') {
-    context.showTracking(); $('tracking-create-form').reset(); requestId = crypto.randomUUID();
+    context.showTracking(); $('tracking-create-form').reset(); document.querySelector('.tracking-optional').open=false; requestId = crypto.randomUUID();
     $('tracking-expiry').value = localDate(new Date(Date.now()+7*86400000));
     $('tracking-expiry').min = localDate(new Date(Date.now()+10*60000));
     $('tracking-expiry').max = localDate(new Date(Date.now()+30*86400000-60000));
-    message('',false,'tracking-create-message'); updateCarriers(); $('tracking-carrier').value = verificationId;
+    message('',false,'tracking-create-message'); updateCarriers(verificationId); $('tracking-carrier').value = verificationId;
     $('tracking-create-dialog').showModal();
   }
   function closeCreate() { if (!saving) $('tracking-create-dialog').close(); }
@@ -121,25 +130,27 @@
     context = options;
     // Native dialog supplies focus trapping and restores focus on close.
     const dialog = document.createElement('dialog'); dialog.id = 'tracking-create-dialog'; dialog.className = 'tracking-dialog'; dialog.setAttribute('aria-labelledby','tracking-dialog-title');
-    dialog.innerHTML = `<div class="tracking-dialog-heading"><div><h2 id="tracking-dialog-title">New tracking</h2><p>Invite a driver to share location for this load.</p></div><button id="tracking-dialog-close" class="icon-button" type="button" aria-label="Close new tracking"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button></div><form id="tracking-create-form"><label for="tracking-carrier">Verified carrier<select id="tracking-carrier" required></select></label><p id="tracking-carrier-hint" class="muted"></p><div class="tracking-form-row"><label for="tracking-driver-name">Driver name<input id="tracking-driver-name" required maxlength="120" autocomplete="off" placeholder="Full name"></label><label for="tracking-driver-phone">Driver phone<input id="tracking-driver-phone" type="tel" required maxlength="24" autocomplete="off" placeholder="+1 (555) 123-4567"></label></div><label for="tracking-load-name">Load name / reference<input id="tracking-load-name" required maxlength="160" placeholder="e.g. Load #1042 — Miami delivery"></label><label for="tracking-vehicles">Vehicles <small>Optional · one vehicle per line</small><textarea id="tracking-vehicles" rows="2" maxlength="8000" placeholder="2024 Toyota Camry · VIN or stock number"></textarea></label><div class="tracking-form-row"><label for="tracking-pickup">Pickup address<input id="tracking-pickup" maxlength="500" placeholder="Auction or pickup location"></label><label for="tracking-delivery">Delivery address<input id="tracking-delivery" maxlength="500" placeholder="Dealership or delivery location"></label></div><div class="tracking-form-row"><label for="tracking-planned">Planned pickup <small>Optional</small><input id="tracking-planned" type="datetime-local"></label><label for="tracking-expiry">Tracking expires<input id="tracking-expiry" type="datetime-local" required></label></div><p class="tracking-consent-note">The driver accepts this load and starts sharing in DeepTruck Driver. Access ends when the load is completed or expires.</p><div id="tracking-create-message" class="inline-message" role="status" aria-live="polite"></div><div class="tracking-dialog-actions"><button id="tracking-dialog-cancel" class="secondary" type="button">Cancel</button><button id="tracking-create-submit" class="primary" type="submit">Send invitation</button></div></form>`;
+    dialog.innerHTML = `<div class="tracking-dialog-heading"><div><p class="eyebrow">Driver invitation</p><h2 id="tracking-dialog-title">New tracking</h2><p>Create a load and invite its driver.</p></div><button id="tracking-dialog-close" class="icon-button" type="button" aria-label="Close new tracking"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button></div><form id="tracking-create-form"><section class="tracking-form-section"><h3>1. Carrier & driver</h3><label for="tracking-carrier">Verified carrier<select id="tracking-carrier" required></select></label><div class="tracking-form-row"><label for="tracking-driver-name">Driver name<input id="tracking-driver-name" required maxlength="120" autocomplete="off" placeholder="Full name"></label><label for="tracking-driver-phone">Driver phone<input id="tracking-driver-phone" type="tel" required maxlength="24" autocomplete="off" placeholder="+1 (555) 123-4567"></label></div><p id="tracking-carrier-hint" class="muted"></p></section><section class="tracking-form-section"><h3>2. Load details</h3><label for="tracking-load-name">Load name / reference<input id="tracking-load-name" required maxlength="160" placeholder="e.g. Load #1042 — Miami delivery"></label><details class="tracking-optional"><summary>Add route, vehicles & pickup time <span class="muted">· optional</span></summary><div><div class="tracking-form-row"><label for="tracking-pickup">Pickup address<input id="tracking-pickup" maxlength="500" placeholder="Auction or pickup location"></label><label for="tracking-delivery">Delivery address<input id="tracking-delivery" maxlength="500" placeholder="Dealership or delivery location"></label></div><label for="tracking-vehicles">Vehicles <small>One vehicle per line</small><textarea id="tracking-vehicles" rows="2" maxlength="8000" placeholder="2024 Toyota Camry · VIN or stock number"></textarea></label><label for="tracking-planned">Planned pickup<input id="tracking-planned" type="datetime-local"></label></div></details></section><section class="tracking-form-section"><h3>3. Location access</h3><label for="tracking-expiry">Tracking expires<input id="tracking-expiry" type="datetime-local" required></label><p class="tracking-consent-note">The driver accepts this load and starts sharing in DeepTruck Driver. Access ends when the load is completed or expires.</p></section><div id="tracking-create-message" class="inline-message" role="status" aria-live="polite"></div><div class="tracking-dialog-actions"><button id="tracking-dialog-cancel" class="secondary" type="button">Cancel</button><button id="tracking-create-submit" class="primary" type="submit">Send invitation</button></div></form>`;
     document.body.append(dialog);
     $('new-tracking-button').addEventListener('click',()=>openCreate());
     $('tracking-dialog-close').addEventListener('click',closeCreate); $('tracking-dialog-cancel').addEventListener('click',closeCreate);
     dialog.addEventListener('cancel',e=>{if(saving)e.preventDefault();});
     $('tracking-refresh').addEventListener('click',()=>load(true));
     $('tracking-search').addEventListener('input',render); $('tracking-filter').addEventListener('change',render);
+    document.querySelectorAll('[data-tracking-filter]').forEach(button => button.addEventListener('click',()=>{ $('tracking-filter').value=button.dataset.trackingFilter; render(); }));
+    $('tracking-back').addEventListener('click',()=>{document.querySelector('.tracking-layout').classList.remove('mobile-detail');$('tracking-list').querySelector(`[data-tracking-select="${selected}"]`)?.focus();});
     $('tracking-list').addEventListener('click',e=>{
       const card = e.target.closest('[data-tracking-select]');
-      if (card) {selected=card.dataset.trackingSelect;render();$('tracking-list').querySelector(`[data-tracking-select="${selected}"]`)?.focus();}
+      if (card) {selected=card.dataset.trackingSelect;render();document.querySelector('.tracking-layout').classList.add('mobile-detail');if(matchMedia('(max-width:760px)').matches){$('tracking-back').focus();$('tracking-detail').scrollIntoView({block:'start'});}else $('tracking-list').querySelector(`[data-tracking-select="${selected}"]`)?.focus();}
       if (e.target.closest('[data-tracking-create]')) openCreate();
     });
     $('tracking-detail').addEventListener('click',async e=>{
       const button = e.target.closest('[data-tracking-action]'); if (!button || actionBusy) return;
       const action = button.dataset.trackingAction, id = selected;
       if (action!=='resend' && !confirm(action==='complete'?'Complete this load and close its location access?':'Cancel this load and close its location access?')) return;
-      actionBusy = true; button.disabled = true; message('');
-      try {const data = await api(`/loads/${id}/${action}`,{});actionBusy=false;await load();message(data.invitation?.message || (action==='complete'?'Load completed. Location access is closed.':'Load cancelled.'),data.invitation?.sent===false);}
-      catch (err) {message(err.message,true);button.disabled=false;} finally {actionBusy=false;}
+      actionBusy = true; button.disabled = true; message('',false,'tracking-action-message');
+      try {const data = await api(`/loads/${id}/${action}`,{});actionBusy=false;await load();const result=data.invitation?.message || (action==='complete'?'Load completed. Location access is closed.':'Load cancelled.'); if(data.invitation?.sent===false && selected===id) message(result,true,'tracking-action-message'); else window.workspaceToast(result);}
+      catch (err) {if(selected===id) message(err.message,true,'tracking-action-message'); else window.workspaceToast(err.message);button.disabled=false;} finally {actionBusy=false;}
     });
     $('tracking-create-form').addEventListener('submit',async e=>{
       e.preventDefault(); if (saving) return;
@@ -150,7 +161,7 @@
       saving = true; $('tracking-create-submit').disabled=true; $('tracking-create-submit').textContent='Saving…'; message('',false,'tracking-create-message');
       try {
         const data = await api('/loads',{clientRequestId:requestId,verificationId:$('tracking-carrier').value,driverName:$('tracking-driver-name').value,driverPhone:$('tracking-driver-phone').value,title:$('tracking-load-name').value,vehicles,pickupAddress:$('tracking-pickup').value,deliveryAddress:$('tracking-delivery').value,plannedAt:planned?.toISOString() || null,expiresAt:expiry.toISOString()});
-        selected=data.load.id; $('tracking-filter').value='open'; $('tracking-search').value='';dialog.close(); await load(); message(data.invitation.message,!data.invitation.sent);
+        selected=data.load.id; $('tracking-filter').value='open'; $('tracking-search').value='';dialog.close(); await load(); document.querySelector('.tracking-layout').classList.add('mobile-detail'); if(data.invitation.sent) window.workspaceToast('Driver invitation sent.'); else message(data.invitation.message,true,'tracking-action-message');
       } catch (err) {message(err.message,true,'tracking-create-message');}
       finally {saving=false;$('tracking-create-submit').disabled=false;$('tracking-create-submit').textContent='Send invitation';}
     });

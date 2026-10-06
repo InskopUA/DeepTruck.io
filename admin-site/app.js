@@ -3,7 +3,7 @@ const POLL_INTERVAL_MS = 5000;
 const authClient = window.deepTruckAuth?.client;
 const state = {
   items: [], query: "", filter: "all", manualCarrier: null, manualVerification: null,
-  manualMessage: "", pollTimer: 0, isLookupLoading: false, session: null, user: null
+  manualMessage: "", page: 0, sort: "updated", isSending: false, pollTimer: 0, isLookupLoading: false, session: null, user: null
 };
 const adminApp = document.getElementById("admin-app");
 const accountEmail = document.getElementById("account-email");
@@ -13,7 +13,7 @@ const settingsEmail = document.getElementById("settings-email");
 const saveAccountButton = document.getElementById("save-account-button");
 const settingsMessage = document.getElementById("settings-message");
 const views = document.querySelectorAll(".view");
-const navButtons = document.querySelectorAll(".sidebar [data-view]");
+const navButtons = document.querySelectorAll("[data-view]");
 const title = document.getElementById("page-title");
 const tbody = document.getElementById("history-body");
 const details = document.getElementById("details");
@@ -25,16 +25,18 @@ const manualResult = document.getElementById("manual-result");
 const verifyMessage = document.getElementById("verify-message");
 let detailsTrigger = null;
 let openingLogin = false;
+let lookupSequence = 0;
 
 const pageCopy = {
   verifications: "Verifications",
-  history: "Verification history",
+  history: "Verifications",
   tracking: "Tracking",
-  billing: "Plans & billing",
-  settings: "Account settings"
+  billing: "Plans",
+  settings: "Settings", help: "Help & resources"
 };
 function setView(view, updateAddress = true) {
-  const selected = pageCopy[view] ? view : "verifications";
+  const selected = view === "history" ? "verifications" : pageCopy[view] ? view : "verifications";
+  document.getElementById("mobile-more").open = false;
   navButtons.forEach(button => {
     const active = button.dataset.view === selected;
     button.classList.toggle("active", active);
@@ -43,7 +45,7 @@ function setView(view, updateAddress = true) {
   });
   views.forEach(section => section.classList.toggle("active", section.id === selected));
   title.textContent = pageCopy[selected];
-  document.getElementById("new-verification-button").hidden = selected !== "history";
+  document.getElementById("new-verification-button").hidden = selected !== "verifications";
   document.getElementById("new-tracking-button").hidden = selected !== "tracking";
   if (selected === "tracking" && state.session) window.deepTruckTracking?.activate();
   document.title = `${pageCopy[selected]} · DeepTruck Verify`;
@@ -56,16 +58,16 @@ function setView(view, updateAddress = true) {
 navButtons.forEach(button => button.addEventListener("click", () => setView(button.dataset.view)));
 document.querySelectorAll("[data-go-view]").forEach(button => button.addEventListener("click", () => {
   setView(button.dataset.goView);
-  if (button.dataset.goView === "verifications") dotInput.focus();
+
 }));
 window.addEventListener("popstate", () => setView(location.hash.slice(1), false));
 window.addEventListener("hashchange", () => setView(location.hash.slice(1), false));
 
 document.getElementById("search").addEventListener("input", event => {
-  state.query = event.target.value.toLowerCase(); renderTable();
+  state.query = event.target.value.toLowerCase(); state.page = 0; renderTable();
 });
 document.querySelectorAll("[data-filter]").forEach(button => button.addEventListener("click", () => {
-  state.filter = button.dataset.filter;
+  state.filter = button.dataset.filter; state.page = 0;
   document.querySelectorAll("[data-filter]").forEach(item => {
     item.classList.toggle("active", item === button);
     item.setAttribute("aria-pressed", String(item === button));
@@ -85,6 +87,8 @@ manualResult.addEventListener("click", async event => {
   const action = event.target?.closest("[data-action]")?.dataset.action;
   if (action === "send-verification") await createManualVerification();
   if (action === "refresh-verification") await refreshManualVerification(true);
+  if (action === "open-existing") { const item = state.manualVerification; document.getElementById("verification-dialog").close(); if (!state.items.some(v => v.id === item.id)) state.items.unshift(item); openDetails(item.id); }
+  if (action === "track-existing") { document.getElementById("verification-dialog").close(); window.deepTruckTracking.openCreate(state.manualVerification.id); }
   if (action === "new-search") { resetManualVerification(); dotInput.focus(); }
 });
 logoutButton.addEventListener("click", async () => {
@@ -119,6 +123,7 @@ document.getElementById("settings-form").addEventListener("submit", async event 
   }
 });
 function closeDetails() {
+  adminApp.inert = false;
   details.classList.remove("open"); details.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
   detailsTrigger?.focus();
@@ -178,10 +183,40 @@ function renderAccount() {
   const initials = name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join("").toUpperCase();
   document.querySelectorAll("[data-account-initials]").forEach(el => el.textContent = initials);
   document.getElementById("workspace-company").textContent = company;
-  settingsEmail.value = state.user?.email || "";
+  settingsEmail.textContent = state.user?.email || "";
   settingsCompany.value = metadata.company_name || metadata.dealership_name || "";
-  document.getElementById("settings-name").value = name;
+  document.getElementById("settings-name").textContent = name;
 }
+let toastTimer;
+window.workspaceToast = function(text) {
+  const toast = document.getElementById("toast"); toast.textContent = text; toast.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.hidden = true, 4500);
+};
+function openLookup() {
+  resetManualVerification(); manualResult.innerHTML = ""; dotForm.reset();
+  document.getElementById("verification-dialog").showModal(); dotInput.focus();
+}
+document.getElementById("new-verification-button").addEventListener("click", openLookup);
+document.getElementById("close-lookup").addEventListener("click", () => { if (!state.isSending) document.getElementById("verification-dialog").close(); });
+document.getElementById("verification-dialog").addEventListener("close", stopPolling);
+document.getElementById("verification-dialog").addEventListener("cancel", event => { if (state.isSending) event.preventDefault(); });
+document.getElementById("mobile-logout").addEventListener("click", () => logoutButton.click());
+document.getElementById("verification-sort").addEventListener("change", event => { state.sort = event.target.value; state.page = 0; renderTable(); });
+document.getElementById("previous-page").addEventListener("click", () => { state.page--; renderTable(); });
+document.getElementById("next-page").addEventListener("click", () => { state.page++; renderTable(); });
+document.addEventListener("click", async event => {
+  const button = event.target.closest("[data-open], [data-copy], [data-load], [data-new-verification]");
+  if (!button) return;
+  if (button.hasAttribute("data-new-verification")) { openLookup(); return; }
+  if (button.dataset.open) openDetails(button.dataset.open);
+  if (button.dataset.load) window.deepTruckTracking.openCreate(button.dataset.load);
+  if (button.dataset.copy) {
+    const item = state.items.find(item => item.id === button.dataset.copy);
+    try { await navigator.clipboard.writeText(item.verificationUrl); window.workspaceToast("Carrier link copied."); }
+    catch { window.workspaceToast("Could not copy. Open the carrier link from its lookup instead."); }
+  }
+});
+
 window.deepTruckTracking.init({getSession: () => state.session, getVerifications: () => state.items, showTracking: () => setView("tracking")});
 initSession();
 
@@ -194,12 +229,15 @@ async function load() {
     if (!response.ok || data.error) throw new Error(data.error || "Failed to load history.");
     if (state.user?.id !== requestUser) return;
     state.items = data.items || [];
+    document.getElementById("verification-list-message").textContent = "";
     renderMetrics();
     renderTable();
     window.deepTruckTracking?.updateCarriers();
   } catch (error) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty error">${escapeHtml(error.message)}</td></tr>`;
-    document.getElementById("recent-body").innerHTML = `<tr><td colspan="3" class="empty error">${escapeHtml(error.message)}</td></tr>`;
+    const message = document.getElementById("verification-list-message");
+    message.textContent = error.message || "Could not load verifications. Refresh to retry.";
+    message.classList.add("error");
+    if (!state.items.length) tbody.innerHTML = '<tr><td colspan="5" class="empty">Unable to load your verifications. Use Refresh to try again.</td></tr>';
   }
 }
 
@@ -211,6 +249,7 @@ async function lookupManualCarrier(dot) {
     return;
   }
 
+  const sequence = ++lookupSequence;
   state.isLookupLoading = true;
   renderSearchButton();
   setManualMessage("Searching carrier...");
@@ -220,18 +259,24 @@ async function lookupManualCarrier(dot) {
   stopPolling();
 
   try {
-    state.manualCarrier = await lookupCarrier(cleanDot);
+    const carrier = await lookupCarrier(cleanDot);
     await load();
-    state.manualVerification = findLatestVerification(cleanDot, "verified");
-    setManualMessage(state.manualVerification ? `Carrier was verified ${relativeAge(state.manualVerification.updatedAt || state.manualVerification.createdAt)}.` : "");
+    const existing = await fetch(`${API_BASE_URL}/verification-requests?dot=${encodeURIComponent(cleanDot)}&limit=1`, { headers: authHeaders() });
+    const records = await existing.json();
+    if (!existing.ok || records.error) throw new Error(records.error || "Could not check existing verifications. Please retry.");
+    if (sequence !== lookupSequence) return;
+    state.manualCarrier = carrier;
+    state.manualVerification = records.items?.find(item => String(item.dot) === cleanDot) || findLatestVerification(cleanDot);
+    updatePolling();
+    setManualMessage(state.manualVerification ? isVerificationComplete(state.manualVerification) ? "This carrier already has a completed verification." : "An existing request is in progress. Continue it below." : "");
     renderManualResult();
   } catch (error) {
+    if (sequence !== lookupSequence) return;
     const message = formatLookupError(error);
     setManualMessage(message, true);
     manualResult.innerHTML = renderManualEmpty("Carrier lookup failed", message);
   } finally {
-    state.isLookupLoading = false;
-    renderSearchButton();
+    if (sequence === lookupSequence) { state.isLookupLoading = false; renderSearchButton(); }
   }
 }
 
@@ -242,12 +287,13 @@ function renderSearchButton() {
 
 async function createManualVerification() {
   const carrier = state.manualCarrier;
-  if (!carrier) return;
+  if (!carrier || state.isSending || state.manualVerification) return;
   if (!carrier.email || !carrier.phone) {
     setManualMessage("Carrier must have both email and phone before verification can be sent.", true);
     return;
   }
 
+  state.isSending = true;
   setManualMessage("Sending verification request...");
   renderManualResult(true);
   try {
@@ -273,7 +319,7 @@ async function createManualVerification() {
   } catch (error) {
     setManualMessage(error.message || String(error), true);
     renderManualResult();
-  }
+  } finally { state.isSending = false; }
 }
 
 async function refreshManualVerification(showMessage = false) {
@@ -294,6 +340,7 @@ async function refreshManualVerification(showMessage = false) {
 }
 
 function resetManualVerification() {
+  lookupSequence++; state.isLookupLoading = false; renderSearchButton();
   state.manualCarrier = null;
   state.manualVerification = null;
   setManualMessage("");
@@ -315,7 +362,7 @@ function stopPolling() {
 function updatePolling() {
   const verification = state.manualVerification;
   const complete = verification && isVerificationComplete(verification);
-  if (verification?.id && !complete) {
+  if (verification?.id && !complete && document.getElementById("verification-dialog").open) {
     startPolling();
     return;
   }
@@ -325,29 +372,33 @@ function updatePolling() {
 function renderMetrics() {
   const stats = {
     total: state.items.length,
-    verified: state.items.filter(item => item.status === "verified").length,
-    pending: state.items.filter(item => item.status !== "verified").length,
+    verified: state.items.filter(isVerificationComplete).length,
+    pending: state.items.filter(item => !isVerificationComplete(item)).length,
     ready: state.items.filter(isVerificationComplete).length
   };
   document.querySelectorAll("[data-stat]").forEach(el => el.textContent = stats[el.dataset.stat]);
 }
-function verificationRow(item, compact = false) {
-  const status = item.status === "verified" ? "Verified" : "Pending";
-  const carrier = `<td class="carrier"><button class="carrier-link" type="button" aria-haspopup="dialog">${escapeHtml(item.carrierName)}</button><span>${compact ? "USDOT " + escapeHtml(item.dot) : "Record " + escapeHtml(String(item.id).slice(0, 8))}</span></td>`;
-  const identifiers = compact ? "" : `<td><b>${escapeHtml(item.dot)}</b><div class="sub">${escapeHtml(item.mc || "—")}</div></td><td>${escapeHtml(item.email)}<div class="sub">${escapeHtml(formatPhone(item.phone))}</div></td>`;
-  return `<tr data-id="${escapeAttribute(item.id)}">${carrier}${identifiers}<td><span class="badge ${status.toLowerCase()}"><i></i>${status}</span></td><td class="date-cell">${formatDate(item.createdAt)}</td></tr>`;
+function verificationProgress(item) {
+  const checks = [["Email", item.emailVerified], ["SMS", item.phoneVerified], ["License", item.licenseUploaded], ["W-9", item.w9Uploaded], ["Insurance", item.coiUploaded]];
+  return { done: checks.filter(([, done]) => done).length, missing: checks.filter(([, done]) => !done).map(([label]) => label) };
+}
+function verificationRow(item) {
+  const progress = verificationProgress(item), complete = progress.done === 5;
+  return `<tr data-id="${escapeAttribute(item.id)}"><td class="carrier"><button class="carrier-link" data-open="${escapeAttribute(item.id)}" type="button" aria-haspopup="dialog">${escapeHtml(item.carrierName)}</button><span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span></td><td>${escapeHtml(item.email)}<div class="sub">${escapeHtml(formatPhone(item.phone))}</div></td><td><div class="progress-label ${complete ? "complete" : ""}"><span class="progress-track" aria-hidden="true"><i style="width:${progress.done * 20}%"></i></span>${complete ? "Complete" : progress.done + "/5 complete"}</div><p class="missing-checks">${complete ? "All documents received" : "Waiting: " + escapeHtml(progress.missing.join(", "))}</p></td><td class="date-cell">${formatDate(item.updatedAt || item.createdAt)}</td><td><div class="row-actions"><button class="icon-button" data-open="${escapeAttribute(item.id)}" type="button" aria-label="Open ${escapeAttribute(item.carrierName)} documents" title="Open documents"><svg aria-hidden="true"><use href="#icon-doc"></use></svg></button>${item.verificationUrl ? `<button class="icon-button" data-copy="${escapeAttribute(item.id)}" type="button" aria-label="Copy verification link for ${escapeAttribute(item.carrierName)}" title="Copy verification link"><svg aria-hidden="true"><use href="#icon-copy"></use></svg></button>` : ""}${complete ? `<button class="icon-button" data-load="${escapeAttribute(item.id)}" type="button" aria-label="Create tracking for ${escapeAttribute(item.carrierName)}" title="Create tracking"><svg aria-hidden="true"><use href="#icon-tracking"></use></svg></button>` : ""}</div></td></tr>`;
 }
 function renderTable() {
   const items = state.items.filter(item => {
     const haystack = `${item.carrierName} ${item.dot} ${item.mc} ${item.email} ${item.phone}`.toLowerCase();
-    const matchesStatus = state.filter === "all" || (state.filter === "verified" ? item.status === "verified" : item.status !== "verified");
-    return haystack.includes(state.query) && matchesStatus;
-  });
-  document.getElementById("history-count").textContent = items.length;
-  tbody.innerHTML = items.length ? items.map(item => verificationRow(item)).join("") : '<tr><td colspan="5" class="empty">No verifications match. Try another search or filter.</td></tr>';
-  const recent = [...state.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
-  document.getElementById("recent-body").innerHTML = recent.length ? recent.map(item => verificationRow(item, true)).join("") : '<tr><td colspan="3" class="empty">Your verification requests will appear here.</td></tr>';
-  document.querySelectorAll('tr[data-id]').forEach(row => row.addEventListener("click", () => openDetails(row.dataset.id)));
+    return haystack.includes(state.query) && (state.filter === "all" || (state.filter === "verified" ? isVerificationComplete(item) : !isVerificationComplete(item)));
+  }).sort((a, b) => state.sort === "name" ? a.carrierName.localeCompare(b.carrierName) : new Date(state.sort === "created" ? b.createdAt : b.updatedAt || b.createdAt) - new Date(state.sort === "created" ? a.createdAt : a.updatedAt || a.createdAt));
+  state.page = Math.min(state.page, Math.max(0, Math.ceil(items.length / 20) - 1));
+  const start = state.page * 20, visible = items.slice(start, start + 20);
+  document.getElementById("history-count").textContent = items.length ? `${start + 1}–${start + visible.length} of ${items.length} verifications` : "0 verifications";
+  document.getElementById("verification-limit-note").textContent = state.items.length >= 100 ? "Showing the latest 100 requests" : "";
+  document.getElementById("previous-page").disabled = state.page === 0;
+  document.getElementById("next-page").disabled = start + 20 >= items.length;
+  document.getElementById("page-number").textContent = items.length ? `Page ${state.page + 1}` : "";
+  tbody.innerHTML = visible.length ? visible.map(verificationRow).join("") : `<tr><td colspan="5" class="empty"><h2>${state.items.length ? "No matching carriers" : "Your carrier list starts here"}</h2><p>${state.items.length ? "Try another search or status." : "Look up a USDOT number to start a verification."}</p>${state.items.length ? "" : '<button type="button" class="primary" data-new-verification>New verification</button>'}</td></tr>`;
 }
 
 function renderManualResult(isBusy = false) {
@@ -359,7 +410,7 @@ function renderManualResult(isBusy = false) {
   const badgeText = complete
     ? `Verified · ${relativeAge(verification.updatedAt || verification.createdAt)}`
     : verification
-      ? "Pending"
+      ? verificationProgress(verification).done + "/5 complete"
       : "Ready to verify";
   const requestState = complete
     ? `completed ${relativeAge(verification.updatedAt || verification.createdAt)}`
@@ -378,22 +429,8 @@ function renderManualResult(isBusy = false) {
         <b class="badge ${complete ? "verified" : verification ? "pending" : "ready"}">${escapeHtml(badgeText)}</b>
       </header>
 
-      <div class="manual-grid">
-        ${infoCard("USDOT", carrier.dot)}
-        ${infoCard("MC", carrier.mc || "-")}
-        ${infoCard("Email", carrier.email || "Not listed")}
-        ${infoCard("Phone", formatPhone(carrier.phone))}
-        ${infoCard("Authority", carrier.authorityStatus || carrier.dotStatus || "-")}
-        ${infoCard("Fleet", `${carrier.fleet.powerUnits ?? "-"} units / ${carrier.fleet.drivers ?? "-"} drivers`)}
-      </div>
-
-      <div class="risk-grid">
-        ${riskCard("Safety", carrier.outOfService ? "Out of service" : "Not out of service", carrier.outOfService ? "bad" : "good")}
-        ${riskCard("Insurance", getInsuranceLabel(carrier), getInsuranceTone(carrier))}
-        ${riskCard("BOC-3", carrier.insurance.bocFiled ? "Filed" : "Not found", carrier.insurance.bocFiled ? "neutral" : "warn")}
-        ${riskCard("Coverage", carrier.insurance.minimumBipdAmount ? money(carrier.insurance.minimumBipdAmount) + " min BIPD" : "No min BIPD", carrier.insurance.minimumBipdAmount ? "neutral" : "warn")}
-      </div>
-
+      <div class="manual-grid">${infoCard("Email", carrier.email || "Not listed")}${infoCard("Phone", formatPhone(carrier.phone))}</div>
+      ${carrier.outOfService ? '<p class="inline-message error">FMCSA lists this carrier as out of service.</p>' : ''}
       <section class="manual-flow">
         <div class="detail-section-title">
           <h3>Verification request</h3>
@@ -404,17 +441,33 @@ function renderManualResult(isBusy = false) {
           ${verification && !complete ? `<button class="primary" data-action="refresh-verification">Refresh status</button>` : ""}
           ${!verification ? `<button class="primary" data-action="send-verification" ${canSend ? "" : "disabled"}>${isBusy ? "Sending..." : "Verify carrier"}</button>` : ""}
           <button class="primary quiet" data-action="new-search">New search</button>
+          ${verification ? `<button class="secondary" data-action="open-existing">Open existing verification</button>` : ""}
+          ${verification && complete ? `<button class="primary" data-action="track-existing">Create tracking</button>` : ""}
           ${verification?.verificationUrl ? `<a class="primary quiet" target="_blank" rel="noreferrer" href="${escapeAttribute(verification.verificationUrl)}">Open carrier link</a>` : ""}
         </div>
         ${canSend || verification ? "" : `<p class="inline-message error">This carrier is missing email or phone.</p>`}
       </section>
+      <details class="request-dates lookup-profile"><summary>FMCSA profile · authority, fleet & insurance</summary>      <div class="manual-grid">
+
+        ${infoCard("Authority", carrier.authorityStatus || carrier.dotStatus || "-")}
+        ${infoCard("Fleet", `${carrier.fleet?.powerUnits ?? "-"} units / ${carrier.fleet?.drivers ?? "-"} drivers`)}
+      </div>
+
+      <div class="risk-grid">
+        ${riskCard("Safety", carrier.outOfService ? "Out of service" : "Not out of service", carrier.outOfService ? "bad" : "good")}
+        ${riskCard("Insurance", getInsuranceLabel(carrier), getInsuranceTone(carrier))}
+        ${riskCard("BOC-3", carrier.insurance?.bocFiled ? "Filed" : "Not found", carrier.insurance?.bocFiled ? "neutral" : "warn")}
+        ${riskCard("Coverage", carrier.insurance?.minimumBipdAmount ? money(carrier.insurance?.minimumBipdAmount) + " min BIPD" : "No min BIPD", carrier.insurance?.minimumBipdAmount ? "neutral" : "warn")}
+      </div>
+
+</details>
     </section>
   `;
 }
 
 function findLatestVerification(dot, status = "") {
   const matches = state.items
-    .filter((item) => item.dot === dot && (!status || item.status === status))
+    .filter((item) => String(item.dot) === String(dot) && (!status || item.status === status))
     .sort((left, right) => new Date(right.updatedAt || right.createdAt) - new Date(left.updatedAt || left.createdAt));
   return matches[0] || null;
 }
@@ -449,72 +502,36 @@ function setManualMessage(message, isError = false) {
   verifyMessage.classList.toggle("error", Boolean(isError));
 }
 
-function openDetails(id) {
-  detailsTrigger = document.activeElement;
-  const item = state.items.find((entry) => entry.id === id);
+function openDetails(id, moveFocus = true) {
+  if (moveFocus) detailsTrigger = document.activeElement;
+  const item = state.items.find(entry => entry.id === id);
   if (!item) return;
-  const complete = item.emailVerified && item.phoneVerified && item.licenseUploaded && item.w9Uploaded && item.coiUploaded;
-  detailsContent.innerHTML = `
-    <header class="detail-hero">
-      <div>
-        <p class="eyebrow">Carrier verification</p>
-        <h2>${escapeHtml(item.carrierName)}</h2>
-        <span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span>
-      </div>
-      <div class="detail-hero-actions"><b class="badge ${complete ? "verified" : "pending"}"><i></i>${complete ? "verified" : "pending"}</b>${complete ? '<button id="create-tracking-from-verification" class="primary" type="button">Create tracking</button>' : ''}</div>
-    </header>
-
-    <div class="detail-grid">
-      ${infoCard("Email", item.email)}
-      ${infoCard("Phone", formatPhone(item.phone))}
-      ${infoCard("Started", formatDate(item.createdAt))}
-      ${infoCard("Last update", formatDate(item.updatedAt))}
-    </div>
-
-    <section class="detail-section">
-      <div class="detail-section-title">
-        <h3>Verification checks</h3>
-        <span>${complete ? "ready for shipper review" : "waiting on carrier"}</span>
-      </div>
-      <div class="checks">
-        ${checkRow("Email verified", item.emailVerified)}
-        ${checkRow("SMS code verified", item.phoneVerified)}
-        ${checkRow("Driver license uploaded", item.licenseUploaded)}
-        ${checkRow("W-9 uploaded", item.w9Uploaded)}
-        ${checkRow("COI uploaded", item.coiUploaded)}
-      </div>
-    </section>
-
-    <section class="detail-section">
-      <div class="detail-section-title">
-        <h3>Activity timeline</h3>
-        <span>request audit trail</span>
-      </div>
-      <div class="activity-feed">
-        <div><span></span><b>Request created</b><em>${formatDate(item.createdAt)}</em></div>
-        <div class="${item.emailVerified ? "done" : ""}"><span></span><b>Email verification</b><em>${item.emailVerified ? "confirmed" : "pending"}</em></div>
-        <div class="${item.phoneVerified ? "done" : ""}"><span></span><b>SMS verification</b><em>${item.phoneVerified ? "confirmed" : "pending"}</em></div>
-        <div class="${complete ? "done" : ""}"><span></span><b>Final review</b><em>${complete ? "ready" : "waiting"}</em></div>
-      </div>
-    </section>
-
-    <section class="detail-section">
-      <div class="detail-section-title">
-        <h3>Documents</h3>
-        <span>uploaded by carrier</span>
-      </div>
-      <div class="document-grid">
-        ${documentCard("Driver license", item.documents?.license, item.licenseUploaded, item.licenseFileName)}
-        ${documentCard("W-9", item.documents?.w9, item.w9Uploaded, item.w9FileName)}
-        ${documentCard("COI", item.documents?.coi, item.coiUploaded, item.coiFileName)}
-      </div>
-    </section>
-  `;
+  const complete = isVerificationComplete(item), progress = verificationProgress(item);
+  const scrollTop = details.querySelector(".details-modal").scrollTop;
+  details.dataset.id = id;
+  detailsContent.innerHTML = `<header class="detail-hero"><p class="eyebrow">Carrier verification</p><h2 id="carrier-detail-title">${escapeHtml(item.carrierName)}</h2><span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span><div class="detail-hero-actions"><span class="badge ${complete ? "verified" : "pending"}">${complete ? "Complete · 5/5" : progress.done + "/5 complete"}</span>${complete ? '<button id="create-tracking-from-verification" class="primary" type="button">Create tracking</button>' : ''}${item.verificationUrl ? `<button class="secondary" data-copy="${escapeAttribute(item.id)}" type="button">Copy carrier link</button>` : ''}<button id="refresh-details" class="icon-button" type="button" aria-label="Refresh verification" title="Refresh verification"><svg aria-hidden="true"><use href="#icon-refresh"></use></svg></button></div></header><div id="detail-message" class="inline-message" role="status"></div><div class="detail-grid">${infoCard("Email", item.email)}${infoCard("Phone", formatPhone(item.phone))}</div><section class="detail-section"><div class="detail-section-title"><h3>Documents</h3><span>Uploaded by carrier</span></div><div class="document-grid">${documentCard("Driver license", item.documents?.license, item.licenseUploaded, item.licenseFileName)}${documentCard("W-9", item.documents?.w9, item.w9Uploaded, item.w9FileName)}${documentCard("Insurance / COI", item.documents?.coi, item.coiUploaded, item.coiFileName)}</div></section><section class="detail-section"><div class="detail-section-title"><h3>Contact verification</h3></div><div class="checks">${checkRow("Email verified", item.emailVerified)}${checkRow("SMS code verified", item.phoneVerified)}</div></section><details class="request-dates"><summary>Request dates</summary><div class="detail-grid">${infoCard("Created", formatDate(item.createdAt))}${infoCard("Last updated", formatDate(item.updatedAt || item.createdAt))}</div></details>`;
+  adminApp.inert = true;
   details.classList.add("open");
   document.getElementById("create-tracking-from-verification")?.addEventListener("click", () => { closeDetails(); window.deepTruckTracking.openCreate(item.id); });
   details.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
-  document.getElementById("close-details").focus();
+  if (moveFocus) { details.querySelector(".details-modal").scrollTop = 0; document.getElementById("close-details").focus(); }
+  else { details.querySelector(".details-modal").scrollTop = scrollTop; document.getElementById("refresh-details").focus({ preventScroll: true }); }
+  document.getElementById("refresh-details").addEventListener("click", async event => {
+    event.currentTarget.disabled = true;
+    try {
+      const response = await fetch(`${API_BASE_URL}/verification-requests/${id}`, { headers: authHeaders(), signal: AbortSignal.timeout(20000) });
+      const record = await response.json(); if (!response.ok || record.error) throw new Error(record.error || "Unable to refresh verification.");
+      state.items = state.items.map(item => item.id === id ? record : item);
+      renderMetrics(); renderTable(); window.deepTruckTracking.updateCarriers();
+      if (details.classList.contains("open") && details.dataset.id === id) openDetails(id, false);
+      window.workspaceToast("Verification refreshed.");
+    } catch (error) {
+      if (details.classList.contains("open") && details.dataset.id === id) {
+        const message = document.getElementById("detail-message"); message.textContent = error.message; message.classList.add("error"); document.getElementById("refresh-details").disabled = false;
+      }
+    }
+  });
 }
 
 function infoCard(label, value) {

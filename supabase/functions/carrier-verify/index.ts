@@ -238,12 +238,22 @@ async function getRecordForUser(req: Request, id: string) {
 async function listVerificationRequests(req: Request, url: URL) {
   const user = await requireUser(req);
   const limit = Math.min(Number(url.searchParams.get("limit") || "50"), 100);
-  const { data, error } = await supabase
+  let query = supabase
     .from("carrier_verification_requests")
     .select("*")
     .eq("shipper_user_id", user.id)
     .order("created_at", { ascending: false })
     .limit(limit);
+  const dot = url.searchParams.get("dot");
+  if (dot) {
+    if (!/^\d{5,8}$/.test(dot)) {
+      const error = new Error("Enter a valid USDOT number.") as Error & { statusCode?: number };
+      error.statusCode = 400;
+      throw error;
+    }
+    query = query.eq("dot", dot);
+  }
+  const { data, error } = await query;
 
   if (error) throw new Error(error.message);
   return {

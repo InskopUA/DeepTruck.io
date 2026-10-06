@@ -130,6 +130,8 @@ Output directory: public
 Install command: npm install
 ```
 
+The admin workspace combines carrier checks and history in one searchable list with progress, missing documents, sorting and pages of 20. It currently loads the latest 100 requests and explicitly labels that limit. New verification lookup checks all owned requests by USDOT, including pending requests outside that list. Carrier documents open in a side panel, and completed checks hand off directly to Tracking. Tracking includes an attention filter for failed invitations, paused sharing, overdue responses and delayed GPS; mobile opens load details with a Back action. Workspace styling lives in `admin-site/workspace.css`; the sign-in and sign-up pages retain their shared `styles.css`.
+
 The build copies `verify-site/` into `public/` and `admin-site/` into `public/admin/`. The extension stays in `manifest.json` and `src/`. The landing's Install Extension button is disabled until the Chrome Web Store listing URL is provided.
 
 After the Vercel domain is live, update the Supabase function secret so verification links in emails/SMS open the Vercel page instead of localhost:
