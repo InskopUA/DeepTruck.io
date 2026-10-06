@@ -29,6 +29,7 @@ export default function App() {
   const [session,setSession]=useState<Session|null>(null),[booting,setBooting]=useState(true);
   const [number,setNumber]=useState(''),[otp,setOtp]=useState(''),[codeSent,setCodeSent]=useState(false),[nextSmsAt,setNextSmsAt]=useState(0),[now,setNow]=useState(Date.now());
   const [loads,setLoads]=useState<Load[]>([]),[busy,setBusy]=useState(false),[refreshing,setRefreshing]=useState(false),[message,setMessage]=useState(''),[tab,setTab]=useState<'open'|'history'>('open');
+  const [loadsLoaded,setLoadsLoaded]=useState(false),[loadError,setLoadError]=useState('');
   const [health,setHealth]=useState<{enabled:boolean;queued:number;lastUpload:string|null;error:string|null}>({enabled:false,queued:0,lastUpload:null,error:null});
   const [invite,setInvite]=useState('');
   const refreshingRef=useRef(false),userRef=useRef(''),revisionRef=useRef(0),busyRef=useRef(false);
@@ -47,24 +48,29 @@ export default function App() {
     return()=>{mounted=false;subscription.unsubscribe();subscriptionState.remove();clearInterval(clock);supabase.auth.stopAutoRefresh();};
   },[]);
   const refresh=useCallback(async()=>{
-    if(refreshingRef.current || busyRef.current)return;
-    refreshingRef.current=true;setRefreshing(true);const userId=session?.user.id,revision=revisionRef.current;
+    if(refreshingRef.current || busyRef.current || !userRef.current)return;
+    refreshingRef.current=true;setRefreshing(true);const userId=userRef.current,revision=revisionRef.current;
+    let receivedLoads=false;
     try {
       const data=await getLoads();if(userRef.current!==userId || revision!==revisionRef.current)return;
       setLoads(data.items);
+      setLoadsLoaded(true);setLoadError('');receivedLoads=true;
       await syncTracking(data.items);
       await flushQueue();setHealth(await trackingHealth());
     } catch(e) {
+      if(userRef.current!==userId || revision!==revisionRef.current)return;
       if(e instanceof ApiError && e.status===401) {
         await stopCollecting(true);
         await supabase.auth.signOut({scope:'local'});
         setMessage('Your session expired. Sign in with your phone number again.');
-      } else setMessage(e instanceof Error?e.message:'Could not refresh your loads.');
+      } else if(receivedLoads) setMessage(e instanceof Error?e.message:'Could not sync location sharing.');
+      else setLoadError(e instanceof Error?e.message:'Could not refresh your loads.');
     }
     finally{refreshingRef.current=false;setRefreshing(false);}
   },[session?.user.id]);
   useEffect(()=>{
     userRef.current=session?.user.id || '';
+    setLoads([]);setLoadsLoaded(false);setLoadError('');
     if(!session)return;
     void refresh();
     const timer=setInterval(()=>{if(AppState.currentState==='active')void refresh();},15000);
@@ -86,6 +92,8 @@ export default function App() {
       const {error}=await supabase.auth.verifyOtp({phone:normalizePhone(number),token:otp,type:'sms'});if(error)throw error;
       setOtp('');setCodeSent(false);setMessage('');
     });
+    // The sign-in event can fire while run() is still busy and skip its first refresh.
+    if(userRef.current)void refresh();
   }
   async function act(load:Load,action:'accept'|'decline'|'start'|'pause'|'complete') {
     if(action==='accept'&&!await ask('Accept this load?',`${load.dealerName} requests tracking for “${load.title}” until ${date(load.expiresAt)}. Location is shared only after you tap Start sharing. History recorded while sharing stays with this load. You can pause at any time.`,'Accept load'))return;
@@ -131,9 +139,10 @@ export default function App() {
       <Text style={s.heading}>Your loads</Text><Text style={s.subtitle}>{pending.length?`${pending.length} invitation${pending.length===1?'':'s'} to review`:'Delivery progress, on your terms.'}</Text>
       <View style={[s.sharingBanner,health.enabled&&active.length>0&&s.sharingOn]}><Text style={s.cardTitle}>{health.enabled&&active.length>0?`Sharing for ${active.length} load${active.length===1?'':'s'}`:'Location sharing is off'}</Text><Text style={s.body}>{health.error || (health.enabled&&active.length>0?'Your phone sends one location update for all active loads.':'Accept a load and tap Start sharing to begin.')}</Text>{health.queued>0?<Text style={s.body}>{health.queued} location updates waiting to sync.</Text>:null}{health.enabled&&active.length>0?<Button title="Stop all sharing" secondary danger disabled={busy} onPress={()=>void stopAll()}/>:null}</View>
       {message?<Text accessibilityLiveRegion="polite" style={s.message}>{message}</Text>:null}
+      {loadError?<Text accessibilityLiveRegion="polite" style={s.message}>{loadError}</Text>:null}
       {message.toLowerCase().includes('settings')?<Button title="Open phone settings" secondary disabled={busy} onPress={()=>void NativeLinking.openSettings()}/>:null}
       <View style={s.tabs}><Pressable accessibilityRole="tab" accessibilityState={{selected:tab==='open'}} onPress={()=>setTab('open')} style={[s.tab,tab==='open'&&s.tabActive]}><Text style={s.tabText}>Active & invitations</Text></Pressable><Pressable accessibilityRole="tab" accessibilityState={{selected:tab==='history'}} onPress={()=>setTab('history')} style={[s.tab,tab==='history'&&s.tabActive]}><Text style={s.tabText}>History</Text></Pressable></View>
-      {!visible.length?<View style={s.card}><Text style={s.cardTitle}>{tab==='history'?'No completed loads yet':'No loads yet'}</Text><Text style={s.body}>{tab==='history'?'Closed loads appear here.':'Invitations sent to your verified phone number will appear here. Pull down to refresh.'}</Text></View>:visible.map(load=><View key={load.id} style={[s.card,load.id===invite&&s.invitedCard]}>
+      {!visible.length?<View style={s.card}><Text style={s.cardTitle}>{!loadsLoaded ? loadError?'Unable to load invitations':'Loading your loads…' : tab==='history'?'No completed loads yet':'No loads yet'}</Text>{!loadsLoaded ? loadError?<Button title="Try again" secondary disabled={refreshing||busy} onPress={()=>void refresh()}/>:<ActivityIndicator color="#286bc0"/>:<Text style={s.body}>{tab==='history'?'Closed loads appear here.':'Invitations sent to your verified phone number will appear here. Pull down to refresh.'}</Text>}</View>:visible.map(load=><View key={load.id} style={[s.card,load.id===invite&&s.invitedCard]}>
         <View style={s.cardHeading}><Text style={s.dealer}>{load.dealerName}</Text><View style={[s.badge,load.status==='active'&&s.badgeActive]}><Text style={s.badgeText}>{labels[load.status]}</Text></View></View><Text style={s.loadTitle}>{load.title}</Text><Text style={s.body}>{load.carrierName} · USDOT {load.carrierDot}</Text>
         {load.pickupAddress?<View style={s.address}><Text style={s.label}>PICKUP</Text><Text style={s.body}>{load.pickupAddress}</Text></View>:null}{load.deliveryAddress?<View style={s.address}><Text style={s.label}>DELIVERY</Text><Text style={s.body}>{load.deliveryAddress}</Text></View>:null}
         {load.vehicles.length?<View style={s.address}><Text style={s.label}>VEHICLES</Text>{load.vehicles.map((v,i)=><Text key={i} style={s.body}>{v}</Text>)}</View>:null}

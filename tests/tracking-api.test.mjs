@@ -5,6 +5,7 @@ import { spawn } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
+import { fetchJson } from '../driver-app/src/http.ts';
 
 test('Edge API: real SDK and SQL, verified driver login, ownership and scoped location',async t=>{
   const db=await PGlite.create();t.after(()=>db.close());
@@ -68,7 +69,7 @@ test('Edge API: real SDK and SQL, verified driver login, ownership and scoped lo
     child.stdout.on('data',read);child.stderr.on('data',read);child.once('error',reject);child.once('exit',code=>{clearTimeout(timeout);reject(new Error('Deno exited '+code+': '+output));});
   });
   const endpoint=`http://127.0.0.1:${port}/functions/v1/driver-tracking`;
-  async function call(path,token,data) {const response=await fetch(endpoint+path,{method:data===undefined?'GET':'POST',headers:{...(token?{Authorization:'Bearer '+token}:{}),'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});return {status:response.status,body:await response.json()};}
+  async function call(path,token,data) {const {response,value}=await fetchJson(endpoint+path,{method:data===undefined?'GET':'POST',headers:{...(token?{Authorization:'Bearer '+token}:{}),'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});return {status:response.status,body:value};}
   assert.equal((await call('/config')).status,200);
   assert.equal((await call('/loads')).status,401);
   assert.equal((await call('/loads','invalid')).status,401);
