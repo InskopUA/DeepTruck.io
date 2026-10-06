@@ -126,7 +126,7 @@ function render(record) {
   setDone(els.coiCheck, record.coiUploaded);
   setButton(els.emailButton, record.emailVerified, "Email verified", "Verifying...");
   els.emailButton.disabled = true;
-  setButton(els.phoneButton, record.phoneVerified, "Phone verified", "Verify phone");
+  setButton(els.phoneButton, record.phoneVerified, "Verified", "Verify");
   els.phoneButton.disabled = Boolean(record.phoneVerified);
   els.code.disabled = Boolean(record.phoneVerified);
   [els.license, els.w9, els.coi].forEach(input => { input.disabled = input.closest(".file-control").classList.contains("is-busy"); });
@@ -143,7 +143,7 @@ function render(record) {
   els.licenseMsg.textContent = record.licenseUploaded ? record.licenseFileName || "" : "";
   els.w9Msg.textContent = record.w9Uploaded ? record.w9FileName || "" : "";
   els.coiMsg.textContent = record.coiUploaded ? record.coiFileName || "" : "";
-  [els.licenseMsg, els.w9Msg, els.coiMsg].forEach(node => node.classList.remove("error"));
+  [els.licenseMsg, els.w9Msg, els.coiMsg].forEach(node => { node.classList.remove("error"); node.title = node.textContent; });
 }
 
 function setDone(node, done) {
@@ -158,7 +158,8 @@ function setButton(button, done, doneText, pendingText) {
 
 function setFileControl(control, label, done, fileName, pendingText) {
   control.classList.toggle("done", Boolean(done));
-  label.textContent = done ? fileName || "Uploaded" : pendingText;
+  label.textContent = done ? "Replace file" : pendingText;
+  control.title = done ? fileName || "Replace uploaded document" : pendingText;
 }
 
 async function verifyEmail() {
@@ -194,11 +195,8 @@ async function uploadSelectedDocument(type) {
   config.message.textContent = "";
   config.message.classList.remove("error");
   const file = config.input.files[0];
-  if (!file) {
-    config.label.textContent = config.pendingText;
-    return;
-  }
-
+  if (!file) return;
+  const previousLabel = config.label.textContent;
   config.label.textContent = "Uploading...";
   config.control.classList.add("is-busy");
   config.input.disabled = true;
@@ -208,12 +206,14 @@ async function uploadSelectedDocument(type) {
     config.label.textContent = file.name;
     await load();
   } catch (error) {
-    config.label.textContent = config.pendingText;
+    config.label.textContent = previousLabel;
     config.message.textContent = error.message;
+    config.message.title = error.message;
     config.message.classList.add("error");
   } finally {
     config.control.classList.remove("is-busy");
     config.input.disabled = false;
+    config.input.value = "";
   }
 }
 

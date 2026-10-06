@@ -2,7 +2,8 @@
   "scripts": {
     "build": "node scripts/build-vercel.js",
     "test": "node --test tests/*.test.mjs",
-    "test:tracking-ui": "node tests/tracking-ui.cjs"
+    "test:tracking-ui": "node tests/tracking-ui.cjs",
+    "test:verification-ui": "node tests/verification-ui.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#090b0e">
+  <meta name="theme-color" content="#ffffff">
   <title>Carrier verification · DeepTruck Verify</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/verification.css">
@@ -11,7 +11,7 @@
 <body>
   <svg class="icon-sprite" aria-hidden="true"><symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol></svg>
   <header class="site-header">
-    <a class="brand" href="/" aria-label="DeepTruck home"><img src="/shield-mark.svg" width="32" height="36" alt=""><span>DeepTruck <small>Verify</small></span></a>
+    <a class="brand" href="/" aria-label="DeepTruck home"><img src="/shield-mark-light.svg" width="32" height="36" alt=""><span>DeepTruck <small>Verify</small></span></a>
     <a class="support-link" href="mailto:verify@deeptruck.io">Need help? <span>Contact support ↗</span></a>
   </header>
   <main class="stage">
@@ -23,8 +23,7 @@
     <div id="page-message" class="page-message" role="alert" hidden></div>
     <div class="verification-layout">
       <aside class="carrier-card" aria-labelledby="carrier-name">
-        <div class="carrier-card-top"><p class="eyebrow">Carrier details</p><span id="status-pill" class="status" role="status">Loading</span></div>
-        <h2 id="carrier-name">Loading carrier…</h2>
+        <div class="carrier-card-top"><div><p class="eyebrow">Carrier details</p><h2 id="carrier-name">Loading carrier…</h2></div><span id="status-pill" class="status" role="status">Loading</span></div>
         <dl class="meta">
           <div><dt>USDOT</dt><dd id="dot">—</dd></div>
           <div><dt>MC</dt><dd id="mc">—</dd></div>
@@ -39,7 +38,7 @@
       </aside>
       <section class="verify" aria-labelledby="checklist-heading">
         <header class="checklist-heading"><h2 id="checklist-heading">Verification checklist</h2><p>Your progress is saved as you complete each step.</p></header>
-        <div id="completion-message" class="completion-message" role="status" hidden><b>You're all set.</b><p>Your contacts are confirmed and all required documents have been received.</p></div>
+        <div id="completion-message" class="completion-message" role="status" hidden><b>Verification complete</b><p>Your contact details and documents are confirmed.</p></div>
         <section class="flow" aria-label="Verification steps">
         <div class="step">
           <div id="email-check" class="dot check" data-step="1" aria-hidden="true"><span></span></div>
@@ -60,7 +59,7 @@
           <form id="phone-form" class="action code-action">
             <label class="sr-only" for="code">Six-digit SMS code</label>
             <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6" disabled>
-            <button id="verify-phone" class="primary" type="submit" disabled>Verify phone</button>
+            <button id="verify-phone" aria-label="Verify phone" class="primary" type="submit" disabled>Verify phone</button>
           </form>
         </div>
 
@@ -99,7 +98,7 @@
         <div class="step">
           <div id="coi-check" class="dot check" data-step="5" aria-hidden="true"><span></span></div>
           <div class="copy">
-            <h2>Certificate of insurance</h2>
+            <h2>Insurance / COI</h2>
             <p>Current insurance certificate.</p>
             <div id="coi-msg" class="message" role="status" aria-live="polite"></div>
           </div>
@@ -112,7 +111,7 @@
           </div>
         </div>
         </section>
-        <p class="checklist-note">Uploading a replacement document updates this verification.</p>
+        <p class="checklist-note">PDF, JPG or PNG · Replace files anytime.</p>
       </section>
     </div>
     <footer class="page-footer"><span>© DeepTruck</span><nav aria-label="Legal"><a href="/privacy">Privacy policy</a><a href="/terms">Terms of service</a></nav></footer>

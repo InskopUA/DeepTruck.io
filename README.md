@@ -118,7 +118,7 @@ Vercel should host only the public web UI:
 - `/privacy` privacy policy for the website, workspace, verification pages, and extension
 - `/terms` terms of service
 - `/admin` authenticated shipper workspace
-- `/verify.html?id=...` carrier verification page
+- `/verify.html?id=...` carrier verification page (light theme with compact, single-screen contact and document steps)
 - `/verify?id=...` same verification page through a clean URL rewrite
 
 Use these Vercel project settings:
@@ -195,3 +195,5 @@ Response:
 ### `GET /verification-requests/:id`
 
 Return the same shape with updated booleans. The shipper screen switches to `Verified` when all three are true.
+
+Run `npm run test:verification-ui` after `npm run build` to check verification at laptop and phone sizes, including SMS confirmation and document upload/replacement retries with mocked API requests.
