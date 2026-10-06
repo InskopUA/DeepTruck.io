@@ -27,6 +27,29 @@ To update an existing installation, open `chrome://extensions`, find **DeepTruck
 
 The popup and extension account page use the same DeepTruck account. Once signed in, the popup shows your account and links to Central Dispatch and your workspace. The carrier panel shows five checks: email, SMS, driver license, W-9, and insurance certificate. The shield icons are packaged locally with the extension.
 
+## Help Center
+
+The public Help Center lives at `/help`. `npm run build` renders its overview,
+16 guides and local search index from `scripts/help-content.cjs` using
+`scripts/build-help.cjs`. Navigation and the table of contents are generated from
+that same content. Add a guide there rather than editing generated `public/` files.
+
+Styles and search / screenshot controls are in `verify-site/help/`. The help pages
+follow the website's saved light/dark preference. Guides link from the website
+footer, workspace Help & resources, carrier verification page, Driver invitation
+page and native Driver profile.
+
+Tutorial screenshots use fictional data and the current interfaces. The tracking
+map illustration is explicitly labeled as an example. To refresh captures, run
+`HELP_SCREENSHOTS=1 npm run test:tracking-ui`, `npm run test:verification-ui`, and
+`npm run test:driver-preview`; their outputs are saved in `/private/tmp`. Optimize
+the selected captures into `verify-site/help/media/` and keep the image dimensions
+in `help-content.cjs` in sync. Never use live identity documents or private accounts
+in documentation images.
+
+Run `npm run build` and `npm run test:help-center` to check guide routes, contrast,
+responsive layouts, search, keyboard controls, screenshot zoom and theme persistence.
+
 ## Driver tracking
 
 The Tracking workspace, new tracking Edge Function/migration, and iPhone/

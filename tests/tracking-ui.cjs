@@ -9,9 +9,9 @@ const origin='https://workspace.test';
 const project='https://yqpeebgmqtqoxumzfrsq.supabase.co';
 const user={id:randomUUID(),email:'dealer@example.com',user_metadata:{full_name:'Test Dealer',company_name:'Northline Logistics'}};
 const session={user,access_token:'test-session',expires_at:Math.floor(Date.now()/1000)+3600};
-const verification={id:randomUUID(),carrierName:'OMAX LLC',dot:'4345567',mc:'MC1698436',email:'carrier@example.com',phone:'3075551234',emailVerified:true,phoneVerified:true,licenseUploaded:true,w9Uploaded:true,coiUploaded:true,status:'verified',createdAt:new Date().toISOString(),verificationUrl:'https://www.deeptruck.io/verify?token=fixture',documents:{license:{url:'https://documents.test/license.pdf',fileName:'License.pdf'},w9:{url:'https://documents.test/w9.pdf',fileName:'W9.pdf'},coi:{url:'https://documents.test/coi.pdf',fileName:'COI.pdf'}}};
+const verification={id:randomUUID(),carrierName:'Northline Transport',dot:'4345567',mc:'MC123456',email:'carrier@example.com',phone:'2025550148',emailVerified:true,phoneVerified:true,licenseUploaded:true,w9Uploaded:true,coiUploaded:true,status:'verified',createdAt:new Date().toISOString(),verificationUrl:'https://www.deeptruck.io/verify?token=fixture',documents:{license:{url:'https://documents.test/license.pdf',fileName:'License.pdf'},w9:{url:'https://documents.test/w9.pdf',fileName:'W9.pdf'},coi:{url:'https://documents.test/coi.pdf',fileName:'COI.pdf'}}};
 const pendingVerification={...verification,id:randomUUID(),carrierName:'Northline Transport',dot:'1234567',status:'pending',w9Uploaded:false,coiUploaded:false,verificationUrl:'https://www.deeptruck.io/verify?token=pending'};
-function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),verificationId:verification.id,title,status,dealerName:'Northline Logistics',carrierName:'OMAX LLC',carrierDot:'4345567',driverName:'John Smith',driverPhone:phone,vehicles:['2024 Toyota Camry · Stock #184'],pickupAddress:'Auction · Atlanta, GA',deliveryAddress:'Dealership · Miami, FL',plannedAt:null,expiresAt:new Date(Date.now()+86400000).toISOString(),createdAt:new Date().toISOString(),invitationStatus:'sent',invitedAt:new Date().toISOString(),latestLocation:status==='active'?{id:randomUUID(),latitude:33.749,longitude:-84.388,accuracy:12,capturedAt:new Date(Date.now()-30000).toISOString()}:null};}
+function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),verificationId:verification.id,title,status,dealerName:'Northline Logistics',carrierName:verification.carrierName,carrierDot:verification.dot,driverName:'John Smith',driverPhone:phone,vehicles:['2024 Toyota Camry · Stock #184'],pickupAddress:'Auction · Atlanta, GA',deliveryAddress:'Dealership · Miami, FL',plannedAt:null,expiresAt:new Date(Date.now()+86400000).toISOString(),createdAt:new Date().toISOString(),invitationStatus:'sent',invitedAt:new Date().toISOString(),latestLocation:status==='active'?{id:randomUUID(),latitude:33.749,longitude:-84.388,accuracy:12,capturedAt:new Date(Date.now()-30000).toISOString()}:null};}
 (async()=>{
  const executable=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || (fs.existsSync('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome')?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':undefined);
  const browser=await chromium.launch({headless:true,...(executable?{executablePath:executable}:{})});
@@ -63,6 +63,25 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  await page.waitForFunction(()=>{const map=document.getElementById('tracking-map');const svg=map.querySelector('.leaflet-overlay-pane svg');return svg && svg.getBoundingClientRect().width>=map.clientWidth;});
  await page.waitForTimeout(200);
  await page.screenshot({path:'/private/tmp/deeptruck-tracking-desktop.png'});
+ if(process.env.HELP_SCREENSHOTS){
+   // Screenshot-only illustrative map; every control is the actual workspace UI.
+   await page.locator('#tracking-map').evaluate(el=>{
+     const illustration=document.createElement('div');illustration.id='help-demo-map';
+     illustration.style.cssText='position:absolute;inset:0;z-index:450;pointer-events:none';
+     illustration.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 310" width="100%" height="100%" preserveAspectRatio="xMidYMid slice"><rect width="700" height="310" fill="#edf1ea"/><path d="M0 225Q150 160 210 210T430 140T700 130" stroke="#bdddeb" stroke-width="38" fill="none"/><path d="M20 50h140v70H20zM450 180h120v80H450zM500 25h160v65H500z" fill="#d4e5cf"/><g stroke="#fff" stroke-width="9"><path d="M0 60h700M0 125h700M0 190h700M0 255h700M80 0v310M160 0v310M240 0v310M320 0v310M400 0v310M480 0v310M560 0v310M640 0v310"/></g><path d="M0 285 700 20" stroke="#d8c6a1" stroke-width="15"/><path d="M0 285 700 20" stroke="#fff2d9" stroke-width="10"/><g font-family="Arial,sans-serif" fill="#667b80" font-size="12"><text x="120" y="104">Pickup area</text><text x="430" y="168">Delivery area</text><text x="16" y="293">Illustrative map · example location</text></g></svg>';
+     illustration.querySelector('svg').style.cssText='width:100%;height:100%;display:block;stroke:none';
+     const point=document.createElement('span');point.style.cssText='position:absolute;left:50%;top:50%;width:17px;height:17px;transform:translate(-50%,-50%);background:#286bc0;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px #286bc01a';illustration.append(point);
+     el.append(illustration);
+   });
+   await page.screenshot({path:'/private/tmp/deeptruck-help-tracking.png'});
+   await page.locator('#help-demo-map').evaluate(el=>el.remove());
+   await page.locator('.sidebar [data-view="verifications"]').click();
+   await page.screenshot({path:'/private/tmp/deeptruck-help-verifications.png'});
+   await page.locator('#history-body .carrier-link').first().click();
+   await page.locator('.details-modal').screenshot({path:'/private/tmp/deeptruck-help-documents.png'});
+   await page.keyboard.press('Escape');
+   await page.locator('.sidebar [data-view="tracking"]').click();
+ }
  await page.locator('#new-tracking-button').click();
  await page.locator('#tracking-create-dialog[open]').waitFor();
  await page.locator('#tracking-carrier').selectOption(verification.id);assert.equal(await page.locator('#tracking-driver-phone').inputValue(),'','carrier office phone is never prefilled');
@@ -70,6 +89,11 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  assert.equal(await page.locator('#tracking-driver-phone').inputValue(),'+15557654321');assert.equal(await page.locator('#tracking-expiry').isVisible(),true);await page.locator('#tracking-load-name').fill('Load #1045 — Test delivery');await page.locator('.tracking-optional summary').click();await page.locator('#tracking-vehicles').fill('Toyota Camry · VIN 1\nHonda Accord · VIN 2');
  await page.locator('#tracking-pickup').fill('Atlanta auction');await page.locator('#tracking-delivery').fill('Miami dealership');
  await page.screenshot({path:'/private/tmp/deeptruck-tracking-create.png'});
+ if(process.env.HELP_SCREENSHOTS){
+   await page.setViewportSize({width:1440,height:1400});
+   await page.locator('#tracking-create-dialog').screenshot({path:'/private/tmp/deeptruck-help-create.png'});
+   await page.setViewportSize({width:1440,height:1000});
+ }
  failCreateNetwork=true;
  await page.locator('#tracking-create-submit').click();
  await page.waitForFunction(()=>document.getElementById('tracking-create-message').textContent.includes('Could not connect to tracking'));
@@ -102,7 +126,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
    console.log(`PASS ${width}px: five menus, Tracking and creation dialog`);
  }
  await page.locator('.sidebar [data-view="verifications"]').click();await page.locator('#history-body .carrier-link').first().click();
- await page.screenshot({path:"/private/tmp/deeptruck-workspace-documents.png"});await page.locator("#refresh-details").click();await page.waitForFunction(()=>document.getElementById("toast").textContent==="Verification refreshed.");assert.equal(await page.locator("#admin-app").evaluate(el=>el.inert),true);assert.equal(await page.locator("#carrier-detail-title").textContent(),"OMAX LLC");assert.equal(await page.locator('.document-card a').count(),3);await page.locator('#create-tracking-from-verification').click();assert.equal(await page.locator('#tracking-carrier').inputValue(),verification.id);
+ await page.screenshot({path:"/private/tmp/deeptruck-workspace-documents.png"});await page.locator("#refresh-details").click();await page.waitForFunction(()=>document.getElementById("toast").textContent==="Verification refreshed.");assert.equal(await page.locator("#admin-app").evaluate(el=>el.inert),true);assert.equal(await page.locator("#carrier-detail-title").textContent(),"Northline Transport");assert.equal(await page.locator('.document-card a').count(),3);await page.locator('#create-tracking-from-verification').click();assert.equal(await page.locator('#tracking-carrier').inputValue(),verification.id);
  await page.keyboard.press('Escape');await page.reload();await page.locator('#tracking.active').waitFor();
  failLoads=true;await page.locator('#tracking-refresh').click();await page.waitForFunction(()=>document.getElementById('tracking-message').textContent==='Tracking unavailable');
  assert.ok(await page.locator('.tracking-card').count()>0,'refresh failures preserve prior records');

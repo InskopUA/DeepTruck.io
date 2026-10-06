@@ -6,7 +6,8 @@
     "test:verification-ui": "node tests/verification-ui.cjs",
     "test:driver-ui": "node tests/driver-ui.cjs",
     "test:driver-preview": "node tests/driver-preview.cjs",
-    "test:site-theme": "node tests/site-theme.cjs"
+    "test:site-theme": "node tests/site-theme.cjs",
+    "test:help-center": "node tests/help-center.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
