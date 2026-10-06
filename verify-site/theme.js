@@ -6,7 +6,7 @@
     const theme = value === 'light' ? 'light' : 'dark';
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#dfe5ec' : '#090b0e');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'light' ? '#edf2f7' : '#090b0e');
     document.querySelectorAll('[data-theme-logo]').forEach(image => {
       image.setAttribute('src', theme === 'light' ? '/shield-mark-light.svg' : '/shield-mark.svg');
     });

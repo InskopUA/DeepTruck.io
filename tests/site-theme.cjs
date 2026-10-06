@@ -171,7 +171,7 @@ function serveStatic(route) {
         await page.goto(origin + route);
         await page.waitForFunction(() => !document.getElementById('auth-submit').disabled);
         assert.equal(await page.locator('html').getAttribute('data-theme'), 'light');
-        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(223, 229, 236)');
+        assert.equal(await page.locator('.auth-page').evaluate(el => getComputedStyle(el).backgroundColor), 'rgb(237, 242, 247)');
         assert.equal(await page.locator('[data-theme-logo]').getAttribute('src'), '/shield-mark-light.svg');
         assert.deepEqual(await contrast(page), [], `${width}px ${route} empty form and placeholders`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${route} ${width}: overflow`);

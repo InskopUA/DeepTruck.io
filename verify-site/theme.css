@@ -42,8 +42,8 @@ html[data-theme="dark"] .timeline-large p { color: #a3adbc; }
 html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
 
 :root[data-theme="light"] {
-  --premium-bg: #dfe5ec;
-  --premium-bg-soft: #d7e0ea;
+  --premium-bg: #edf2f7;
+  --premium-bg-soft: #e5edf6;
   --premium-panel: #ffffff;
   --premium-panel-2: #edf3fa;
   --premium-text: #182638;
