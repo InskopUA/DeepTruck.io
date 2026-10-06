@@ -10,6 +10,11 @@ const els = {
   mc: document.getElementById("mc"),
   email: document.getElementById("email"),
   phone: document.getElementById("phone"),
+  pageMessage: document.getElementById("page-message"),
+  progress: document.getElementById("verification-progress"),
+  progressLabel: document.getElementById("progress-label"),
+  progressHelp: document.getElementById("progress-help"),
+  completionMessage: document.getElementById("completion-message"),
   emailCheck: document.getElementById("email-check"),
   phoneCheck: document.getElementById("phone-check"),
   licenseCheck: document.getElementById("license-check"),
@@ -45,14 +50,17 @@ els.emailButton.addEventListener("click", async () => {
   await verifyEmail().catch((error) => showError(error.message));
 });
 
-els.phoneButton.addEventListener("click", async () => {
+document.getElementById("phone-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
   if (els.phoneButton.classList.contains("done")) return;
+  els.phoneButton.disabled = true;
   els.phoneMsg.textContent = "";
   try {
     await post("phone", { code: els.code.value });
     await load();
   } catch (error) {
     els.phoneMsg.textContent = error.message;
+    els.phoneButton.disabled = false;
   }
 });
 
@@ -96,9 +104,16 @@ async function request(url, options) {
 
 function render(record) {
   const done = record.emailVerified && record.phoneVerified && record.licenseUploaded && record.w9Uploaded && record.coiUploaded;
+  const completed = [record.emailVerified, record.phoneVerified, record.licenseUploaded, record.w9Uploaded, record.coiUploaded].filter(Boolean).length;
+  els.progress.value = completed;
+  els.progressLabel.textContent = `${completed} of 5 complete`;
+  els.progressHelp.textContent = done ? "Verification complete. Thank you." : "All five steps are required to complete verification.";
+  els.completionMessage.hidden = !done;
+  els.pageMessage.hidden = true;
   els.carrierName.textContent = record.carrierName || "Carrier verification";
   els.statusPill.textContent = done ? "Verified" : "Pending";
   els.statusPill.classList.toggle("done", done);
+  els.statusPill.classList.remove("error");
   els.dot.textContent = record.dot || "-";
   els.mc.textContent = record.mc || "-";
   els.email.textContent = record.email || "-";
@@ -113,6 +128,8 @@ function render(record) {
   els.emailButton.disabled = true;
   setButton(els.phoneButton, record.phoneVerified, "Phone verified", "Verify phone");
   els.phoneButton.disabled = Boolean(record.phoneVerified);
+  els.code.disabled = Boolean(record.phoneVerified);
+  [els.license, els.w9, els.coi].forEach(input => { input.disabled = input.closest(".file-control").classList.contains("is-busy"); });
   if (record.phoneVerified) els.phoneMsg.textContent = "";
   setFileControl(els.uploadButton, els.licenseLabel, record.licenseUploaded, record.licenseFileName, "Upload license");
   setFileControl(els.w9UploadButton, els.w9Label, record.w9Uploaded, record.w9FileName, "Upload W-9");
@@ -126,10 +143,12 @@ function render(record) {
   els.licenseMsg.textContent = record.licenseUploaded ? record.licenseFileName || "" : "";
   els.w9Msg.textContent = record.w9Uploaded ? record.w9FileName || "" : "";
   els.coiMsg.textContent = record.coiUploaded ? record.coiFileName || "" : "";
+  [els.licenseMsg, els.w9Msg, els.coiMsg].forEach(node => node.classList.remove("error"));
 }
 
 function setDone(node, done) {
   node.classList.toggle("done", Boolean(done));
+  node.closest(".step").classList.toggle("is-complete", Boolean(done));
 }
 
 function setButton(button, done, doneText, pendingText) {
@@ -173,6 +192,7 @@ async function uploadSelectedDocument(type) {
   }[type];
 
   config.message.textContent = "";
+  config.message.classList.remove("error");
   const file = config.input.files[0];
   if (!file) {
     config.label.textContent = config.pendingText;
@@ -181,6 +201,7 @@ async function uploadSelectedDocument(type) {
 
   config.label.textContent = "Uploading...";
   config.control.classList.add("is-busy");
+  config.input.disabled = true;
   try {
     const fileData = await readFile(file);
     await post(type, { fileName: file.name, fileData });
@@ -189,14 +210,21 @@ async function uploadSelectedDocument(type) {
   } catch (error) {
     config.label.textContent = config.pendingText;
     config.message.textContent = error.message;
+    config.message.classList.add("error");
   } finally {
     config.control.classList.remove("is-busy");
+    config.input.disabled = false;
   }
 }
 
 function showError(message) {
   els.statusPill.textContent = "Error";
-  els.carrierName.textContent = message;
+  els.statusPill.classList.remove("done");
+  els.statusPill.classList.add("error");
+  els.pageMessage.textContent = message;
+  els.pageMessage.hidden = false;
+  els.progressLabel.textContent = "Unable to load";
+  if (els.carrierName.textContent === "Loading carrier…") els.carrierName.textContent = "Carrier verification";
 }
 
 function readFile(file) {

@@ -3,97 +3,120 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Carrier Verification</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="theme-color" content="#090b0e">
+  <title>Carrier verification · DeepTruck Verify</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/verification.css">
 </head>
 <body>
+  <svg class="icon-sprite" aria-hidden="true"><symbol id="icon-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></symbol></svg>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="DeepTruck home"><img src="/shield-mark.svg" width="32" height="36" alt=""><span>DeepTruck <small>Verify</small></span></a>
+    <a class="support-link" href="mailto:verify@deeptruck.io">Need help? <span>Contact support ↗</span></a>
+  </header>
   <main class="stage">
-    <section class="verify">
-      <header class="top">
-        <div>
-          <p class="brand">DeepTruck Verify</p>
-          <h1 id="carrier-name">Carrier verification</h1>
+    <header class="page-heading">
+      <p class="eyebrow">Carrier onboarding</p>
+      <h1>Complete your verification</h1>
+      <p>Confirm your contact details and upload the required documents.</p>
+    </header>
+    <div id="page-message" class="page-message" role="alert" hidden></div>
+    <div class="verification-layout">
+      <aside class="carrier-card" aria-labelledby="carrier-name">
+        <div class="carrier-card-top"><p class="eyebrow">Carrier details</p><span id="status-pill" class="status" role="status">Loading</span></div>
+        <h2 id="carrier-name">Loading carrier…</h2>
+        <dl class="meta">
+          <div><dt>USDOT</dt><dd id="dot">—</dd></div>
+          <div><dt>MC</dt><dd id="mc">—</dd></div>
+          <div class="wide"><dt>Email address</dt><dd id="email">—</dd></div>
+          <div class="wide"><dt>Phone number</dt><dd id="phone">—</dd></div>
+        </dl>
+        <div class="progress-section">
+          <div class="progress-heading"><b>Your progress</b><span id="progress-label" role="status">Loading…</span></div>
+          <progress id="verification-progress" max="5" value="0" aria-label="Completed verification steps"></progress>
+          <p id="progress-help">All five steps are required to complete verification.</p>
         </div>
-        <span id="status-pill" class="status">Loading</span>
-      </header>
-
-      <div class="meta">
-        <span>USDOT <b id="dot">-</b></span>
-        <span>MC <b id="mc">-</b></span>
-        <span class="wide">Email <b id="email">-</b></span>
-        <span class="wide">Phone <b id="phone">-</b></span>
-      </div>
-
-      <section class="flow">
+      </aside>
+      <section class="verify" aria-labelledby="checklist-heading">
+        <header class="checklist-heading"><h2 id="checklist-heading">Verification checklist</h2><p>Your progress is saved as you complete each step.</p></header>
+        <div id="completion-message" class="completion-message" role="status" hidden><b>You're all set.</b><p>Your contacts are confirmed and all required documents have been received.</p></div>
+        <section class="flow" aria-label="Verification steps">
         <div class="step">
-          <div id="email-check" class="dot check"><span></span></div>
+          <div id="email-check" class="dot check" data-step="1" aria-hidden="true"><span></span></div>
           <div class="copy">
             <h2>Email confirmation</h2>
             <p>Confirmed automatically when this page opens.</p>
           </div>
-          <button id="verify-email" type="button">Verified</button>
+          <button id="verify-email" type="button" disabled>Checking…</button>
         </div>
 
         <div class="step">
-          <div id="phone-check" class="dot check"><span></span></div>
+          <div id="phone-check" class="dot check" data-step="2" aria-hidden="true"><span></span></div>
           <div class="copy">
-            <h2>SMS code</h2>
+            <h2>Phone confirmation</h2>
             <p id="phone-help">Enter the code sent to the carrier phone.</p>
-            <div id="phone-msg" class="message"></div>
+            <div id="phone-msg" class="message" role="status" aria-live="polite"></div>
           </div>
-          <div class="action code-action">
-            <input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="8">
-            <button id="verify-phone">Verify</button>
-          </div>
+          <form id="phone-form" class="action code-action">
+            <label class="sr-only" for="code">Six-digit SMS code</label>
+            <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" maxlength="6" disabled>
+            <button id="verify-phone" class="primary" type="submit" disabled>Verify phone</button>
+          </form>
         </div>
 
         <div class="step">
-          <div id="license-check" class="dot check"><span></span></div>
+          <div id="license-check" class="dot check" data-step="3" aria-hidden="true"><span></span></div>
           <div class="copy">
             <h2>Driver license</h2>
             <p>PDF, JPG, or PNG.</p>
-            <div id="license-msg" class="message"></div>
+            <div id="license-msg" class="message" role="status" aria-live="polite"></div>
           </div>
           <div class="action license-action">
             <label id="upload-license" class="file-control">
-              <input id="license" type="file" accept="image/*,.pdf">
+              <input id="license" type="file" accept="image/*,.pdf" aria-label="Upload driver license" disabled>
+              <svg aria-hidden="true"><use href="#icon-upload"></use></svg>
               <span id="license-label">Upload license</span>
             </label>
           </div>
         </div>
 
         <div class="step">
-          <div id="w9-check" class="dot check"><span></span></div>
+          <div id="w9-check" class="dot check" data-step="4" aria-hidden="true"><span></span></div>
           <div class="copy">
-            <h2>W-9</h2>
+            <h2>W-9 form</h2>
             <p>Signed W-9 document.</p>
-            <div id="w9-msg" class="message"></div>
+            <div id="w9-msg" class="message" role="status" aria-live="polite"></div>
           </div>
           <div class="action document-action">
             <label id="upload-w9" class="file-control">
-              <input id="w9" type="file" accept="image/*,.pdf">
+              <input id="w9" type="file" accept="image/*,.pdf" aria-label="Upload W-9 form" disabled>
+              <svg aria-hidden="true"><use href="#icon-upload"></use></svg>
               <span id="w9-label">Upload W-9</span>
             </label>
           </div>
         </div>
 
         <div class="step">
-          <div id="coi-check" class="dot check"><span></span></div>
+          <div id="coi-check" class="dot check" data-step="5" aria-hidden="true"><span></span></div>
           <div class="copy">
-            <h2>COI</h2>
-            <p>Certificate of insurance.</p>
-            <div id="coi-msg" class="message"></div>
+            <h2>Certificate of insurance</h2>
+            <p>Current insurance certificate.</p>
+            <div id="coi-msg" class="message" role="status" aria-live="polite"></div>
           </div>
           <div class="action document-action">
             <label id="upload-coi" class="file-control">
-              <input id="coi" type="file" accept="image/*,.pdf">
+              <input id="coi" type="file" accept="image/*,.pdf" aria-label="Upload certificate of insurance" disabled>
+              <svg aria-hidden="true"><use href="#icon-upload"></use></svg>
               <span id="coi-label">Upload COI</span>
             </label>
           </div>
         </div>
+        </section>
+        <p class="checklist-note">Uploading a replacement document updates this verification.</p>
       </section>
-    </section>
+    </div>
+    <footer class="page-footer"><span>© DeepTruck</span><nav aria-label="Legal"><a href="/privacy">Privacy policy</a><a href="/terms">Terms of service</a></nav></footer>
   </main>
-  <script src="verify.js"></script>
+  <script src="/verify.js"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ driver-app/ios/
 driver-app/android/
 driver-app/dist/
 public/
+supabase/.temp/
 supabase/functions/.env
 supabase/functions/.env.*
 !.env.example

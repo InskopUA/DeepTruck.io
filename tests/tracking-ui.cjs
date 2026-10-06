@@ -16,7 +16,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  const browser=await chromium.launch({headless:true,...(executable?{executablePath:executable}:{})});
  try{
  const ctx=await browser.newContext({viewport:{width:1440,height:1000}}),errors=[];
- let loads=[fixture('active','Load #1042 — Miami'),fixture('pending','Load #1043 — Tampa','+15551234568'),fixture('accepted','Load #1044 — Orlando','+15551234569')],created,failLoads=false;
+ let loads=[fixture('active','Load #1042 — Miami'),fixture('pending','Load #1043 — Tampa','+15551234568'),fixture('accepted','Load #1044 — Orlando','+15551234569')],created,failLoads=false,failCreateNetwork=false;
  await ctx.route(origin+'/**',async route=>{
    const pathname=new URL(route.request().url()).pathname;
    const relative=pathname==='/admin/'?'/admin/index.html':pathname==='/driver/'?'/driver/index.html':pathname;
@@ -36,6 +36,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
    const p=url.pathname.split('/driver-tracking')[1];
    if(p==='/loads'&&req.method()==='GET')return failLoads?respond({error:'Tracking unavailable'},503):respond({items:loads});
    if(p==='/loads'&&req.method()==='POST'){
+     if(failCreateNetwork)return route.abort('failed');
      created=req.postDataJSON();const v=fixture('pending',created.title,created.driverPhone);Object.assign(v,{driverName:created.driverName,vehicles:created.vehicles,deliveryAddress:created.deliveryAddress,pickupAddress:created.pickupAddress,invitationStatus:'failed',invitedAt:null});loads.unshift(v);return respond({load:v,invitation:{sent:false,message:'Load saved, but the SMS could not be sent. You can retry from its tracking card.'}},201);
    }
    if(p?.endsWith('/points')){const v=loads.find(v=>p.includes(v.id));return respond({points:v?.latestLocation?[v.latestLocation]:[]});}
@@ -60,6 +61,14 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  await page.locator('#tracking-load-name').fill('Load #1045 — Test delivery');await page.locator('#tracking-vehicles').fill('Toyota Camry · VIN 1\nHonda Accord · VIN 2');
  await page.locator('#tracking-pickup').fill('Atlanta auction');await page.locator('#tracking-delivery').fill('Miami dealership');
  await page.screenshot({path:'/private/tmp/deeptruck-tracking-create.png'});
+ failCreateNetwork=true;
+ await page.locator('#tracking-create-submit').click();
+ await page.waitForFunction(()=>document.getElementById('tracking-create-message').textContent.includes('Could not connect to tracking'));
+ assert.equal(await page.locator('#tracking-create-dialog').evaluate(el=>el.open),true);
+ assert.equal(await page.locator('#tracking-driver-phone').inputValue(),'+15557654321');
+ assert.equal(await page.locator('#tracking-load-name').inputValue(),'Load #1045 — Test delivery');
+ assert.equal(await page.locator('#tracking-create-submit').isEnabled(),true);
+ failCreateNetwork=false;
  await page.locator('#tracking-create-submit').click();await page.waitForFunction(()=>!document.getElementById('tracking-create-dialog').open);
  await page.waitForFunction(()=>document.getElementById('tracking-message').textContent.includes('SMS could not'));
  assert.equal(created.verificationId,verification.id);assert.equal(created.driverPhone,'+15557654321');assert.equal(created.vehicles.length,2);assert.match(created.clientRequestId,/^[0-9a-f-]{36}$/);

@@ -13,7 +13,12 @@
   async function api(path, data) {
     const session = context.getSession();
     if (!session) throw new Error('Please sign in again.');
-    const response = await fetch(API + path,{method:data === undefined ? 'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:data === undefined ? undefined:JSON.stringify(data),signal:AbortSignal.timeout(20000)});
+    let response;
+    try {
+      response = await fetch(API + path,{method:data === undefined ? 'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:data === undefined ? undefined:JSON.stringify(data),signal:AbortSignal.timeout(20000)});
+    } catch {
+      throw new Error('Could not connect to tracking. Please try again.');
+    }
     const value = await response.json().catch(()=>({}));
     if (!response.ok || value.error) throw new Error(value.error || 'Unable to load tracking. Please try again.');
     return value;
