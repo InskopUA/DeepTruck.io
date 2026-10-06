@@ -25,7 +25,7 @@ button { cursor: pointer; }
 a { color: var(--accent); text-decoration: none; }
 button:disabled { cursor: wait; opacity: .6; }
 [hidden], .auth-hidden, .icon-sprite { display: none !important; }
-svg { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+svg:not(.leaflet-pane svg) { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
 button, a, input { outline-offset: 4px; }
 :focus-visible { outline: 3px solid #80afe6; }
 h1, h2, h3, p { margin: 0; }

@@ -1,0 +1,106 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import { PGlite } from '@electric-sql/pglite';
+import { createPayload, phone, effectiveStatus, locationBatch } from '../supabase/functions/driver-tracking/validation.ts';
+import { canCollect, validPoint } from '../driver-app/src/tracking-policy.ts';
+
+test('phone normalization, input validation and independent collection policy',()=>{
+  assert.equal(phone('(555) 123-4567'),'+15551234567');
+  assert.equal(phone('+44 7700 900123'),'+447700900123');
+  assert.throws(()=>phone('555-12'));
+  const now=Date.now(),expires=new Date(now+3600000).toISOString();
+  assert.equal(effectiveStatus({status:'active',expires_at:new Date(now-1).toISOString()},now),'expired');
+  assert.equal(effectiveStatus({status:'completed',expires_at:new Date(now-1).toISOString()},now),'completed');
+  const input={title:'Load',driverName:'John',driverPhone:'5551234567',expiresAt:expires,vehicles:['Toyota Camry']};
+  assert.equal(createPayload(input,'Dealer',now).driver_phone,'+15551234567');
+  assert.throws(()=>createPayload({...input,plannedAt:expires},'Dealer',now));
+  assert.throws(()=>createPayload({...input,vehicles:Array(51).fill('Car')},'Dealer',now));
+  assert.throws(()=>createPayload({...input,expiresAt:new Date(now+31*86400000).toISOString()},'Dealer',now));
+  const point={id:randomUUID(),latitude:40,longitude:-74,accuracy:10,capturedAt:new Date(now).toISOString()};
+  assert.equal(locationBatch({points:[point]})[0].latitude,40);
+  assert.throws(()=>locationBatch({points:[{...point,latitude:'40'}]}));
+  assert.throws(()=>locationBatch({points:[{...point,longitude:200}]}));
+  assert.throws(()=>locationBatch({points:[]}));
+  const control={enabled:true,userId:'driver',loads:[{id:'A',expiresAt:new Date(now-1).toISOString()},{id:'B',expiresAt:expires}]};
+  assert.equal(canCollect(control,'driver',now),true);
+  assert.equal(canCollect(control,'another-driver',now),false);
+  assert.equal(canCollect({...control,enabled:false},'driver',now),false);
+  assert.equal(canCollect({...control,loads:[control.loads[0]]},'driver',now),false);
+  assert.equal(validPoint(point,now),true);
+  assert.equal(validPoint({...point,capturedAt:new Date(now+1000).toISOString()},now),false);
+  assert.equal(validPoint({...point,accuracy:-1},now),false);
+});
+
+test('PostgreSQL: consent, multiple dealers, pauses, expiry, retries and permissions',async t=>{
+  const db=await PGlite.create();
+  t.after(()=>db.close());
+  await db.exec(`create role anon; create role authenticated; create role service_role;
+    create schema auth; create table auth.users(id uuid primary key);
+    create function auth.role() returns text language sql as $$select current_user::text$$;
+    create schema storage; create table storage.buckets(id text primary key,name text,public boolean);`);
+  for(const file of ['20260911232000_carrier_verify.sql','20260912033000_add_w9_coi_documents.sql','20261003164500_add_shipper_user_to_verifications.sql','20261005180000_driver_tracking.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
+  const A=randomUUID(),B=randomUUID(),driver=randomUUID(),stranger=randomUUID(),vA=randomUUID(),vB=randomUUID();
+  for(const id of [A,B,driver,stranger])await db.query('insert into auth.users values ($1)',[id]);
+  for(const [id,owner] of [[vA,A],[vB,B]])await db.query(`insert into carrier_verification_requests(id,shipper_user_id,dot,carrier_name,email,phone,sms_code_hash,email_verified,phone_verified,license_uploaded,w9_uploaded,coi_uploaded) values ($1,$2,'123456','Carrier','carrier@example.com','5551234567','test',true,true,true,true,true)`,[id,owner]);
+  const payload=()=>({dealer_name:'Dealer',driver_name:'John',driver_phone:'+15551234567',title:'Load',expires_at:new Date(Date.now()+86400000).toISOString(),vehicles:['Camry']});
+  async function create(owner,verification,request=randomUUID()){return (await db.query('select tracking_create($1,$2,$3,$4) result',[owner,verification,request,JSON.stringify(payload())])).rows[0].result;}
+  async function action(actor,load,act,isDriver=true,number='+15551234567'){return (await db.query('select tracking_action($1,$2,$3,$4,$5) result',[actor,number,load,act,isDriver])).rows[0].result;}
+  async function ingest(points){return (await db.query('select tracking_ingest($1,$2) result',[driver,JSON.stringify(points)])).rows[0].result;}
+  async function visible(owner,load){return (await db.query('select * from tracking_points($1,$2,500)',[owner,load])).rows;}
+  const baseTime=Date.now()-120000;
+  const point=(seconds=0)=>({id:randomUUID(),latitude:40+seconds/1000,longitude:-74,accuracy:10,captured_at:new Date(baseTime+seconds*1000).toISOString()});
+  await assert.rejects(()=>create(B,vA),/completed carrier verification/);
+  const request=randomUUID(),one=await create(A,vA,request),again=await create(A,vA,request);
+  assert.equal(again.created,false);assert.equal(again.load.id,one.load.id);
+  const la=one.load.id,lb=(await create(B,vB)).load.id;
+  await assert.rejects(()=>action(stranger,la,'accept',true,'+15557654321'),/Load not found/);
+  await assert.rejects(()=>action(stranger,la,'accept',true,null),/Load not found/);
+  await assert.rejects(()=>action(B,la,'cancel',false),/Load not found/);
+  await assert.rejects(()=>action(driver,la,'start'),/not available/);
+  assert.equal((await ingest([point(1)])).inserted,0,'no GPS before any consent');
+  await action(driver,la,'accept');
+  assert.equal((await ingest([point(1)])).inserted,0,'accepting does not start sharing');
+  await action(driver,la,'start');await action(driver,la,'start');
+  assert.equal((await db.query('select count(*) n from tracking_access_periods where load_id=$1',[la])).rows[0].n,1,'start retries do not duplicate periods');
+  await db.query('update tracking_access_periods set started_at=$1 where load_id=$2',[new Date(baseTime+10000).toISOString(),la]);
+  await action(driver,lb,'accept');await action(driver,lb,'start');
+  await db.query('update tracking_access_periods set started_at=$1 where load_id=$2',[new Date(baseTime+20000).toISOString(),lb]);
+  const pre=point(5),onlyA=point(15),shared=point(25);
+  assert.equal((await ingest([pre,onlyA,shared])).inserted,2);
+  assert.equal((await ingest([shared])).inserted,0,'upload retries deduplicate');
+  assert.deepEqual((await visible(A,la)).map(p=>p.id),[shared.id,onlyA.id]);
+  assert.deepEqual((await visible(B,lb)).map(p=>p.id),[shared.id]);
+  assert.equal((await visible(B,la)).length,0,'another dealer cannot read this load');
+  await action(A,la,'complete',false);
+  // Pin a deterministic completion boundary to test late/offline uploads.
+  await db.query('update tracking_access_periods set ended_at=$1 where load_id=$2',[new Date(baseTime+30000).toISOString(),la]);
+  const afterA=point(35);assert.equal((await ingest([afterA])).activeLoads,1);
+  assert.equal((await visible(A,la)).some(p=>p.id===afterA.id),false,'A loses new coordinates');
+  assert.equal((await visible(B,lb)).some(p=>p.id===afterA.id),true,'B keeps sharing');
+  const offlineA=point(28);await ingest([offlineA]);assert.equal((await visible(A,la)).some(p=>p.id===offlineA.id),true,'late fix captured during access is scoped correctly');
+  await action(driver,lb,'pause');
+  await db.query('update tracking_access_periods set ended_at=$1 where load_id=$2',[new Date(baseTime+40000).toISOString(),lb]);
+  assert.equal((await ingest([point(45)])).inserted,0,'paused periods collect no new fixes');
+  await action(driver,lb,'start');
+  await db.query('update tracking_access_periods set started_at=$1 where load_id=$2 and ended_at is null',[new Date(baseTime+50000).toISOString(),lb]);
+  const resumed=point(55);await ingest([resumed]);assert.equal((await visible(B,lb)).some(p=>p.id===resumed.id),true);
+  await db.query('update tracking_loads set expires_at=$1 where id=$2',[new Date(baseTime+60000).toISOString(),lb]);
+  assert.equal((await ingest([point(65)])).inserted,0,'expiry enforced without cron or app connection');
+  assert.equal((await ingest([point(65)])).activeLoads,0);
+  await assert.rejects(()=>action(driver,lb,'start'),/expired/);
+  const lc=(await create(A,vA)).load.id,ld=(await create(B,vB)).load.id;
+  await action(driver,lc,'accept');await action(driver,lc,'start');await action(driver,ld,'accept');await action(driver,ld,'start');
+  await db.query('select tracking_pause_all($1)',[driver]);
+  assert.equal((await db.query("select count(*) n from tracking_loads where driver_user_id=$1 and status='active'",[driver])).rows[0].n,0);
+  await assert.rejects(()=>action(stranger,lc,'start',true,'+15551234567'),/Load not found/,'phone match cannot take over a bound account');
+  const le=(await create(A,vA)).load.id;
+  await db.query('select tracking_claim_sms($1,$2)',[A,le]);
+  await assert.rejects(()=>db.query('select tracking_claim_sms($1,$2)',[A,le]),/SMS limit/);
+  await assert.rejects(()=>db.query('select tracking_claim_sms($1,$2)',[B,le]),/no longer available/);
+  await db.exec('set role authenticated');
+  await assert.rejects(()=>db.query('select * from tracking_locations'),/permission denied/);
+  await assert.rejects(()=>db.query('select tracking_pause_all($1)',[driver]),/permission denied/);
+  await db.exec('reset role');
+});

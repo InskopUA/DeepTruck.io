@@ -27,6 +27,14 @@ To update an existing installation, open `chrome://extensions`, find **DeepTruck
 
 The popup and extension account page use the same DeepTruck account. Once signed in, the popup shows your account and links to Central Dispatch and your workspace. The carrier panel shows five checks: email, SMS, driver license, W-9, and insurance certificate. The shield icons are packaged locally with the extension.
 
+## Driver tracking
+
+The Tracking workspace, new tracking Edge Function/migration, and iPhone/
+Android driver application live in `admin-site/`, `supabase/`, and
+`driver-app/`. See [deployment and test steps](docs/tracking.md) and
+[mobile setup](driver-app/README.md). Production setup and signed device
+builds are separate from the local source implementation.
+
 ## Local backend demo
 
 Run:

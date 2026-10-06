@@ -29,6 +29,7 @@ let openingLogin = false;
 const pageCopy = {
   verifications: "Verifications",
   history: "Verification history",
+  tracking: "Tracking",
   billing: "Plans & billing",
   settings: "Account settings"
 };
@@ -43,6 +44,8 @@ function setView(view, updateAddress = true) {
   views.forEach(section => section.classList.toggle("active", section.id === selected));
   title.textContent = pageCopy[selected];
   document.getElementById("new-verification-button").hidden = selected !== "history";
+  document.getElementById("new-tracking-button").hidden = selected !== "tracking";
+  if (selected === "tracking" && state.session) window.deepTruckTracking?.activate();
   document.title = `${pageCopy[selected]} · DeepTruck Verify`;
   if (updateAddress) {
     const hash = selected === "verifications" ? "" : `#${selected}`;
@@ -179,6 +182,7 @@ function renderAccount() {
   settingsCompany.value = metadata.company_name || metadata.dealership_name || "";
   document.getElementById("settings-name").value = name;
 }
+window.deepTruckTracking.init({getSession: () => state.session, getVerifications: () => state.items, showTracking: () => setView("tracking")});
 initSession();
 
 async function load() {
@@ -192,6 +196,7 @@ async function load() {
     state.items = data.items || [];
     renderMetrics();
     renderTable();
+    window.deepTruckTracking?.updateCarriers();
   } catch (error) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty error">${escapeHtml(error.message)}</td></tr>`;
     document.getElementById("recent-body").innerHTML = `<tr><td colspan="3" class="empty error">${escapeHtml(error.message)}</td></tr>`;
@@ -456,7 +461,7 @@ function openDetails(id) {
         <h2>${escapeHtml(item.carrierName)}</h2>
         <span>USDOT ${escapeHtml(item.dot)} · ${escapeHtml(item.mc || "No MC")}</span>
       </div>
-      <b class="badge ${complete ? "verified" : "pending"}"><i></i>${complete ? "verified" : "pending"}</b>
+      <div class="detail-hero-actions"><b class="badge ${complete ? "verified" : "pending"}"><i></i>${complete ? "verified" : "pending"}</b>${complete ? '<button id="create-tracking-from-verification" class="primary" type="button">Create tracking</button>' : ''}</div>
     </header>
 
     <div class="detail-grid">
@@ -506,6 +511,7 @@ function openDetails(id) {
     </section>
   `;
   details.classList.add("open");
+  document.getElementById("create-tracking-from-verification")?.addEventListener("click", () => { closeDetails(); window.deepTruckTracking.openCreate(item.id); });
   details.setAttribute("aria-hidden", "false");
   document.body.classList.add("modal-open");
   document.getElementById("close-details").focus();

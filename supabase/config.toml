@@ -2,3 +2,7 @@ project_id = "yqpeebgmqtqoxumzfrsq"
 
 [functions.carrier-verify]
 verify_jwt = false
+
+[functions.driver-tracking]
+# Every private route validates its bearer token with auth.getUser().
+verify_jwt = false

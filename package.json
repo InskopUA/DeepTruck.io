@@ -1,6 +1,12 @@
 {
   "scripts": {
-    "build": "node scripts/build-vercel.js"
+    "build": "node scripts/build-vercel.js",
+    "test": "node --test tests/*.test.mjs",
+    "test:tracking-ui": "node tests/tracking-ui.cjs"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "deno": "^2.9.6",
+    "playwright": "^1.63.0"
+  }
 }

@@ -1,6 +1,11 @@
 .env
 .env.*
 .DS_Store
+node_modules/
+driver-app/.expo/
+driver-app/ios/
+driver-app/android/
+driver-app/dist/
 public/
 supabase/functions/.env
 supabase/functions/.env.*
