@@ -177,6 +177,7 @@ body.premium-landing {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .premium-landing .btn svg { flex: none; }
+.premium-landing .nav-actions .btn { font-size: 14px; line-height: 20px; min-height: 36px; padding: 7px 14px; }
 
 .btn:hover {
   transform: translateY(-1px);
@@ -3510,7 +3511,8 @@ body.premium-landing {
 }
 
 .hero-centered .hero-actions { gap: 14px; justify-content: center; margin: 0; }
-.premium-landing .hero-actions .btn { gap: 8px; line-height: normal; min-height: auto; }
+.premium-landing .hero-actions .btn { font-size: 14px; gap: 8px; line-height: 20px; min-height: 40px; padding: 9px 16px; }
+@media(max-width:760px) { .premium-landing .hero-actions .btn { font-size: 13px; line-height: 18px; min-height: 38px; padding: 9px 14px; } }
 
 .hero-visual {
   height: 370px;
