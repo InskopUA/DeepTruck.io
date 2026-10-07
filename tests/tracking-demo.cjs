@@ -25,13 +25,17 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
     assert.equal(await page.locator('[data-demo-phone-status]').textContent(),'Location sharing on');
     const before=await position();await page.locator('.tracking-phone').hover();await page.clock.runFor(1800);assert.notEqual(await position(),before,'truck advances even when phone preview is hovered');
     assert.equal(await page.locator('.tracking-location-icon').evaluate(el=>getComputedStyle(el,'::after').animationName),'tracking-location-pulse');
-    const current=await contrast(page);assert.deepEqual(current,[],width+' '+theme+' sharing contrast');
+    const current=await contrast(page,'#driver-tracking');assert.deepEqual(current,[],width+' '+theme+' sharing contrast');
     if([1440,390].includes(width))await page.locator('.tracking-layout').screenshot({path:'/private/tmp/deeptruck-tracking-animated-'+theme+'-'+width+'.png'});
     await page.clock.runFor(5600);assert.equal(await state(),'delivered');assert.equal(await page.locator('[data-demo-action]').textContent(),'Delivery complete');
     const endpoint=await page.locator('[data-demo-route]').evaluate(p=>{const end=p.getPointAtLength(p.getTotalLength());return {x:end.x,y:end.y};});
     const final=await page.locator('[data-demo-truck]').evaluate(t=>{const m=t.transform.baseVal.consolidate().matrix;return {x:m.e,y:m.f};});assert.ok(Math.abs(final.x-endpoint.x)<.01&&Math.abs(final.y-endpoint.y)<.01,'truck reaches delivery');
     const truck=await page.locator('.tracking-truck-disc').boundingBox(),phone=await page.locator('.tracking-phone').boundingBox();
     assert.ok(truck.x+truck.width<=phone.x || truck.y+truck.height<=phone.y,'phone does not hide the destination truck');
+    const card=await page.locator('.tracking-layout').boundingBox(),preview=await page.locator('.tracking-preview').boundingBox();
+    assert.ok(phone.x>=card.x && phone.x+phone.width<=card.x+card.width && phone.y>=preview.y && phone.y+phone.height<=preview.y+preview.height,'phone stays inside the unified card, above the flow strip');
+    const destination=await page.locator('.tracking-map-delivery').boundingBox();
+    assert.ok(destination.y+destination.height<=truck.y,'delivery label sits above the truck');
     await page.clock.runFor(1900);assert.equal(await state(),'ready');assert.equal(await position(),initial,'demo resets for the next invitation');
     await page.clock.runFor(2000);await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));await page.clock.runFor(100);
     await page.locator('.tracking-preview.demo-offscreen').waitFor();const paused=await position();await page.clock.runFor(2000);assert.equal(await position(),paused,'offscreen demo does not keep rendering');
