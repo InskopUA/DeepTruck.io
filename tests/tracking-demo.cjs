@@ -33,7 +33,9 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
     const truck=await page.locator('.tracking-truck-disc').boundingBox(),phone=await page.locator('.tracking-phone').boundingBox();
     assert.ok(truck.x+truck.width<=phone.x || truck.y+truck.height<=phone.y,'phone does not hide the destination truck');
     const card=await page.locator('.tracking-layout').boundingBox(),preview=await page.locator('.tracking-preview').boundingBox();
-    assert.ok(phone.x>=card.x && phone.x+phone.width<=card.x+card.width && phone.y>=preview.y && phone.y+phone.height<=preview.y+preview.height,'phone stays inside the unified card, above the flow strip');
+    assert.ok(phone.x>=card.x && phone.x+phone.width<=card.x+card.width && phone.y>=preview.y && phone.y+phone.height<=preview.y+preview.height,'phone stays inside the visual scene');
+    const heading=await page.locator('.tracking-copy').boundingBox();assert.ok(heading.y+heading.height<=preview.y,'headline is above the scene');
+    const surface=await page.locator('.tracking-layout').evaluate(el=>{const s=getComputedStyle(el);return {border:s.borderTopWidth,background:s.backgroundColor,shadow:s.boxShadow};});assert.deepEqual(surface,{border:'0px',background:'rgba(0, 0, 0, 0)',shadow:'none'},'tracking is an open scene, not another card');
     const destination=await page.locator('.tracking-map-delivery').boundingBox();
     assert.ok(destination.y+destination.height<=truck.y,'delivery label sits above the truck');
     await page.clock.runFor(1900);assert.equal(await state(),'ready');assert.equal(await position(),initial,'demo resets for the next invitation');

@@ -342,28 +342,26 @@
       <div class="container tracking-layout">
         <div class="tracking-copy reveal">
           <p class="section-kicker">DeepTruck Driver</p>
-          <h2 id="tracking-title" class="section-title">Every load.<br>One clear view.</h2>
-          <p class="tracking-lead">Follow your driver’s location<br>from pickup to delivery.</p>
-          <a class="btn btn-primary tracking-cta" href="/signup">Start tracking <span aria-hidden="true">↗</span></a>
-          <p class="tracking-assurance"><svg aria-hidden="true"><use href="#icon-shield"/></svg>Driver consent. Access ends with the load.</p>
+          <h2 id="tracking-title" class="section-title">Every load. <span>One clear view.</span></h2>
+          <p class="tracking-lead">Driver location, from pickup to delivery.</p>
         </div>
         <figure class="tracking-preview reveal delay-1" aria-labelledby="tracking-preview-caption">
           <figcaption id="tracking-preview-caption" class="sr-only">Animated example: the driver starts sharing, then the load moves from Miami to Atlanta.</figcaption>
           <div class="tracking-board">
-            <div class="tracking-board-heading"><h3><svg aria-hidden="true"><use href="#icon-pin"/></svg>Miami <span>→</span> Atlanta</h3><span class="tracking-live"><i></i><span data-demo-workspace-status>Awaiting driver</span></span></div>
+            <div class="tracking-board-heading"><h3><svg aria-hidden="true"><use href="#icon-pin"/></svg>Load #1042</h3><span class="tracking-live"><i></i><span data-demo-workspace-status>Awaiting driver</span></span></div>
             <div class="tracking-map" role="img" aria-label="Illustrated route from pickup to delivery with the driver's latest shared position">
-              <svg class="tracking-map-art" viewBox="0 0 540 270" fill="none" aria-hidden="true">
-                <path class="tracking-map-land" d="M0 0h335l-25 56 25 36-29 46 14 45-46 35-26 52H0Z"/>
-                <g class="tracking-map-roads"><path d="m-20 68 209 13 55-105M-20 212l139-54 81 45 107-29 55 44M72-20l42 94-12 69 55 132M230-20l30 55 71 19 89-14M193 0l-38 51 36 76 79 11 106 22M0 126l124 5 83-50 139 27M30 270l107-61 61-84 83-15 38-85"/></g>
-                <path class="tracking-map-route-base" d="M82 214 111 186 130 143 152 119 169 84 184 52"/>
-                <path class="tracking-map-route" data-demo-route d="M82 214 111 186 130 143 152 119 169 84 184 52"/>
-                <circle class="tracking-map-endpoint" cx="82" cy="214" r="6"/><circle class="tracking-map-endpoint" cx="184" cy="52" r="6"/>
-                <g class="tracking-truck" data-demo-truck transform="translate(82 214)">
-                  <circle class="tracking-map-halo" r="25"/><circle class="tracking-truck-disc" r="17"/>
+              <svg class="tracking-map-art" viewBox="0 0 900 400" fill="none" aria-hidden="true">
+                <g class="tracking-map-roads"><path d="M-30 92 200 110 300 46 530 82 640 30 930 55M-30 200 172 174 267 249 430 220 580 277 950 225M-30 340 225 310 380 367 570 332 740 369 940 310M88-30l44 159-41 101 50 200M260-30l-8 159 43 90-13 211M430-30l-43 116 57 144-17 200M600-30l26 105-49 132 29 223M790-30l-48 144 62 143-51 173M-30 265l227-82 144-31 103-88 236 58 270 48M30 430l248-155 175-64 199-103 190-77"/></g>
+
+                <path class="tracking-map-route-base" d="M140 280 C220 280 235 210 320 210 S410 135 490 135 L600 135"/>
+                <path class="tracking-map-route" data-demo-route data-compact-route="M82 214 111 186 130 143 152 119 169 84 184 52" data-wide-route="M140 280 C220 280 235 210 320 210 S410 135 490 135 L600 135" d="M140 280 C220 280 235 210 320 210 S410 135 490 135 L600 135"/>
+                <circle class="tracking-map-endpoint" cx="140" cy="280" r="6"/><circle class="tracking-map-endpoint" cx="600" cy="135" r="6"/>
+                <g class="tracking-truck" data-demo-truck transform="translate(140 280)">
+                  <circle class="tracking-map-halo" r="32"/><circle class="tracking-truck-disc" r="20"/>
                   <g class="tracking-truck-icon"><path d="M-10-6H2v10h-12Z M2-3h5l4 4v3H2Z"/><path d="M5-3v4h6"/><circle cx="-6" cy="5" r="2"/><circle cx="7" cy="5" r="2"/></g>
                 </g>
-                <text class="tracking-map-pickup" x="82" y="242" text-anchor="middle">Miami, FL</text>
-                <text class="tracking-map-delivery" x="184" y="27" text-anchor="middle">Atlanta, GA</text>
+                <text class="tracking-map-pickup" x="140" y="316" text-anchor="middle">Miami, FL</text>
+                <text class="tracking-map-delivery" x="600" y="99" text-anchor="middle">Atlanta, GA</text>
               </svg>
             </div>
             <div class="tracking-update"><span><svg aria-hidden="true"><use href="#icon-pin"/></svg><span data-demo-update>Waiting to start</span></span><small>Driver location · Demo</small></div>
@@ -379,10 +377,9 @@
             <div class="tracking-phone-home" aria-hidden="true"></div>
           </div>
         </figure>
-        <div class="tracking-benefits" aria-label="Tracking flow">
-          <div><span class="tracking-step">01</span><span>Invite the driver</span><svg aria-hidden="true"><use href="#icon-phone"/></svg></div>
-          <div><span class="tracking-step">02</span><span>Start sharing</span><svg aria-hidden="true"><use href="#icon-pin"/></svg></div>
-          <div><span class="tracking-step">03</span><span>Follow the load</span><svg aria-hidden="true"><use href="#icon-shield"/></svg></div>
+        <div class="tracking-actions">
+          <a class="btn btn-primary tracking-cta" href="/signup">Start tracking <span aria-hidden="true">↗</span></a>
+          <p class="tracking-assurance"><svg aria-hidden="true"><use href="#icon-shield"/></svg>Driver consent. Access ends with the load.</p>
         </div>
       </div>
     </section>
