@@ -3310,17 +3310,34 @@ body.premium-landing {
 .feature-right {
   --feature-top-fade: min(144px, 16vh);
   --feature-bottom-fade: min(180px, 26vh);
+  --feature-side-strength: .35;
   --feature-fade-mask:
     linear-gradient(180deg,
       transparent var(--feature-clip-top, 0px),
       #000 calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)),
       #000 max(calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)), calc(var(--feature-viewport-bottom, 100%) - var(--feature-bottom-fade))),
-      transparent var(--feature-viewport-bottom, 100%));
+      transparent var(--feature-viewport-bottom, 100%)),
+    linear-gradient(90deg,
+      #000 40%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .020)) 45%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .074)) 50%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .156)) 55%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .259)) 60%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .376)) 65%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .500)) 70%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .624)) 75%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .741)) 80%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .844)) 85%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .926)) 90%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength) * .980)) 95%,
+      rgb(0 0 0 / calc(1 - var(--feature-side-strength))) 100%);
   clip-path: inset(var(--feature-clip-top, 0px) 0 0);
   display: grid;
   gap: 72px;
   -webkit-mask-image: var(--feature-fade-mask);
   mask-image: var(--feature-fade-mask);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
   min-width: 0;
   width: calc(100% + max(var(--page-gutter), (100vw - var(--premium-max)) / 2));
 }

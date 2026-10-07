@@ -136,6 +136,7 @@ html[data-theme="light"] .timeline-large p,
 html[data-theme="light"] .review-card-head > div > span { color: var(--premium-muted); }
 
 /* Light surfaces keep the original borders, depth and blue accents. */
+html[data-theme="light"] .feature-right { --feature-side-strength: .08; }
 html[data-theme="light"] .hero-visual .hero-product,
 html[data-theme="light"] .hero-orbit-card,
 html[data-theme="light"] .demo-surface,
