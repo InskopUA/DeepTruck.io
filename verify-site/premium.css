@@ -3315,15 +3315,12 @@ body.premium-landing {
       transparent var(--feature-clip-top, 0px),
       #000 calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)),
       #000 max(calc(var(--feature-clip-top, 0px) + var(--feature-top-fade)), calc(var(--feature-viewport-bottom, 100%) - var(--feature-bottom-fade))),
-      transparent var(--feature-viewport-bottom, 100%)),
-    linear-gradient(90deg, #000 65%, rgba(0, 0, 0, .35));
+      transparent var(--feature-viewport-bottom, 100%));
   clip-path: inset(var(--feature-clip-top, 0px) 0 0);
   display: grid;
   gap: 72px;
   -webkit-mask-image: var(--feature-fade-mask);
   mask-image: var(--feature-fade-mask);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
   min-width: 0;
   width: calc(100% + max(var(--page-gutter), (100vw - var(--premium-max)) / 2));
 }
@@ -3343,6 +3340,7 @@ body.premium-landing {
 
 .feature-visual .demo-surface {
   align-content: center;
+  background: #101823;
   display: grid;
   padding: 30px;
 }
