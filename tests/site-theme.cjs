@@ -67,6 +67,15 @@ function serveStatic(route) {
             .map(el => ({text: el.textContent, size: getComputedStyle(el).fontSize, reference}));
         });
         for (const heading of headingSizes) assert.equal(heading.size, heading.reference, `${width}px ${theme}: ${heading.text} uses the reviews heading size`);
+        const buttons = await page.evaluate(() => {
+          const properties = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'borderRadius', 'padding', 'minHeight', 'gap', 'backgroundColor', 'backgroundImage', 'borderColor', 'color', 'boxShadow'];
+          const style = el => Object.fromEntries(properties.map(key => [key, getComputedStyle(el)[key]]));
+          return ['btn-primary', 'btn-ghost'].flatMap(kind => {
+            const reference = style(document.querySelector('.hero-actions .' + kind));
+            return [...document.querySelectorAll('.btn.' + kind)].map(el => ({text: el.textContent.trim(), style: style(el), reference}));
+          });
+        });
+        for (const button of buttons) assert.deepEqual(button.style, button.reference, `${width}px ${theme}: ${button.text} uses the shared hero button style`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${width} ${theme}: horizontal overflow`);
         assert.equal(await page.locator('.dealer-toggle, .reviews-toggle').count(), 0, 'marquee pause controls removed');
         for (const selector of ['.tracking-copy', '.tracking-board', '.tracking-phone']) {

@@ -18,6 +18,13 @@
   --premium-radius: 24px;
   --premium-max: 1760px;
   --premium-heading-size: clamp(36px, 4.5vw, 58px);
+  --button-primary-bg: rgba(134, 181, 237, .065);
+  --button-primary-hover: rgba(134, 181, 237, .13);
+  --button-primary-border: rgba(152, 190, 234, .45);
+  --button-primary-text: #c2d9f3;
+  --button-secondary-bg: rgba(255, 255, 255, .025);
+  --button-secondary-hover: rgba(255, 255, 255, .055);
+  --button-secondary-text: #bac9db;
   --page-gutter: 7.75vw;
 }
 
@@ -160,50 +167,51 @@ body.premium-landing {
   gap: 8px;
 }
 
-.btn {
+.premium-landing .btn {
   align-items: center;
-  border: 0;
-  border-radius: 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-shadow: none;
   cursor: pointer;
   display: inline-flex;
-  font-size: 13px;
+  font: inherit;
+  font-size: 16px;
   font-weight: 680;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
-  min-height: auto;
-  padding: 11px 15px;
+  line-height: 1.4;
+  min-height: 48px;
+  padding: 12px 18px;
+  white-space: nowrap;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.premium-landing .btn svg { flex: none; }
 
 .btn:hover {
   transform: translateY(-1px);
 }
 
-.btn-ghost {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid var(--premium-line);
-  color: #c8d1dc;
+.premium-landing .btn-ghost {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
 }
 
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.055);
-  border-color: var(--premium-line-strong);
+.premium-landing .btn-ghost:hover {
+  background: var(--button-secondary-hover);
 }
 
-.btn-primary {
-  background: linear-gradient(180deg, #7bb9ff, #4b8af9);
-  box-shadow: 0 9px 34px rgba(75, 138, 249, 0.24);
-  color: #07111e;
+.premium-landing .btn-primary {
+  background: var(--button-primary-bg);
+  border-color: var(--button-primary-border);
+  color: var(--button-primary-text);
 }
 
-.btn-primary:hover {
-  box-shadow: 0 14px 40px rgba(75, 138, 249, 0.35);
+.premium-landing .btn-primary:hover {
+  background: var(--button-primary-hover);
 }
 
-.btn-lg {
-  border-radius: 13px;
-  font-size: 14px;
-  padding: 14px 19px;
+@media (max-width: 760px) {
+  .premium-landing .btn { font-size: 13px; min-height: 44px; padding: 11px 14px; }
 }
 
 .hamburger {
@@ -3496,19 +3504,6 @@ body.premium-landing {
 }
 
 .hero-centered .hero-actions { gap: 14px; justify-content: center; margin: 0; }
-.hero-centered .btn-lg { border-radius: 8px; font-size: 16px; padding: 12px 18px; }
-.hero-centered .btn-primary,
-.nav .btn-primary,
-.footer-cta.btn-primary {
-  background: rgba(134, 181, 237, 0.065);
-  border: 1px solid rgba(152, 190, 234, 0.45);
-  box-shadow: none;
-  color: #c2d9f3;
-}
-.hero-centered .btn-primary:hover,
-.nav .btn-primary:hover,
-.footer-cta.btn-primary:hover { background: rgba(134, 181, 237, 0.13); }
-.hero-centered .btn-ghost { background: rgba(255, 255, 255, 0.025); border-color: transparent; color: #bac9db; }
 
 .hero-visual {
   height: 370px;
@@ -3709,8 +3704,7 @@ body.premium-landing {
   .hero-centered .hero-copy { padding-top: 31px; }
   .hero-centered h1 { font-size: clamp(32px, 7.8vw, 48px); margin: 20px auto; max-width: 550px; overflow-wrap: normal; white-space: normal; width: 100%; }
   .hero-centered .lead { font-size: 15px; margin-bottom: 22px; max-width: 520px; }
-  .hero-centered .btn-lg { font-size: 13px; padding: 11px 14px; width: auto; }
-  .footer-cta.btn-lg { font-size: 13px; padding: 11px 14px; }
+  .hero-centered .btn-lg { width: auto; }
   .hero-visual { height: 330px; margin-top: 18px; max-width: 620px; }
   .hero-emblem { height: 320px; top: 0; width: 307px; }
   .hero-visual .hero-product { left: 0; top: 92px; transform: rotate(-7deg) scale(.49); transform-origin: left top; width: 270px; }
@@ -3772,8 +3766,6 @@ body.premium-landing {
 .extension-copy { max-width: 66%; position: relative; z-index: 2; }
 .extension-copy h2 { font-size: clamp(30px, 2.65vw, 47px); font-weight: 600; letter-spacing: -.045em; line-height: 1.28; margin: 0; max-width: 790px; }
 .extension-copy p { color: #919ba9; font-size: clamp(15px, 1.15vw, 18px); line-height: 1.7; margin: 24px 0 30px; max-width: 650px; }
-.extension-install.btn-primary { background: rgba(134, 181, 237, .065); border: 1px solid rgba(152, 190, 234, .45); border-radius: 8px; box-shadow: none; color: #c2d9f3; font-size: 15px; gap: 10px; padding: 13px 20px; }
-.extension-install.btn-primary:hover { background: rgba(134, 181, 237, .13); }
 .extension-install:disabled { cursor: default; }
 .extension-install:focus-visible { outline: 2px solid #9ac7fc; outline-offset: 5px; }
 .extension-mascot { --shield-look: -10; animation: extensionShieldLook 15s ease-in-out infinite; bottom: -92px; height: 535px; position: absolute; right: -36px; width: 514px; z-index: 1; }
@@ -3783,7 +3775,7 @@ body.premium-landing {
 .extension-motion-paused, .extension-motion-paused .shield-eyes { animation-play-state: paused; }
 @media (min-width: 1600px) { .extension-card { min-height: 500px; padding: 80px; } .extension-mascot { bottom: -108px; height: 610px; width: 585px; right: -30px; } }
 @media (max-width: 1100px) and (min-width: 761px) { .extension-card { padding: 48px 40px; min-height: 410px; } .extension-copy { max-width: 65%; } .extension-copy h2 { font-size: 32px; } .extension-mascot { height: 470px; width: 451px; bottom: -86px; right: -85px; } }
-@media (max-width: 760px) { .premium-landing .extension-section { padding: 54px 0; } .extension-card { border-radius: 22px; display: block; min-height: 0; padding: 34px 28px 0; } .extension-copy { max-width: 100%; } .extension-copy h2 { font-size: clamp(27px, 5.6vw, 36px); max-width: 520px; } .extension-copy p { font-size: 14px; margin: 18px 0 24px; max-width: 430px; } .extension-install.btn-primary { font-size: 13px; padding: 12px 16px; } .extension-mascot { bottom: auto; height: 390px; margin: 14px -52px -30px auto; position: relative; right: auto; width: 374px; } }
+@media (max-width: 760px) { .premium-landing .extension-section { padding: 54px 0; } .extension-card { border-radius: 22px; display: block; min-height: 0; padding: 34px 28px 0; } .extension-copy { max-width: 100%; } .extension-copy h2 { font-size: clamp(27px, 5.6vw, 36px); max-width: 520px; } .extension-copy p { font-size: 14px; margin: 18px 0 24px; max-width: 430px; } .extension-mascot { bottom: auto; height: 390px; margin: 14px -52px -30px auto; position: relative; right: auto; width: 374px; } }
 @media (max-width: 390px) { .extension-card { padding: 30px 24px 0; } .extension-mascot { height: 360px; margin: 12px -46px -26px auto; width: 346px; } }
 @media (prefers-reduced-motion: reduce) { .extension-mascot, .extension-mascot .shield-eyes { animation: none; } .extension-mascot { --shield-look: -10; } }
 

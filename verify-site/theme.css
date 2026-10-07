@@ -39,7 +39,6 @@ html[data-theme="dark"] .queue-row small,
 html[data-theme="dark"] .queue-row.header,
 html[data-theme="dark"] .hero-activity-card time,
 html[data-theme="dark"] .timeline-large p { color: #a3adbc; }
-html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
 
 :root[data-theme="light"] {
   --premium-bg: #edf2f7;
@@ -60,6 +59,13 @@ html[data-theme="dark"] .price-card .btn-primary { color: #07111e; }
   --light-shadow-soft: 0 2px 5px rgba(29, 49, 77, .05), 0 12px 28px rgba(29, 49, 77, .09);
   --light-shadow-raised: 0 3px 8px rgba(29, 49, 77, .08), 0 22px 50px rgba(29, 49, 77, .16), inset 0 1px 0 #fff;
   --premium-shadow: var(--light-shadow-raised);
+  --button-primary-bg: rgba(36, 95, 173, .055);
+  --button-primary-hover: rgba(36, 95, 173, .11);
+  --button-primary-border: rgba(36, 95, 173, .45);
+  --button-primary-text: #245fad;
+  --button-secondary-bg: rgba(39, 65, 98, .045);
+  --button-secondary-hover: rgba(39, 65, 98, .085);
+  --button-secondary-text: #465b75;
 }
 
 /* Navigation and calls to action. */
@@ -69,21 +75,6 @@ html[data-theme="light"] .brand-mark,
 html[data-theme="light"] .side-logo { background-image: url("shield-mark-light.svg"); filter: none; }
 html[data-theme="light"] .nav-links a { color: #526379; }
 html[data-theme="light"] .nav-links a:hover { background: #eaf0f8; color: var(--premium-text); }
-html[data-theme="light"] .btn-ghost { background: #fff; color: #34465e; box-shadow: 0 2px 4px rgba(29, 49, 77, .05); }
-html[data-theme="light"] .btn-ghost:hover { background: #edf3fa; }
-html[data-theme="light"] .btn-primary { background: linear-gradient(180deg, #286ac0, #1f56a4); color: #fff; box-shadow: 0 2px 3px rgba(24, 58, 105, .15), 0 8px 20px rgba(40, 107, 192, .22), inset 0 1px 0 rgba(255, 255, 255, .18); }
-html[data-theme="light"] .hero-centered .btn-primary,
-html[data-theme="light"] .nav .btn-primary,
-html[data-theme="light"] .footer-cta.btn-primary,
-html[data-theme="light"] .extension-install.btn-primary,
-html[data-theme="light"] .legal-page .legal-signup { background: linear-gradient(180deg, #286ac0, #1f56a4); border-color: #215aab; box-shadow: 0 2px 3px rgba(24, 58, 105, .15), 0 8px 20px rgba(40, 107, 192, .22), inset 0 1px 0 rgba(255, 255, 255, .18); color: #fff; }
-html[data-theme="light"] .btn-primary:hover,
-html[data-theme="light"] .hero-centered .btn-primary:hover,
-html[data-theme="light"] .nav .btn-primary:hover,
-html[data-theme="light"] .footer-cta.btn-primary:hover,
-html[data-theme="light"] .extension-install.btn-primary:hover,
-html[data-theme="light"] .legal-page .legal-signup:hover { background: linear-gradient(180deg, #235eac, #19498c); box-shadow: 0 3px 6px rgba(24, 58, 105, .17), 0 12px 28px rgba(40, 107, 192, .27), inset 0 1px 0 rgba(255, 255, 255, .18); }
-html[data-theme="light"] .hero-centered .btn-ghost { background: transparent; color: #465b75; box-shadow: none; }
 html[data-theme="light"] .hamburger { background: #edf3fa; }
 
 /* Titles and secondary text, including all product demonstration panels. */

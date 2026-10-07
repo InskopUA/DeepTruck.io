@@ -3,8 +3,6 @@
 .legal-header-inner { align-items: center; display: flex; gap: 20px; justify-content: space-between; }
 .legal-header .brand { font-size: 19px; }
 .legal-header-actions { align-items: center; display: flex; gap: 20px; font-size: 14px; }
-.legal-page .legal-signup { background: rgba(134, 181, 237, .065); border: 1px solid rgba(152, 190, 234, .45); border-radius: 8px; box-shadow: none; color: #c2d9f3; padding: 11px 17px; }
-.legal-page .legal-signup:hover { background: rgba(134, 181, 237, .13); }
 .legal-container { max-width: 1240px; }
 .legal-intro { padding: 76px 0 52px; }
 .legal-back { color: var(--legal-muted) !important; display: inline-block; font-size: 13px; margin-bottom: 38px; }
@@ -40,7 +38,6 @@
   .legal-header { padding: 16px 0; }
   .legal-header .brand { font-size: 17px; gap: 8px; }
   .legal-header-actions { gap: 14px; font-size: 12px; }
-  .legal-page .legal-signup { padding: 10px 13px; }
   .legal-intro { padding: 40px 0 34px; }
   .legal-back { margin-bottom: 28px; }
   .legal-intro p { font-size: 15px; }

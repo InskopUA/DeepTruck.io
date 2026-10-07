@@ -15,9 +15,6 @@
 .tracking-lead { color: var(--tracking-muted); font-size: 16px; line-height: 1.7; margin: 14px 0 0; }
 .tracking-actions { align-items: center; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 2; }
 .tracking-action-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-.tracking-action-buttons .btn { min-height: 44px; }
-.tracking-cta { gap: 18px; }
-.tracking-section .tracking-cta { color: #07111e; }
 .tracking-assurance { align-items: center; color: var(--tracking-muted); display: flex; font-size: 10px; gap: 7px; line-height: 1.7; margin: 0; }
 .tracking-assurance svg { color: var(--premium-blue); flex: none; height: 14px; width: 14px; }
 .tracking-preview figcaption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
