@@ -14,12 +14,14 @@
 .tracking-copy .section-title { font-size: clamp(32px,3vw,46px); font-weight: 600; line-height: 1.12; max-width: none; }
 .tracking-lead { color: var(--tracking-muted); font-size: 16px; line-height: 1.7; margin: 14px 0 0; }
 .tracking-actions { align-items: center; display: flex; flex-direction: column; gap: 15px; position: relative; z-index: 2; }
+.tracking-action-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.tracking-action-buttons .btn { min-height: 44px; }
 .tracking-cta { gap: 18px; }
 .tracking-section .tracking-cta { color: #07111e; }
 .tracking-assurance { align-items: center; color: var(--tracking-muted); display: flex; font-size: 10px; gap: 7px; line-height: 1.7; margin: 0; }
 .tracking-assurance svg { color: var(--premium-blue); flex: none; height: 14px; width: 14px; }
 .tracking-preview figcaption { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.tracking-preview { height: 460px; margin: 18px 0 10px; max-width: 1100px; position: relative; width: 100%; }
+.tracking-preview { height: 460px; margin: 18px auto 10px; max-width: 1100px; position: relative; width: 100%; }
 .tracking-board { inset: 0; position: absolute; }
 .tracking-board-heading { align-items: center; display: flex; justify-content: space-between; gap: 12px; left: 12%; position: absolute; right: 8%; top: 28px; z-index: 2; }
 .tracking-board h3 { align-items: center; display: flex; font-size: 12px; font-weight: 500; gap: 9px; letter-spacing: -.015em; margin: 0; }
@@ -75,8 +77,41 @@
 @keyframes tracking-tap { 0% { opacity: 0; transform: scale(1.3); } 35%,75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(.7); } }
 @keyframes tracking-location-pulse { 0% { opacity: .65; transform: scale(.7); } 100% { opacity: 0; transform: scale(1.55); } }
 @keyframes tracking-map-pulse { 0% { transform: scale(.65); fill-opacity: .2; } 100% { transform: scale(1.3); fill-opacity: 0; } }
-html[data-theme='light'] .tracking-section { --tracking-panel: #fff; --tracking-soft: #edf3fb; --tracking-muted: #506178; --tracking-map-bg: #edf2f8; --tracking-land: #d8e4f0; --tracking-roads: #c1cede; --tracking-route: #286bc0; --tracking-green: #23734d; }
-html[data-theme='light'] .tracking-phone { border-color: #d0dbe8; box-shadow: 0 3px 8px #1d314d1a,0 20px 40px #1d314d26; }
+html[data-theme='light'] .tracking-section { --tracking-panel: #fff; --tracking-soft: #edf3fb; --tracking-muted: #506178; --tracking-map-bg: #edf2f8; --tracking-land: #d8e4f0; --tracking-roads: #b2c3d8; --tracking-route: #286bc0; --tracking-green: #23734d; }
+/* Light comes from above the route; the phone and marker cast their own shadows. */
+html[data-theme='light'] .tracking-map {
+  background: none;
+}
+html[data-theme='light'] .tracking-map::before {
+  content: '';
+  inset: 0;
+  position: absolute;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center,#000 35%,transparent 73%);
+  background:
+    radial-gradient(ellipse at 38% 27%,rgba(255,255,255,.94),transparent 48%),
+    radial-gradient(ellipse at 64% 58%,rgba(78,126,188,.18),transparent 53%),
+    radial-gradient(ellipse at 30% 66%,rgba(95,154,225,.13),transparent 48%);
+}
+html[data-theme='light'] .tracking-map-art { position: relative; }
+html[data-theme='light'] .tracking-map-roads { filter: drop-shadow(0 1px 0 rgba(255,255,255,.85)); }
+html[data-theme='light'] .tracking-map-route-base { stroke-opacity: .38; stroke-width: 3.5; }
+html[data-theme='light'] .tracking-map-route { stroke-width: 3; filter: drop-shadow(0 2px 2px rgba(36,95,173,.2)); }
+html[data-theme='light'] .tracking-map-endpoint { filter: drop-shadow(0 2px 2px rgba(29,49,77,.18)); }
+html[data-theme='light'] .tracking-truck-disc { filter: drop-shadow(0 3px 4px rgba(25,72,135,.32)); }
+html[data-theme='light'] .tracking-live {
+  background: linear-gradient(145deg,#fff,#eaf1fa);
+  border-color: #bccfe5;
+  box-shadow: inset 0 1px 0 #fff,0 2px 4px rgba(29,49,77,.06);
+}
+html[data-theme='light'] .tracking-phone {
+  background: linear-gradient(155deg,#fff 58%,#f4f7fc);
+  border-color: #d2deec;
+  box-shadow: inset 0 0 0 1px #fff,0 2px 4px rgba(29,49,77,.12),0 12px 22px -8px rgba(29,49,77,.26),0 38px 55px -18px rgba(29,49,77,.3),-12px 0 35px -18px rgba(70,119,183,.2);
+}
+html[data-theme='light'] .tracking-phone-action { box-shadow: inset 0 1px 0 rgba(255,255,255,.18),0 3px 7px rgba(36,95,173,.16); }
+html[data-theme='light'] .tracking-preview[data-demo-state='sharing'] .tracking-phone-action,
+html[data-theme='light'] .tracking-preview[data-demo-state='delivered'] .tracking-phone-action { box-shadow: inset 0 1px 0 #fff; }
 html[data-theme='light'] .tracking-truck-icon { stroke: #fff; }
 @media(min-width:1600px){ .tracking-preview { height: 490px; max-width: 1250px; } .tracking-map { height: 430px; } .tracking-phone { right: 9%; top: 73px; width: 216px; } }
 @media(min-width:761px) and (max-width:1100px){ .tracking-copy .section-title { font-size: 32px; } .tracking-preview { height: 435px; } .tracking-phone { right: 2%; top: 65px; width: 174px; padding-inline: 12px; transform: rotate(-2deg); } .tracking-phone h3 { font-size: 18px; } .tracking-board-heading { left: 9%; right: 2%; } .tracking-map { height: 365px; } .tracking-update { left: 9%; bottom: 28px; } }
