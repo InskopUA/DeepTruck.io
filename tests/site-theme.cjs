@@ -61,6 +61,12 @@ function serveStatic(route) {
         await page.waitForTimeout(350);
         await page.evaluate(() => document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')));
         assert.equal(await page.locator('html').getAttribute('data-theme'), theme);
+        const headingSizes = await page.evaluate(() => {
+          const reference = getComputedStyle(document.querySelector('.reviews-heading .section-title')).fontSize;
+          return [...document.querySelectorAll('.section-title, .hero-centered h1, .extension-copy h2, .faq-heading h2')]
+            .map(el => ({text: el.textContent, size: getComputedStyle(el).fontSize, reference}));
+        });
+        for (const heading of headingSizes) assert.equal(heading.size, heading.reference, `${width}px ${theme}: ${heading.text} uses the reviews heading size`);
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${width} ${theme}: horizontal overflow`);
         assert.equal(await page.locator('.dealer-toggle, .reviews-toggle').count(), 0, 'marquee pause controls removed');
         for (const selector of ['.tracking-copy', '.tracking-board', '.tracking-phone']) {
@@ -80,6 +86,7 @@ function serveStatic(route) {
           await page.screenshot({path: `/private/tmp/deeptruck-hero-${theme}-${width}.png`});
           await page.locator('.extension-card').screenshot({path: `/private/tmp/deeptruck-extension-${theme}-${width}.png`});
           await page.locator('.tracking-layout').screenshot({path: `/private/tmp/deeptruck-tracking-feature-${theme}-${width}.png`});
+          await page.locator('#platform-scale').screenshot({path: `/private/tmp/deeptruck-metrics-${theme}-${width}.png`});
         }
         assert.deepEqual(violations, [], `${width}px ${theme} theme contrast`);
         if (theme === 'light') {

@@ -17,6 +17,7 @@
   --premium-shadow: 0 30px 90px rgba(0, 0, 0, 0.38);
   --premium-radius: 24px;
   --premium-max: 1760px;
+  --premium-heading-size: clamp(36px, 4.5vw, 58px);
   --page-gutter: 7.75vw;
 }
 
@@ -3785,3 +3786,14 @@ body.premium-landing {
 @media (max-width: 760px) { .premium-landing .extension-section { padding: 54px 0; } .extension-card { border-radius: 22px; display: block; min-height: 0; padding: 34px 28px 0; } .extension-copy { max-width: 100%; } .extension-copy h2 { font-size: clamp(27px, 5.6vw, 36px); max-width: 520px; } .extension-copy p { font-size: 14px; margin: 18px 0 24px; max-width: 430px; } .extension-install.btn-primary { font-size: 13px; padding: 12px 16px; } .extension-mascot { bottom: auto; height: 390px; margin: 14px -52px -30px auto; position: relative; right: auto; width: 374px; } }
 @media (max-width: 390px) { .extension-card { padding: 30px 24px 0; } .extension-mascot { height: 360px; margin: 12px -46px -26px auto; width: 346px; } }
 @media (prefers-reduced-motion: reduce) { .extension-mascot, .extension-mascot .shield-eyes { animation: none; } .extension-mascot { --shield-look: -10; } }
+
+/* Share the reviews heading scale across the main landing-page titles. */
+.premium-landing .section-title,
+.premium-landing .hero-centered h1,
+.premium-landing .extension-copy h2,
+.premium-landing .faq-heading h2 {
+  font-size: var(--premium-heading-size);
+}
+@media (max-width: 760px) {
+  .premium-landing { --premium-heading-size: 39px; }
+}

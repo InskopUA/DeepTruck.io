@@ -14,7 +14,7 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
   const page=await ctx.newPage();page.on('pageerror',e=>errors.push(e.message));await page.clock.install({time:new Date('2026-10-07T12:00:00Z')});await page.clock.pauseAt(new Date('2026-10-07T12:00:01Z'));
   const position=()=>page.locator('[data-demo-truck]').getAttribute('transform');
   const state=()=>page.locator('.tracking-preview').getAttribute('data-demo-state');
-  for(const width of [1440,768,390,320]){
+  for(const width of [1920,1440,768,390,320]){
    await page.setViewportSize({width,height:900});
    for(const theme of ['dark','light']){
     await page.goto(origin);await page.evaluate(value=>{localStorage.setItem('deeptruck.theme',value);},theme);await page.reload();
@@ -26,13 +26,14 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
     const before=await position();await page.locator('.tracking-phone').hover();await page.clock.runFor(1800);assert.notEqual(await position(),before,'truck advances even when phone preview is hovered');
     assert.equal(await page.locator('.tracking-location-icon').evaluate(el=>getComputedStyle(el,'::after').animationName),'tracking-location-pulse');
     const current=await contrast(page,'#driver-tracking');assert.deepEqual(current,[],width+' '+theme+' sharing contrast');
-    if([1440,390].includes(width))await page.locator('.tracking-layout').screenshot({path:'/private/tmp/deeptruck-tracking-animated-'+theme+'-'+width+'.png'});
+    if([1920,1440,390].includes(width))await page.locator('.tracking-layout').screenshot({path:'/private/tmp/deeptruck-tracking-animated-'+theme+'-'+width+'.png'});
     await page.clock.runFor(5600);assert.equal(await state(),'delivered');assert.equal(await page.locator('[data-demo-action]').textContent(),'Delivery complete');
     const endpoint=await page.locator('[data-demo-route]').evaluate(p=>{const end=p.getPointAtLength(p.getTotalLength());return {x:end.x,y:end.y};});
     const final=await page.locator('[data-demo-truck]').evaluate(t=>{const m=t.transform.baseVal.consolidate().matrix;return {x:m.e,y:m.f};});assert.ok(Math.abs(final.x-endpoint.x)<.01&&Math.abs(final.y-endpoint.y)<.01,'truck reaches delivery');
     const truck=await page.locator('.tracking-truck-disc').boundingBox(),phone=await page.locator('.tracking-phone').boundingBox();
     assert.ok(truck.x+truck.width<=phone.x || truck.y+truck.height<=phone.y,'phone does not hide the destination truck');
     const card=await page.locator('.tracking-layout').boundingBox(),preview=await page.locator('.tracking-preview').boundingBox();
+    if(width>=761) assert.ok(Math.abs(preview.width-card.width)<1,'desktop tracking scene uses the full content width');
     assert.ok(phone.x>=card.x && phone.x+phone.width<=card.x+card.width && phone.y>=preview.y && phone.y+phone.height<=preview.y+preview.height,'phone stays inside the visual scene');
     const heading=await page.locator('.tracking-copy').boundingBox();assert.ok(heading.y+heading.height<=preview.y,'headline is above the scene');
     const surface=await page.locator('.tracking-layout').evaluate(el=>{const s=getComputedStyle(el);return {border:s.borderTopWidth,background:s.backgroundColor,shadow:s.boxShadow};});assert.deepEqual(surface,{border:'0px',background:'rgba(0, 0, 0, 0)',shadow:'none'},'tracking is an open scene, not another card');
@@ -42,7 +43,7 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
     await page.clock.runFor(2000);await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));await page.clock.runFor(100);
     await page.locator('.tracking-preview.demo-offscreen').waitFor();const paused=await position();await page.clock.runFor(2000);assert.equal(await position(),paused,'offscreen demo does not keep rendering');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
-    const sizes=await page.evaluate(()=>['#tracking-title','.feature-intro .section-title'].map(s=>getComputedStyle(document.querySelector(s)).fontSize));assert.equal(sizes[0],sizes[1],'tracking uses the established section heading size');
+    const sizes=await page.evaluate(()=>['#tracking-title','#pricing .section-title'].map(s=>getComputedStyle(document.querySelector(s)).fontSize));assert.equal(sizes[0],sizes[1],'tracking uses the established section heading size');
    }
    console.log('PASS '+width+'px: synchronized tap, sharing pulse, truck route, delivery, looping and both themes');
   }

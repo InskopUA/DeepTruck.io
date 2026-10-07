@@ -1,0 +1,69 @@
+.premium-landing .platform-scale {
+  padding: clamp(80px,8vw,140px) 0;
+}
+.platform-metrics {
+  display: grid;
+  gap: clamp(24px,3.5vw,64px);
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  margin: 0;
+}
+.platform-metric {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.platform-metric dt {
+  color: var(--premium-muted);
+  font-size: clamp(17px,1.45vw,24px);
+  font-weight: 400;
+  letter-spacing: -.025em;
+  line-height: 1.4;
+  margin-top: 20px;
+  order: 2;
+}
+.platform-metric dd { margin: 0; }
+.metric-value {
+  color: var(--premium-text);
+  display: inline-block;
+  font-size: clamp(64px,6.8vw,136px);
+  font-weight: 600;
+  letter-spacing: -.075em;
+  line-height: 1;
+  position: relative;
+  white-space: nowrap;
+}
+.metric-value > span { color: var(--premium-blue); font-weight: 400; }
+.metric-value i {
+  align-items: center;
+  background: linear-gradient(145deg,#192332,#0e131b);
+  border: 1px solid var(--premium-line-strong);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 #ffffff0a,0 8px 20px #0003;
+  color: var(--premium-blue);
+  display: inline-flex;
+  height: 44px;
+  justify-content: center;
+  position: absolute;
+  right: -5px;
+  top: -36px;
+  transform: rotate(-9deg);
+  width: 48px;
+}
+.metric-value i svg { height: 23px; width: 23px; }
+.platform-metric:nth-child(even) .metric-value i { transform: rotate(8deg); }
+html[data-theme='light'] .metric-value i {
+  background: linear-gradient(145deg,#fff,#e9f0fa);
+  box-shadow: inset 0 1px 0 #fff,0 3px 6px #1d314d0a,0 10px 20px -8px #1d314d26;
+}
+@media(max-width:1100px) {
+  .platform-metrics { gap: 28px; grid-template-columns: repeat(2,minmax(0,1fr)); row-gap: 76px; }
+  .metric-value { font-size: clamp(64px,10vw,100px); }
+}
+@media(max-width:600px) {
+  .premium-landing .platform-scale { padding: 88px 0 72px; }
+  .platform-metrics { column-gap: 24px; row-gap: 66px; }
+  .metric-value { font-size: clamp(44px,13vw,76px); }
+  .platform-metric dt { font-size: 15px; margin-top: 14px; }
+  .metric-value i { border-radius: 11px; height: 30px; top: -28px; width: 34px; }
+  .metric-value i svg { height: 17px; width: 17px; }
+}
