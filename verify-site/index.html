@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="premium.css">
   <link rel="stylesheet" href="/theme.css">
   <link rel="stylesheet" href="/tracking-feature.css">
+  <script src="/tracking-demo.js" defer></script>
 </head>
 <body class="premium-landing">
   <svg class="icon-sprite" aria-hidden="true" focusable="false">
@@ -341,40 +342,43 @@
       <div class="container tracking-layout">
         <div class="tracking-copy reveal">
           <p class="section-kicker">DeepTruck Driver</p>
-          <h2 id="tracking-title">More visibility.<br>Safer vehicle transport.</h2>
-          <p class="tracking-lead">Verify the carrier. Follow the load. Our driver app brings location sharing into your workspace, helping your team keep control from pickup to delivery.</p>
+          <h2 id="tracking-title" class="section-title">Follow the load.<br>Stay in control.</h2>
+          <p class="tracking-lead">Driver location. In your workspace.<br>From pickup to delivery.</p>
           <div class="tracking-benefits">
-            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-phone"/></svg></span><div><h3>Know who is sharing</h3><p>Invite the driver by phone. They sign in and accept the load in DeepTruck Driver.</p></div></div>
-            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-pin"/></svg></span><div><h3>See when an update needs attention</h3><p>Review the latest position, GPS accuracy and update time alongside the load.</p></div></div>
-            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-shield"/></svg></span><div><h3>Keep access tied to the load</h3><p>The driver chooses when to share. Access ends when the load is completed or expires.</p></div></div>
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-phone"/></svg></span><span>Invite the driver by phone</span></div>
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-pin"/></svg></span><span>See location and update time</span></div>
+            <div><span class="tracking-benefit-icon"><svg aria-hidden="true"><use href="#icon-shield"/></svg></span><span>Sharing ends with the load</span></div>
           </div>
           <a class="btn btn-primary tracking-cta" href="/signup">Start tracking loads <span aria-hidden="true">↗</span></a>
         </div>
         <figure class="tracking-preview reveal delay-1" aria-labelledby="tracking-preview-caption">
-          <figcaption id="tracking-preview-caption">Your workspace. Their driver app. One shared load.</figcaption>
+          <figcaption id="tracking-preview-caption">Driver app → Your workspace</figcaption>
           <div class="tracking-board">
-            <div class="tracking-board-heading"><div><span class="tracking-demo-label">Product preview</span><h3>Vehicle transport</h3></div><span class="tracking-live"><i></i>Sharing</span></div>
+            <div class="tracking-board-heading"><div><span class="tracking-demo-label">Product preview</span><h3>Vehicle transport</h3></div><span class="tracking-live"><i></i><span data-demo-workspace-status>Awaiting driver</span></span></div>
             <div class="tracking-map" role="img" aria-label="Illustrated route from pickup to delivery with the driver's latest shared position">
               <svg class="tracking-map-art" viewBox="0 0 540 270" fill="none" aria-hidden="true">
                 <path class="tracking-map-land" d="M0 0h335l-25 56 25 36-29 46 14 45-46 35-26 52H0Z"/>
                 <g class="tracking-map-roads"><path d="m-20 68 209 13 55-105M-20 212l139-54 81 45 107-29 55 44M72-20l42 94-12 69 55 132M230-20l30 55 71 19 89-14M193 0l-38 51 36 76 79 11 106 22M0 126l124 5 83-50 139 27M30 270l107-61 61-84 83-15 38-85"/></g>
-                <path class="tracking-map-route-base" d="M82 214 137 184 166 138 198 112 220 76 240 52"/>
-                <path class="tracking-map-route" d="M82 214 137 184 166 138 198 112 220 76 240 52"/>
-                <circle class="tracking-map-endpoint" cx="82" cy="214" r="6"/><circle class="tracking-map-endpoint" cx="240" cy="52" r="6"/>
-                <circle class="tracking-map-halo" cx="166" cy="138" r="22"/><circle class="tracking-map-driver" cx="166" cy="138" r="8"/>
+                <path class="tracking-map-route-base" d="M82 214 120 184 143 138 171 112 189 76 208 52"/>
+                <path class="tracking-map-route" data-demo-route d="M82 214 120 184 143 138 171 112 189 76 208 52"/>
+                <circle class="tracking-map-endpoint" cx="82" cy="214" r="6"/><circle class="tracking-map-endpoint" cx="208" cy="52" r="6"/>
+                <g class="tracking-truck" data-demo-truck transform="translate(82 214)">
+                  <circle class="tracking-map-halo" r="25"/><circle class="tracking-truck-disc" r="17"/>
+                  <g class="tracking-truck-icon"><path d="M-10-6H2v10h-12Z M2-3h5l4 4v3H2Z"/><path d="M5-3v4h6"/><circle cx="-6" cy="5" r="2"/><circle cx="7" cy="5" r="2"/></g>
+                </g>
               </svg>
               <span class="tracking-map-pickup">Miami, FL</span><span class="tracking-map-delivery">Atlanta, GA</span>
             </div>
-            <div class="tracking-update"><span><svg aria-hidden="true"><use href="#icon-pin"/></svg>Updated · 30 sec ago</span><small>GPS accuracy · approx. 8 m</small></div>
+            <div class="tracking-update"><span><svg aria-hidden="true"><use href="#icon-pin"/></svg><span data-demo-update>Waiting to start</span></span><small>Illustrated product demo</small></div>
           </div>
           <div class="tracking-phone" aria-label="DeepTruck Driver app preview">
             <div class="tracking-phone-camera" aria-hidden="true"></div>
             <div class="tracking-phone-brand"><span class="brand-mark mini" aria-hidden="true"></span><span>DeepTruck <small>Driver</small></span></div>
-            <div class="tracking-phone-status"><i></i>Location sharing on</div>
-            <h3>Your load</h3><p class="tracking-phone-dealer">Demo dealership</p>
+            <div class="tracking-phone-status"><span class="tracking-location-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-6 18-4-8-8-4Z"/></svg></span><span data-demo-phone-status>Ready to start</span></div>
+            <h3>Your load</h3>
             <div class="tracking-phone-route"><div><span>Pickup</span><b>Miami, FL</b></div><div><span>Delivery</span><b>Atlanta, GA</b></div></div>
-            <span class="tracking-phone-pause">Pause tracking</span>
-            <p class="tracking-phone-consent">You control sharing for this load.</p>
+            <span class="tracking-phone-action"><span data-demo-action>Start tracking</span><span class="tracking-demo-tap" aria-hidden="true"></span></span>
+            <p class="tracking-phone-consent">You control sharing.</p>
             <div class="tracking-phone-home" aria-hidden="true"></div>
           </div>
         </figure>
