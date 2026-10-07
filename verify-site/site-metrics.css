@@ -22,6 +22,8 @@
   order: 2;
 }
 .platform-metric dd { margin: 0; }
+.platform-scale .platform-proof { margin-top: clamp(42px,5vw,72px); }
+.platform-proof svg { flex: none; }
 .metric-value {
   color: var(--premium-text);
   display: inline-block;
