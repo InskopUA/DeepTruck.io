@@ -47,7 +47,34 @@ const root=path.resolve(__dirname,'../verify-site'),origin='https://demo.deeptru
    }
    console.log('PASS '+width+'px: synchronized tap, sharing pulse, truck route, delivery, looping and both themes');
   }
-  await page.emulateMedia({reducedMotion:'reduce'});await page.locator('.tracking-preview').scrollIntoViewIfNeeded();await page.clock.runFor(100);assert.equal(await state(),'sharing');const staticPoint=await position();await page.clock.runFor(6000);assert.equal(await position(),staticPoint);assert.equal(await page.locator('.tracking-location-icon').evaluate(el=>getComputedStyle(el,'::after').animationName),'none');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  for(const [width,height] of [[1920,1080],[1470,807],[1366,768],[1280,720],[1920,720],[1440,600],[1024,768],[768,900]]){
+    await page.setViewportSize({width,height});
+    for(const theme of ['dark','light']){
+      await page.goto(origin);await page.evaluate(value=>localStorage.setItem('deeptruck.theme',value),theme);await page.reload();
+      await page.evaluate(()=>{
+        document.querySelectorAll('.reveal').forEach(el=>el.classList.add('visible'));
+        document.querySelector('#driver-tracking').scrollIntoView({block:'start',behavior:'instant'});
+      });
+      await page.clock.runFor(200);
+      const nav=await page.locator('.nav').boundingBox(),heading=await page.locator('.tracking-copy').boundingBox(),actions=await page.locator('.tracking-actions').boundingBox();
+      assert.ok(heading.y>=nav.y+nav.height,'tracking heading clears the fixed navigation');
+      assert.ok(actions.y+actions.height<=height-1,`${width}x${height} ${theme}: both CTAs and consent line fit in the viewport`);
+      const phone=await page.locator('.tracking-phone').boundingBox(),scene=await page.locator('.tracking-preview').boundingBox(),map=await page.locator('.tracking-map').boundingBox();
+      assert.ok(phone.y>=scene.y&&phone.y+phone.height<=scene.y+scene.height,'resized phone stays above the CTAs');
+      const badge=await page.locator('.tracking-live').boundingBox();assert.ok(badge.y+badge.height<=phone.y,'phone stays below the sharing badge on short screens');
+      for(const label of ['.tracking-map-pickup','.tracking-map-delivery']){
+        const box=await page.locator(label).boundingBox();assert.ok(box.y>=map.y&&box.y+box.height<=map.y+map.height,'route labels are not clipped on short screens');
+      }
+      const marker=await page.locator('.tracking-truck-disc').boundingBox();assert.ok(Math.abs(marker.width-marker.height)<1,'wide map keeps the truck marker circular');
+      const destination=await page.locator('.tracking-map-delivery').boundingBox();
+      assert.ok(destination.x+destination.width<=phone.x||destination.y+destination.height<=phone.y,'phone does not obscure the delivery label');
+      assert.deepEqual(await contrast(page,'#driver-tracking'),[]);
+      if(width===1470||height===600)await page.screenshot({path:`/private/tmp/deeptruck-tracking-viewport-${theme}-${width}x${height}.png`});
+      console.log(`PASS ${width}x${height} ${theme}: complete section, CTAs and map fit below navigation`);
+    }
+  }
+  await page.locator('.tracking-preview').scrollIntoViewIfNeeded();await page.clock.runFor(100);assert.equal(await state(),'sharing');const staticPoint=await position();await page.clock.runFor(6000);assert.equal(await position(),staticPoint);assert.equal(await page.locator('.tracking-location-icon').evaluate(el=>getComputedStyle(el,'::after').animationName),'none');
   assert.deepEqual(errors,[]);console.log('PASS reduced motion shows a stable sharing preview');await ctx.close();
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1});
