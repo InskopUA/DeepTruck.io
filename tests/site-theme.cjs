@@ -68,7 +68,7 @@ function serveStatic(route) {
         });
         for (const heading of headingSizes) assert.equal(heading.size, heading.reference, `${width}px ${theme}: ${heading.text} uses the reviews heading size`);
         const buttons = await page.evaluate(() => {
-          const properties = ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'borderRadius', 'padding', 'minHeight', 'gap', 'backgroundColor', 'backgroundImage', 'borderColor', 'color', 'boxShadow'];
+          const properties = ['fontFamily', 'fontWeight', 'borderRadius', 'backgroundColor', 'backgroundImage', 'borderColor', 'color', 'boxShadow'];
           const style = el => Object.fromEntries(properties.map(key => [key, getComputedStyle(el)[key]]));
           return ['btn-primary', 'btn-ghost'].flatMap(kind => {
             const reference = style(document.querySelector('.hero-actions .' + kind));

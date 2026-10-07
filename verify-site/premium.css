@@ -3493,6 +3493,7 @@ body.premium-landing {
 }
 
 .hero-centered .hero-actions { gap: 14px; justify-content: center; margin: 0; }
+.premium-landing .hero-actions .btn { gap: 8px; line-height: normal; min-height: auto; }
 
 .hero-visual {
   height: 370px;
