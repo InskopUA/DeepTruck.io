@@ -9,7 +9,8 @@
     "test:site-theme": "node tests/site-theme.cjs",
     "test:help-center": "node tests/help-center.cjs",
     "test:tracking-demo": "node tests/tracking-demo.cjs",
-    "test:inspection-ui": "node tests/inspection-preview.cjs"
+    "test:inspection-ui": "node tests/inspection-preview.cjs",
+    "test:pickup-damage-site": "node tests/pickup-damage-site.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
