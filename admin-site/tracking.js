@@ -6,6 +6,8 @@
   const closed = status => ['completed','cancelled','declined','expired'].includes(status);
   let context, items = [], selected = '', timer, loading = false, map, marker, trail, mappedLoad = '', requestId = '', saving = false, owner = '';
   let routePoints = [], pointLoad = '', pointRequest = 0, actionBusy = false, actionItem = '';
+  let documentEditor, savedLoadId = '';
+  const pickup = window.deepTruckPickupDocuments;
   const needsAttention = v => !closed(statusOf(v)) && (v.invitationStatus === 'failed' || statusOf(v) === 'paused' || (statusOf(v) === 'pending' && Date.now()-Date.parse(v.createdAt)>86400000) || (statusOf(v) === 'active' && (!v.latestLocation || Date.now()-Date.parse(v.latestLocation.capturedAt)>300000)));
   function syncFilters() { document.querySelectorAll('[data-tracking-filter]').forEach(button => { const active = button.dataset.trackingFilter === $('tracking-filter').value; button.classList.toggle('active', active); button.setAttribute('aria-pressed',String(active)); }); }
   const date = value => value ? new Date(value).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}) : 'Not specified';
@@ -17,7 +19,7 @@
     if (!session) throw new Error('Please sign in again.');
     let response;
     try {
-      response = await fetch(API + path,{method:data === undefined ? 'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:data === undefined ? undefined:JSON.stringify(data),signal:AbortSignal.timeout(20000)});
+      response = await fetch(API + path,{method:data === undefined ? 'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,...(data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data === undefined ? undefined:data instanceof FormData?data:JSON.stringify(data),signal:AbortSignal.timeout(data instanceof FormData?60000:20000)});
     } catch {
       throw new Error('Could not connect to tracking. Please try again.');
     }
@@ -53,7 +55,7 @@
     $('tracking-map').hidden = true; $('tracking-map-note').hidden = true;
     if (!item) { $('tracking-detail-meta').innerHTML = ''; $('tracking-detail-content').innerHTML = '<h2>Track your deliveries</h2><p>Select a load to view its driver and location.</p>'; return; }
     const status = statusOf(item);
-    $('tracking-detail-meta').innerHTML = `<div class="tracking-detail-heading"><h2>${escape(item.title)}</h2><span class="tracking-status ${status}">${escape(labels[status])}</span></div><dl class="tracking-info"><div><dt>Driver</dt><dd>${escape(item.driverName)}<small>${escape(item.driverPhone)}</small></dd></div><div><dt>Carrier</dt><dd>${escape(item.carrierName)}<small>USDOT ${escape(item.carrierDot)}</small></dd></div><div><dt>Pickup</dt><dd>${escape(item.pickupAddress || 'Not specified')}</dd></div><div><dt>Delivery</dt><dd>${escape(item.deliveryAddress || 'Not specified')}</dd></div><div><dt>Planned pickup</dt><dd>${escape(date(item.plannedAt))}</dd></div><div><dt>Access expires</dt><dd>${escape(date(item.expiresAt))}</dd></div></dl>${item.vehicles?.length?`<div class="tracking-vehicles"><b>Vehicles</b><ul>${item.vehicles.map(v=>'<li>'+escape(v)+'</li>').join('')}</ul></div>`:''}<div class="tracking-location-summary"><b>${escape(freshness(item))}</b><p>${item.latestLocation?(status==='active' && Date.now()-Date.parse(item.latestLocation.capturedAt)>300000 ? 'Waiting for a new GPS fix from the driver’s phone. The map shows the last recorded position.' : 'Accuracy: approximately '+Math.round(item.latestLocation.accuracy)+' m. Position is from the driver’s phone.'):status==='pending'?'The driver must accept this load and start sharing.':status==='accepted'?'The driver has accepted and can start sharing when the trip begins.':status==='paused'?'The driver paused sharing for this load.':'No coordinates have been received for this load.'}</p></div>${status==='pending'?`<p class="tracking-sms-state ${item.invitationStatus==='failed'?'sms-failed':''}">${item.invitationStatus==='sent'?'SMS invitation sent · '+escape(date(item.invitedAt)):item.invitationStatus==='failed'?'SMS invitation was not sent. Retry below.':'SMS invitation has not been sent.'}</p>`:''}${!closed(status)?`<div class="tracking-load-actions">${status==='pending'?'<button class="secondary" type="button" data-tracking-action="resend">Resend invitation</button>':''}${['accepted','active','paused'].includes(status)?'<button class="primary" type="button" data-tracking-action="complete">Complete load</button>':''}<button class="text-button" type="button" data-tracking-action="cancel">Cancel load</button></div>`:''}`;
+    $('tracking-detail-meta').innerHTML = `<div class="tracking-detail-heading"><h2>${escape(item.title)}</h2><span class="tracking-status ${status}">${escape(labels[status])}</span></div><dl class="tracking-info"><div><dt>Driver</dt><dd>${escape(item.driverName)}<small>${escape(item.driverPhone)}</small></dd></div><div><dt>Carrier</dt><dd>${escape(item.carrierName)}<small>USDOT ${escape(item.carrierDot)}</small></dd></div><div><dt>Pickup</dt><dd>${escape(item.pickupAddress || 'Not specified')}</dd></div><div><dt>Delivery</dt><dd>${escape(item.deliveryAddress || 'Not specified')}</dd></div><div><dt>Planned pickup</dt><dd>${escape(date(item.plannedAt))}</dd></div><div><dt>Access expires</dt><dd>${escape(date(item.expiresAt))}</dd></div></dl>${item.vehicles?.length?`<div class="tracking-vehicles"><b>Vehicles</b><ul>${item.vehicles.map(v=>'<li>'+escape(v)+'</li>').join('')}</ul></div>`:''}<div class="tracking-location-summary"><b>${escape(freshness(item))}</b><p>${item.latestLocation?(status==='active' && Date.now()-Date.parse(item.latestLocation.capturedAt)>300000 ? 'Waiting for a new GPS fix from the driver’s phone. The map shows the last recorded position.' : 'Accuracy: approximately '+Math.round(item.latestLocation.accuracy)+' m. Position is from the driver’s phone.'):status==='pending'?'The driver must accept this load and start sharing.':status==='accepted'?'The driver has accepted and can start sharing when the trip begins.':status==='paused'?'The driver paused sharing for this load.':'No coordinates have been received for this load.'}</p></div>${status==='pending'?`<p class="tracking-sms-state ${item.invitationStatus==='failed'?'sms-failed':''}">${item.invitationStatus==='sent'?'SMS invitation sent · '+escape(date(item.invitedAt)):item.invitationStatus==='failed'?'SMS invitation was not sent. Retry below.':'SMS invitation has not been sent.'}</p>`:''}${pickup.render(item)}${!closed(status)?`<div class="tracking-load-actions">${status==='pending'?'<button class="secondary" type="button" data-tracking-action="resend">Resend invitation</button>':''}${['accepted','active','paused'].includes(status)?'<button class="primary" type="button" data-tracking-action="complete">Complete load</button>':''}<button class="text-button" type="button" data-tracking-action="cancel">Cancel load</button></div>`:''}`;
     const heading = $('tracking-detail-meta').querySelector('.tracking-detail-heading');
     const summary = $('tracking-detail-meta').querySelector('.tracking-location-summary');
     $('tracking-detail-content').replaceChildren(heading,summary);
@@ -118,11 +120,14 @@
     $('tracking-create-submit').disabled = !verified.length;
   }
   function openCreate(verificationId = '') {
+    documentEditor?.destroy(); savedLoadId='';
+    $('tracking-create-form').querySelectorAll('input,select,textarea').forEach(el=>el.disabled=false);
     context.showTracking(); $('tracking-create-form').reset(); document.querySelector('.tracking-optional').open=false; requestId = crypto.randomUUID();
     $('tracking-expiry').value = localDate(new Date(Date.now()+7*86400000));
     $('tracking-expiry').min = localDate(new Date(Date.now()+10*60000));
     $('tracking-expiry').max = localDate(new Date(Date.now()+30*86400000-60000));
     message('',false,'tracking-create-message'); updateCarriers(verificationId); $('tracking-carrier').value = verificationId;
+    documentEditor=pickup.editor($('tracking-create-documents'),{addressInput:$('tracking-pickup')});
     $('tracking-create-dialog').showModal();
   }
   function closeCreate() { if (!saving) $('tracking-create-dialog').close(); }
@@ -130,7 +135,7 @@
     context = options;
     // Native dialog supplies focus trapping and restores focus on close.
     const dialog = document.createElement('dialog'); dialog.id = 'tracking-create-dialog'; dialog.className = 'tracking-dialog'; dialog.setAttribute('aria-labelledby','tracking-dialog-title');
-    dialog.innerHTML = `<div class="tracking-dialog-heading"><div><p class="eyebrow">Driver invitation</p><h2 id="tracking-dialog-title">New tracking</h2><p>Create a load and invite its driver.</p></div><button id="tracking-dialog-close" class="icon-button" type="button" aria-label="Close new tracking"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button></div><form id="tracking-create-form"><section class="tracking-form-section"><h3>1. Carrier & driver</h3><label for="tracking-carrier">Verified carrier<select id="tracking-carrier" required></select></label><div class="tracking-form-row"><label for="tracking-driver-name">Driver name<input id="tracking-driver-name" required maxlength="120" autocomplete="off" placeholder="Full name"></label><label for="tracking-driver-phone">Driver phone<input id="tracking-driver-phone" type="tel" required maxlength="24" autocomplete="off" placeholder="+1 (555) 123-4567"></label></div><p id="tracking-carrier-hint" class="muted"></p></section><section class="tracking-form-section"><h3>2. Load details</h3><label for="tracking-load-name">Load name / reference<input id="tracking-load-name" required maxlength="160" placeholder="e.g. Load #1042 — Miami delivery"></label><details class="tracking-optional"><summary>Add route, vehicles & pickup time <span class="muted">· optional</span></summary><div><div class="tracking-form-row"><label for="tracking-pickup">Pickup address<input id="tracking-pickup" maxlength="500" placeholder="Auction or pickup location"></label><label for="tracking-delivery">Delivery address<input id="tracking-delivery" maxlength="500" placeholder="Dealership or delivery location"></label></div><label for="tracking-vehicles">Vehicles <small>One vehicle per line</small><textarea id="tracking-vehicles" rows="2" maxlength="8000" placeholder="2024 Toyota Camry · VIN or stock number"></textarea></label><label for="tracking-planned">Planned pickup<input id="tracking-planned" type="datetime-local"></label></div></details></section><section class="tracking-form-section"><h3>3. Location access</h3><label for="tracking-expiry">Tracking expires<input id="tracking-expiry" type="datetime-local" required></label><p class="tracking-consent-note">The driver accepts this load and starts sharing in DeepTruck Driver. Access ends when the load is completed or expires.</p></section><div id="tracking-create-message" class="inline-message" role="status" aria-live="polite"></div><div class="tracking-dialog-actions"><button id="tracking-dialog-cancel" class="secondary" type="button">Cancel</button><button id="tracking-create-submit" class="primary" type="submit">Send invitation</button></div></form>`;
+    dialog.innerHTML = `<div class="tracking-dialog-heading"><div><p class="eyebrow">Driver invitation</p><h2 id="tracking-dialog-title">New tracking</h2><p>Create a load and invite its driver.</p></div><button id="tracking-dialog-close" class="icon-button" type="button" aria-label="Close new tracking"><svg aria-hidden="true"><use href="#icon-close"></use></svg></button></div><form id="tracking-create-form"><section class="tracking-form-section"><h3>1. Carrier & driver</h3><label for="tracking-carrier">Verified carrier<select id="tracking-carrier" required></select></label><div class="tracking-form-row"><label for="tracking-driver-name">Driver name<input id="tracking-driver-name" required maxlength="120" autocomplete="off" placeholder="Full name"></label><label for="tracking-driver-phone">Driver phone<input id="tracking-driver-phone" type="tel" required maxlength="24" autocomplete="off" placeholder="+1 (555) 123-4567"></label></div><p id="tracking-carrier-hint" class="muted"></p></section><section class="tracking-form-section"><h3>2. Load details</h3><label for="tracking-load-name">Load name / reference<input id="tracking-load-name" required maxlength="160" placeholder="e.g. Load #1042 — Miami delivery"></label><details class="tracking-optional"><summary>Add route, vehicles & pickup time <span class="muted">· optional</span></summary><div><div class="tracking-form-row"><label for="tracking-pickup">Pickup address<input id="tracking-pickup" maxlength="500" placeholder="Auction or pickup location"></label><label for="tracking-delivery">Delivery address<input id="tracking-delivery" maxlength="500" placeholder="Dealership or delivery location"></label></div><label for="tracking-vehicles">Vehicles <small>One vehicle per line</small><textarea id="tracking-vehicles" rows="2" maxlength="8000" placeholder="2024 Toyota Camry · VIN or stock number"></textarea></label><label for="tracking-planned">Planned pickup<input id="tracking-planned" type="datetime-local"></label></div></details></section><section class="tracking-form-section"><h3>3. Location access</h3><label for="tracking-expiry">Tracking expires<input id="tracking-expiry" type="datetime-local" required></label><p class="tracking-consent-note">The driver accepts this load and starts sharing in DeepTruck Driver. Access ends when the load is completed or expires.</p></section><section id="tracking-create-documents" class="pickup-editor"></section><div id="tracking-create-message" class="inline-message" role="status" aria-live="polite"></div><div class="tracking-dialog-actions"><button id="tracking-dialog-cancel" class="secondary" type="button">Cancel</button><button id="tracking-create-submit" class="primary" type="submit">Send invitation</button></div></form>`;
     document.body.append(dialog);
     $('new-tracking-button').addEventListener('click',()=>openCreate());
     $('tracking-dialog-close').addEventListener('click',closeCreate); $('tracking-dialog-cancel').addEventListener('click',closeCreate);
@@ -145,6 +150,21 @@
       if (e.target.closest('[data-tracking-create]')) openCreate();
     });
     $('tracking-detail').addEventListener('click',async e=>{
+      const item=items.find(v=>v.id===selected);
+      if(e.target.closest('[data-pickup-add]') && item && !actionBusy){pickup.openEditor(item,api,()=>load());return;}
+      const openDocument=e.target.closest('[data-pickup-open]'),unlockDocuments=e.target.closest('[data-pickup-unlock]');
+      if((openDocument || unlockDocuments) && !actionBusy && item){
+        if(unlockDocuments && !confirm('Unlock pickup documents for this driver now?'))return;
+        const target=selected,button=openDocument || unlockDocuments;
+        const preview=openDocument?window.open('about:blank','_blank'):null;if(preview)preview.opener=null;
+        actionBusy=true;button.disabled=true;message('',false,'tracking-action-message');
+        try{
+          const data=await api(`/loads/${target}/documents/${openDocument?openDocument.dataset.pickupOpen+'/open':'unlock'}`,{});
+          if(openDocument){if(preview)preview.location.replace(data.url);else window.location.assign(data.url);}
+          else {actionBusy=false;await load();window.workspaceToast('Pickup documents unlocked.');}
+        }catch(error){preview?.close();if(target===selected)message(error.message,true,'tracking-action-message');else window.workspaceToast(error.message);}
+        finally{actionBusy=false;button.disabled=false;}return;
+      }
       const button = e.target.closest('[data-tracking-action]'); if (!button || actionBusy) return;
       const action = button.dataset.trackingAction, id = selected;
       if (action!=='resend' && !confirm(action==='complete'?'Complete this load and close its location access?':'Cancel this load and close its location access?')) return;
@@ -158,11 +178,21 @@
       if (vehicles.length>50) {message('Add no more than 50 vehicles.',true,'tracking-create-message');return;}
       const expiry = new Date($('tracking-expiry').value), planned = $('tracking-planned').value ? new Date($('tracking-planned').value) : null;
       if (!Number.isFinite(expiry.getTime()) || expiry.getTime()<=Date.now()+300000 || expiry.getTime()>Date.now()+30*86400000 || (planned && planned>=expiry)) {message('Choose a valid expiry after planned pickup, within 30 days.',true,'tracking-create-message');return;}
+      try{documentEditor.validate();}catch(error){message(error.message,true,'tracking-create-message');return;}
       saving = true; $('tracking-create-submit').disabled=true; $('tracking-create-submit').textContent='Saving…'; message('',false,'tracking-create-message');
       try {
-        const data = await api('/loads',{clientRequestId:requestId,verificationId:$('tracking-carrier').value,driverName:$('tracking-driver-name').value,driverPhone:$('tracking-driver-phone').value,title:$('tracking-load-name').value,vehicles,pickupAddress:$('tracking-pickup').value,deliveryAddress:$('tracking-delivery').value,plannedAt:planned?.toISOString() || null,expiresAt:expiry.toISOString()});
+        let data;
+        if(!savedLoadId){
+          data = await api('/loads',{clientRequestId:requestId,verificationId:$('tracking-carrier').value,driverName:$('tracking-driver-name').value,driverPhone:$('tracking-driver-phone').value,title:$('tracking-load-name').value,vehicles,pickupAddress:$('tracking-pickup').value,deliveryAddress:$('tracking-delivery').value,plannedAt:planned?.toISOString() || null,expiresAt:expiry.toISOString(),deferInvitation:documentEditor.hasFiles()});
+          savedLoadId=data.load.id;
+          $('tracking-create-form').querySelectorAll('.tracking-form-section input,.tracking-form-section select,.tracking-form-section textarea').forEach(el=>el.disabled=true);
+        }
+        if(documentEditor.hasFiles()){
+          $('tracking-create-submit').textContent='Uploading…';await documentEditor.save(savedLoadId,api);
+          data={load:{id:savedLoadId},...await api(`/loads/${savedLoadId}/resend`,{})};
+        }else if(!data){data={load:{id:savedLoadId},invitation:{sent:false,message:'Load saved. You can send its invitation from the tracking card.'}};}
         selected=data.load.id; $('tracking-filter').value='open'; $('tracking-search').value='';dialog.close(); await load(); document.querySelector('.tracking-layout').classList.add('mobile-detail'); if(data.invitation.sent) window.workspaceToast('Driver invitation sent.'); else message(data.invitation.message,true,'tracking-action-message');
-      } catch (err) {message(err.message,true,'tracking-create-message');}
+      } catch (err) {message((savedLoadId?'Load saved. ':'')+err.message,true,'tracking-create-message');}
       finally {saving=false;$('tracking-create-submit').disabled=false;$('tracking-create-submit').textContent='Send invitation';}
     });
   }

@@ -1,5 +1,6 @@
 import { createClient, type User } from 'npm:@supabase/supabase-js@2.117.2';
 import { HttpError, uuid, phone, effectiveStatus, createPayload, locationBatch } from './validation.ts';
+import { decorateDocuments, documentRoutes, documentViewer } from './documents.ts';
 
 const env = (name: string) => Deno.env.get(name) || '';
 const serviceKey = env('SUPABASE_SERVICE_ROLE_KEY') || JSON.parse(env('SUPABASE_SECRET_KEYS') || '{}').default;
@@ -73,20 +74,29 @@ async function sendInvitation(userId: string,id: string) {
   }
 }
 
+const documentsContext={db,serviceKey,json,databaseError,requireDealer,driverPhone};
+async function loadsWithDocuments(user: User, loads: Record<string,any>[], driver = false) {
+  const documentStates=await decorateDocuments(user,loads,driver,documentsContext);
+  return loads.map((load,i)=>({...publicLoad(load,load.latest_location ? publicPoint(load.latest_location) : null),...documentStates[i]}));
+}
+
 Deno.serve({port:Number(env('PORT') || '8000')},async req => {
   if (req.method === 'OPTIONS') return new Response(null,{status:204,headers:cors});
   try {
     const path = new URL(req.url).pathname.replace(/^.*\/driver-tracking(?=\/|$)/,'') || '/';
+    if (req.method==='GET' && path==='/documents/view') return await documentViewer(req,documentsContext);
     if (req.method === 'GET' && path === '/config') return json({
       iosStoreUrl: env('DRIVER_IOS_STORE_URL'), androidStoreUrl:env('DRIVER_ANDROID_STORE_URL'), appScheme:'deeptruck-driver'
     });
     const user = await requireUser(req);
+    const documentResponse=await documentRoutes(req,path,user,documentsContext);
+    if(documentResponse) return documentResponse;
     if (req.method === 'GET' && path === '/loads') {
       requireDealer(user);
       const {data,error} = await db.rpc('tracking_dealer_loads',{p_shipper:user.id});
       databaseError(error);
       // Each latest point is selected through its own load's access periods.
-      const items = (data || []).map((load: Record<string,any>)=>publicLoad(load,load.latest_location ? publicPoint(load.latest_location) : null));
+      const items = await loadsWithDocuments(user,data || []);
       return json({items,serverNow:new Date().toISOString()});
     }
     if (req.method === 'POST' && path === '/loads') {
@@ -95,18 +105,18 @@ Deno.serve({port:Number(env('PORT') || '8000')},async req => {
       const {data,error} = await db.rpc('tracking_create',{p_shipper:user.id,p_verification:uuid(input.verificationId,'carrier verification'),p_request:uuid(input.clientRequestId,'request ID'),p_payload:createPayload(input,name)});
       databaseError(error);
       let invitation = {sent:data.load.invitation_status === 'sent',message:'Load already saved.'};
-      if (data.created) {
+      if (data.created && input.deferInvitation!==true) {
         try { invitation = await sendInvitation(user.id,data.load.id); }
         catch (e) { invitation = {sent:false,message:e instanceof HttpError ? e.message : 'Load saved. Please retry sending its invitation.'}; }
       }
       const load = await dealerLoad(user.id,data.load.id);
-      return json({load:publicLoad(load),invitation},data.created ? 201 : 200);
+      return json({load:(await loadsWithDocuments(user,[load]))[0],invitation},data.created ? 201 : 200);
     }
     const dealerRoute = path.match(/^\/loads\/([^/]+)(?:\/(points|resend|complete|cancel))?$/);
     if (dealerRoute) {
       requireDealer(user); const [,id,action] = dealerRoute; const load = await dealerLoad(user.id,id);
       if (req.method === 'GET' && action === 'points') return json({points:await points(user.id,id,500)});
-      if (req.method === 'GET' && !action) return json({load:publicLoad(load,(await points(user.id,id))[0] || null)});
+      if (req.method === 'GET' && !action) return json({load:{...(await loadsWithDocuments(user,[load]))[0],latestLocation:(await points(user.id,id))[0] || null}});
       if (req.method === 'POST' && action === 'resend') return json({invitation:await sendInvitation(user.id,id)});
       if (req.method === 'POST' && ['complete','cancel'].includes(action || '')) {
         const {data,error} = await db.rpc('tracking_action',{p_actor:user.id,p_phone:'',p_load:id,p_action:action,p_driver:false}); databaseError(error);
@@ -118,7 +128,7 @@ Deno.serve({port:Number(env('PORT') || '8000')},async req => {
       if (req.method === 'GET' && path === '/driver/loads') {
         const {data,error} = await db.from('tracking_loads').select('*').or(`driver_user_id.eq.${user.id},and(driver_user_id.is.null,driver_phone.eq.${number},status.eq.pending)`).order('created_at',{ascending:false}).limit(100);
         databaseError(error);
-        return json({items:(data || []).map(v => publicLoad(v)),serverNow:new Date().toISOString()});
+        return json({items:await loadsWithDocuments(user,data || [],true),serverNow:new Date().toISOString()});
       }
       if (req.method === 'POST' && path === '/driver/pause-all') {
         const {error} = await db.rpc('tracking_pause_all',{p_driver:user.id}); databaseError(error); return json({paused:true});

@@ -111,6 +111,55 @@ Base: `/functions/v1/driver-tracking`. Private routes require a Bearer token.
 | `POST /driver/pause-all` | Close all this driver's access periods |
 | `POST /driver/locations` | Idempotent batch of 1–100 points |
 
+## Pickup documents
+
+Tracking creation can include optional PDF, JPG or PNG gate passes and release
+forms (up to 20 files, 10 MB each). The workspace confirms an exact pickup
+address and map pin before uploading. New loads with files use
+`deferInvitation: true`; the invitation is sent only after files finish uploading.
+Retrying a failed upload keeps the same load and document IDs.
+
+Files use the private `pickup-documents` bucket. A restrictive Storage policy
+denies direct anon/authenticated access even if another bucket has a broad
+permissive policy. Document metadata never exposes object paths or file URLs.
+Driver load cards and details show the attachment names and locked/ready state.
+Opening an available attachment uses the phone's document viewer/browser, which
+supports PDF/image zoom; no new native dependency or binary rebuild is required.
+
+The server releases a load's files within **1 mile (1609.344 m)** of its confirmed
+pickup point. Arrival requires an active consent period for that load, a GPS fix
+captured/received within 90 seconds, and accuracy no worse than 100 m. The
+distance plus reported uncertainty must be inside the radius. Coordinates are
+device-reported and are not independent proof of driver identity or arrival.
+Load reads evaluate arrival; the existing driver/workspace refresh cadence is
+15 seconds. Driver's Update location action requests a new fix immediately.
+
+The owning dealer can Unlock documents without a GPS fix. The driver must still
+accept the invitation so access binds to their Auth UUID. Arrival/manual release
+persists through pauses or GPS loss while the load remains open. Changing the
+pickup is denied after release. Cancellation, completion and expiry deny future
+driver reads; the owner retains access to their original attachments.
+
+The API issues HMAC-signed viewer tickets valid for two minutes, without storage
+URLs. Every viewer request checks the load gate again, including after fetching
+the stored file. Responses use `no-store`. Opened records the first driver file
+response, not issuing a link or a dealer preview. Any already downloaded file or
+screenshot cannot be recalled by the app.
+
+| Route | Purpose |
+| --- | --- |
+| `POST /loads/:id/pickup` | Owner saves address + confirmed latitude/longitude |
+| `POST /loads/:id/documents` | Owner uploads multipart file, kind and stable document UUID |
+| `POST /loads/:id/documents/unlock` | Owner manually releases this load's documents |
+| `POST /loads/:id/documents/:documentId/open` | Owner requests a short-lived preview ticket |
+| `POST /driver/loads/:id/documents/:documentId/open` | Bound driver requests a ticket after release |
+| `GET /documents/view?ticket=…` | Verify ticket and current load access, then serve file bytes |
+
+Address search uses deliberate requests to Photon's public geocoder, with a
+15-second timeout. The user must confirm the entrance on the map; an address
+search result alone never releases documents. Manual map placement remains
+available if search fails. OSM map tiles retain attribution.
+
 ## Verification and release gates
 
 ```sh

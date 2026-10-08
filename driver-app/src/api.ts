@@ -19,4 +19,5 @@ export async function api<T>(path:string,data?:unknown):Promise<T> {
 export const getLoads = () => api<{items:Load[];serverNow:string}>('/driver/loads');
 export const loadAction = (id:string,action:'accept'|'decline'|'start'|'pause'|'complete') => api<{load:Load;serverNow:string}>(`/driver/loads/${id}/${action}`,{});
 export const pauseAll = () => api<{paused:boolean}>('/driver/pause-all',{});
+export const documentLink = (loadId:string,documentId:string) => api<{url:string}>(`/driver/loads/${loadId}/documents/${documentId}/open`,{});
 export const sendPoints = (points:Point[]) => api<{inserted:number;activeLoads:number}>('/driver/locations',{points});

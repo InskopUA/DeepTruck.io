@@ -17,6 +17,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  const browser=await chromium.launch({headless:true,...(executable?{executablePath:executable}:{})});
  try{
  const ctx=await browser.newContext({viewport:{width:1440,height:1000},permissions:['clipboard-read','clipboard-write']}),errors=[];
+ let failUploadOnce=false,documentRequests=[];
  let verificationPosts=0,requests=[],verifications=[verification,pendingVerification],failExisting=false;
  let loads=[fixture('active','Load #1042 — Miami'),fixture('pending','Load #1043 — Tampa','+15551234568'),fixture('accepted','Load #1044 — Orlando','+15551234569')],created,failLoads=false,failCreateNetwork=false;
  await ctx.route(origin+'/**',async route=>{
@@ -29,6 +30,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  });
  await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',r=>r.fulfill({contentType:'application/javascript',body:`window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:${JSON.stringify(session)}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>({}),updateUser:async()=>({data:{user:${JSON.stringify(user)}}})}})};`}));
  await ctx.route('https://*.tile.openstreetmap.org/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aK1cAAAAASUVORK5CYII=','base64')}));
+ await ctx.route('https://photon.komoot.io/api/**',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({features:[{geometry:{type:'Point',coordinates:[-84.388,33.749]},properties:{name:'Auction entrance',housenumber:'100',street:'Auction Road',city:'Atlanta',state:'Georgia',postcode:'30303'}}]})}));
  await ctx.route(project+'/**',async route=>{
    const req=route.request(),url=new URL(req.url());
    const respond=(body,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});
@@ -43,10 +45,25 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
    if(url.pathname.endsWith('/driver-tracking/config'))return respond({iosStoreUrl:'',androidStoreUrl:''});
    assert.equal(req.headers().authorization,'Bearer test-session');
    const p=url.pathname.split('/driver-tracking')[1];
+   documentRequests.push(p);
+   const docMatch=p?.match(/^\/loads\/([^/]+)\/(pickup|documents(?:\/(unlock)|\/([^/]+)\/(open))?)$/);
+   if(docMatch){
+     const load=loads.find(v=>v.id===docMatch[1]);if(!load)return respond({error:'Missing load'},404);
+     if(docMatch[2]==='pickup'){const body=req.postDataJSON();assert.equal(body.confirmed,true);load.pickupLocation={latitude:body.latitude,longitude:body.longitude,radiusMiles:1};load.pickupAddress=body.address;return respond({saved:true});}
+     if(docMatch[2]==='documents'){
+       if(failUploadOnce){failUploadOnce=false;return route.abort('failed');}
+       const multipart=req.postDataBuffer().toString();assert.match(multipart,/%PDF-/);const documentId=multipart.match(/name="id"\r\n\r\n([^\r]+)/)[1];
+       load.pickupDocuments ||= {documents:[],status:'locked',canOpen:false,unlockedAt:null,unlockMethod:null};
+       if(!load.pickupDocuments.documents.some(d=>d.id===documentId))load.pickupDocuments.documents.push({id:documentId,name:'Gate pass.pdf',kind:multipart.includes('release_form')?'release_form':'gate_pass',openedAt:null});
+       return respond({saved:true,id:documentId},201);
+     }
+     if(docMatch[3]){Object.assign(load.pickupDocuments,{status:'available',unlockedAt:new Date().toISOString(),unlockMethod:'manual'});return respond({pickupDocuments:load.pickupDocuments});}
+     return respond({url:'https://documents.test/pickup.pdf'});
+   }
    if(p==='/loads'&&req.method()==='GET')return failLoads?respond({error:'Tracking unavailable'},503):respond({items:loads});
    if(p==='/loads'&&req.method()==='POST'){
      requests.push(req.postDataJSON());if(failCreateNetwork)return route.abort('failed');
-     created=req.postDataJSON();const v=fixture('pending',created.title,created.driverPhone);Object.assign(v,{driverName:created.driverName,vehicles:created.vehicles,deliveryAddress:created.deliveryAddress,pickupAddress:created.pickupAddress,invitationStatus:'failed',invitedAt:null});loads.unshift(v);return respond({load:v,invitation:{sent:false,message:'Load saved, but the SMS could not be sent. You can retry from its tracking card.'}},201);
+     created=req.postDataJSON();const v=fixture('pending',created.title,created.driverPhone);Object.assign(v,{driverName:created.driverName,vehicles:created.vehicles,deliveryAddress:created.deliveryAddress,pickupAddress:created.pickupAddress,invitationStatus:created.deferInvitation?'not_sent':'failed',invitedAt:null});loads.unshift(v);return respond({load:v,invitation:{sent:false,message:'Load saved, but the SMS could not be sent. You can retry from its tracking card.'}},201);
    }
    if(p?.endsWith('/points')){const v=loads.find(v=>p.includes(v.id));return respond({points:v?.latestLocation?[v.latestLocation]:[]});}
    const match=p?.match(/^\/loads\/([^/]+)\/(resend|complete|cancel)$/);
@@ -152,6 +169,33 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  const failed=loads.find(v=>v.status==='pending');failed.invitationStatus='failed';const delayed=loads.find(v=>v.status==='active');delayed.latestLocation.capturedAt=new Date(Date.now()-600000).toISOString();await page.locator('#tracking-refresh').click();await page.waitForFunction(()=>document.getElementById('tracking-attention-count').textContent==='2');assert.equal(await page.locator('.tracking-card').count(),2);
  await page.locator('.tracking-card').first().click();const selectedId=await page.locator('.tracking-card.selected').getAttribute('data-tracking-select');await page.locator('#tracking-refresh').click();assert.equal(await page.locator('.tracking-card.selected').getAttribute('data-tracking-select'),selectedId);assert.equal(await page.locator('#tracking-detail').isVisible(),true);
  await page.goto(origin+'/admin/#history');await page.locator('#verifications.active').waitFor();assert.equal(await page.locator('#page-title').textContent(),'Verifications');
+ await page.goto(origin+'/admin/#tracking');await page.locator('#tracking.active').waitFor();await page.setViewportSize({width:1440,height:1000});
+ await page.locator('#new-tracking-button').click();await page.locator('#tracking-carrier').selectOption(verification.id);
+ await page.locator('#tracking-driver-name').fill('Pickup Driver');await page.locator('#tracking-driver-phone').fill('+15551234570');await page.locator('#tracking-load-name').fill('Protected pickup');
+ const edit=page.locator('#tracking-create-documents');await edit.locator('input[type=file]').setInputFiles({name:'Gate pass.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\nGate pass fixture\n%%EOF')});
+ const countBefore=loads.length,requestsBefore=requests.length;
+ await page.locator('#tracking-create-submit').click();await page.waitForFunction(()=>document.getElementById('tracking-create-message').textContent.includes('Confirm the exact'));assert.equal(requests.length,requestsBefore,'no load is created before confirming the pickup');
+ await edit.locator('[aria-label="Exact pickup address"]').fill('100 Auction Road, Atlanta GA 30303');await edit.locator('[data-pickup-search]').click();await edit.locator('.pickup-address-result').first().click();await edit.locator('[aria-label="Confirm pickup location"]').check();
+ await page.screenshot({path:'/private/tmp/deeptruck-pickup-documents-create.png'});
+ documentRequests=[];failUploadOnce=true;await page.locator('#tracking-create-submit').click();await page.waitForFunction(()=>document.getElementById('tracking-create-message').textContent.includes('Load saved.'));
+ assert.equal(loads.length,countBefore+1);assert.equal(documentRequests.some(p=>p.endsWith('/resend')),false,'invitation waits for all attachments');
+ await page.locator('#tracking-create-submit').click();await page.waitForFunction(()=>!document.getElementById('tracking-create-dialog').open);
+ assert.equal(loads.length,countBefore+1,'upload retry does not create another load');assert.equal(requests.length,requestsBefore+1);assert.equal(created.deferInvitation,true);
+ await page.locator('.pickup-document-list').waitFor();assert.match(await page.locator('.pickup-documents').textContent(),/Locked/);
+ assert.equal(documentRequests.at(-2)?.endsWith('/resend') || documentRequests.some(p=>p.endsWith('/resend')),true);
+ await page.locator('[data-pickup-unlock]').click();await page.waitForFunction(()=>document.querySelector('.pickup-documents').textContent.includes('Unlocked by you'));
+ assert.match(await page.locator('.pickup-document-list').textContent(),/Available/);assert.equal(await page.locator('[data-pickup-unlock]').count(),0);
+ await page.screenshot({path:'/private/tmp/deeptruck-pickup-documents-detail.png'});
+ await page.locator('[data-pickup-add]').click();const more=page.locator('.pickup-edit-dialog');await more.locator('input[type=file]').setInputFiles({name:'Release form.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\nRelease fixture\n%%EOF')});assert.equal(await more.locator('[aria-label="Exact pickup address"]').inputValue(),'100 Auction Road, Atlanta GA 30303');
+ await more.locator('[type=submit]').click();await page.waitForFunction(()=>!document.querySelector('.pickup-edit-dialog'));assert.equal(await page.locator('.pickup-document-list li').count(),2);
+ for(const width of [320,390,768,1440]){
+   await page.setViewportSize({width,height:1000});if(width<=760 && !await page.locator('#tracking-detail').isVisible())await page.locator('.tracking-card.selected').click();
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),width+'px pickup documents overflow');
+   await page.locator('[data-pickup-add]').click();const panel=page.locator('.pickup-edit-dialog');await panel.locator('input[type=file]').setInputFiles({name:'Release form.pdf',mimeType:'application/pdf',buffer:Buffer.from('%PDF-1.4\nFixture\n%%EOF')});
+   assert.ok(await panel.evaluate(el=>el.scrollWidth<=el.clientWidth),width+'px pickup editor overflow');
+   if(width===390)await panel.screenshot({path:'/private/tmp/deeptruck-pickup-documents-mobile.png'});await page.keyboard.press('Escape');
+ }
+ console.log('PASS pickup pin confirmation, one-mile map, uploads before invitation, safe upload retry, manual unlock and attachments on existing loads');
  await page.goto(origin+'/driver/?invite='+loads[0].id);assert.equal(await page.locator('#open-driver').getAttribute('href'),'deeptruck-driver://loads?invite='+loads[0].id);
  await page.waitForFunction(()=>document.getElementById('install-status').textContent.includes('pilot testing'));
  assert.deepEqual(errors,[]);console.log('PASS merged workspace, progress, lookup reuse, new verification, clipboard, drawer refresh, pagination, attention filters, mobile navigation, invitation retries and tracking handoff');

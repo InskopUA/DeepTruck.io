@@ -3,7 +3,7 @@ import { Alert, AppState, Linking as NativeLinking } from 'react-native';
 import * as Linking from 'expo-linking';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './auth';
-import { ApiError, getLoads, loadAction, pauseAll } from './api';
+import { ApiError, documentLink, getLoads, loadAction, pauseAll } from './api';
 import { captureIfDue, captureNow, flushQueue, locationAccess, requestLocationPermissions, stopCollecting, syncTracking, trackingHealth } from './tracking';
 import { closed, effectiveLoad, initialAccess, initialHealth, locationReady } from './driver-state';
 import type { Load } from './types';
@@ -129,6 +129,18 @@ export function useDriver() {
       await syncTracking(data.items); await flushQueue(); setHealth(await trackingHealth());
     });
   }
+  async function openDocument(load: Load, documentId: string) {
+    await run(async () => {
+      const {url}=await documentLink(load.id,documentId);
+      await NativeLinking.openURL(url);
+    });
+  }
+  async function refreshPickupLocation() {
+    await run(async () => {
+      await captureNow(); await flushQueue();
+      const data=await getLoads();setLoads(data.items);setHealth(await trackingHealth());
+    });
+  }
   async function stopAll(signOut = false) {
     if (!await confirm(signOut ? 'Sign out?' : 'Pause all tracking?', 'Location sharing for your active loads will stop.', signOut ? 'Sign out' : 'Pause all')) return;
     await run(async () => {
@@ -140,6 +152,6 @@ export function useDriver() {
   }
   const effective = loads.map(load => effectiveLoad(load, now));
   const visible = effective.filter(load => screen === 'history' ? closed(load.status) : !closed(load.status)).sort((a, b) => a.id === invite ? -1 : b.id === invite ? 1 : 0);
-  return { session, booting, number, setNumber, otp, setOtp, codeSent, nextSmsAt, sendCode, verifyCode, changeNumber: () => { setCodeSent(false); setOtp(''); setMessage(''); }, loads: effective, visible, loadsLoaded, loadError, busy, refreshing, refresh, message, dismissMessage: () => setMessage(''), screen, setScreen, now, invite, health, access, permissionOpen, permissionStep, beginStart, enableLocation, openSettings, closePermission, showPermissions, openProfileSettings, permissionForLoad: startIntent.current !== null, act, stopAll };
+  return { session, booting, number, setNumber, otp, setOtp, codeSent, nextSmsAt, sendCode, verifyCode, changeNumber: () => { setCodeSent(false); setOtp(''); setMessage(''); }, loads: effective, visible, loadsLoaded, loadError, busy, refreshing, refresh, message, dismissMessage: () => setMessage(''), screen, setScreen, now, invite, health, access, permissionOpen, permissionStep, beginStart, enableLocation, openSettings, closePermission, showPermissions, openProfileSettings, permissionForLoad: startIntent.current !== null, act, stopAll, openDocument, refreshPickupLocation };
 }
 export type DriverController = ReturnType<typeof useDriver>;
