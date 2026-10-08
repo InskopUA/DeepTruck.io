@@ -389,56 +389,85 @@
     </section>
 
     <section id="pickup-damage" class="pickup-damage-section" aria-labelledby="damage-title">
-      <div class="container damage-layout">
-        <div class="damage-copy reveal">
-          <p class="section-kicker">Pickup damage capture</p>
-          <h2 id="damage-title" class="section-title">Damage noted. <span>Gate pass ready.</span></h2>
-          <p class="damage-lead">Tap a part. Add a photo. Damage codes and a photo QR appear right on the gate pass.</p>
-          <p class="damage-benefit"><svg aria-hidden="true"><use href="#icon-shield"/></svg>A clearer pickup record. Shared with your team.</p>
-          <div class="damage-actions">
-            <a class="btn btn-primary" href="/signup">Start for Free <span aria-hidden="true">↗</span></a>
-            <a class="btn btn-ghost" href="mailto:hello@deeptruck.io?subject=Book%20a%20DeepTruck%20demo">Book a Demo</a>
-          </div>
-          <p class="damage-format">Manheim gate passes · Recorded by the driver</p>
+      <div class="container">
+        <div class="damage-copy center reveal">
+          <p class="section-kicker">For dealers · Manheim pickups</p>
+          <h2 id="damage-title" class="section-title">A clearer inspection.<br>On the Manheim gate pass.</h2>
+          <p class="damage-lead">Record the damage. Print the pass. Leave a copy at guard check.</p>
         </div>
-        <figure class="damage-demo reveal delay-1" data-damage-state="idle" aria-labelledby="damage-demo-caption">
-          <div class="damage-scene">
-            <svg class="damage-flow-art" viewBox="0 0 740 500" preserveAspectRatio="none" aria-hidden="true"><path d="M166 268V340Q166 371 198 371H408"/></svg>
-            <div class="damage-paper">
-              <div class="damage-paper-brand"><svg aria-hidden="true"><use href="#icon-shield"/></svg>DeepTruck</div>
-              <p class="damage-paper-type">GATE PASS</p><h3><span>Vehicle</span> <span>release</span></h3>
-              <svg class="damage-barcode" viewBox="0 0 220 35" preserveAspectRatio="none" aria-hidden="true"><path fill="#202c3d" d="M0 0h2v35H0zm4 0h1v35H4zm4 0h3v35H8zm6 0h2v35h-2zm5 0h4v35h-4zm7 0h1v35h-1zm4 0h3v35h-3zm6 0h1v35h-1zm4 0h2v35h-2zm5 0h4v35h-4zm7 0h2v35h-2zm5 0h1v35h-1zm4 0h3v35h-3zm6 0h2v35h-2zm5 0h4v35h-4zm7 0h1v35h-1zm4 0h2v35h-2zm5 0h3v35h-3zm6 0h1v35h-1zm4 0h4v35h-4zm7 0h2v35h-2zm5 0h1v35h-1zm4 0h3v35h-3zm6 0h2v35h-2zm5 0h4v35h-4zm7 0h1v35h-1zm4 0h3v35h-3zm6 0h2v35h-2zm5 0h1v35h-1zm4 0h4v35h-4zm7 0h2v35h-2zm5 0h1v35h-1zm4 0h3v35h-3zm6 0h2v35h-2zm5 0h4v35h-4zm7 0h1v35h-1zm4 0h2v35h-2zm5 0h3v35h-3zm6 0h1v35h-1zm4 0h4v35h-4zm7 0h2v35h-2zm5 0h1v35h-1zm4 0h3v35h-3z"/></svg>
-              <div class="damage-paper-fields"><div><span>Load</span><b>#1042</b></div><div><span>Pickup</span><b>Manheim</b></div><div><span>Vehicle</span><b>2025 SUV</b></div><div><span>Document</span><b>Gate pass</b></div></div>
-              <div class="damage-paper-lines" aria-hidden="true"><i></i><i></i></div>
-              <div class="damage-notes">
-                <div><p class="damage-notes-title">PICKUP DAMAGE NOTES</p><div class="damage-note-result"><code>10-12-3</code><small>Left front door<br>Scratch · Over 3–6 in</small></div></div>
-                <div class="damage-photo-qr"><img src="/pickup-damage-qr.svg" width="56" height="56" alt="Illustrated photo QR"><small>Damage photos</small></div>
-                <p class="damage-notes-empty">Your notes go here.</p>
+        <figure class="damage-demo reveal" data-damage-state="idle" aria-labelledby="damage-demo-caption">
+          <div class="damage-flow">
+            <div class="damage-example damage-example-phone">
+              <div class="damage-example-heading"><span>01</span><h3>Inspect &amp; photograph</h3><svg aria-hidden="true"><use href="#icon-phone"/></svg></div>
+              <div class="damage-scene damage-phone-scene">
+                <div class="damage-phone">
+                  <div class="damage-phone-status" aria-hidden="true"><b>9:41</b><i></i><span>▮▮▮ ▰</span></div>
+                  <div class="damage-phone-brand"><span class="brand-mark" aria-hidden="true"></span><b>DeepTruck <small>Driver</small></b></div>
+                  <div class="damage-phone-content">
+                    <div class="damage-load-view">
+                      <span class="damage-phone-label">YOUR PICKUP</span><h4>Manheim Chicago</h4>
+                      <div class="damage-load-route"><span>Pickup documents</span><b>Gate pass</b><small>Ready to open</small></div>
+                      <div class="damage-load-file"><img src="/gate-pass-demo.png" width="38" height="49" alt="" loading="lazy"><div><b>Vehicle release</b><small>Manheim · PDF</small></div><span>↗</span></div>
+                      <div class="damage-start-control">Inspection <svg aria-hidden="true"><use href="#icon-check"/></svg><i class="damage-touch"></i></div>
+                      <p>Record pickup damage</p>
+                    </div>
+                    <div class="damage-inspection-view">
+                      <div class="damage-screen-heading"><span>‹ Loads</span><h4>Record damage</h4></div>
+                      <div class="damage-view-tabs"><b>Left</b><span>Right</span><span>Front</span><span>Rear</span><span>Top</span></div>
+                      <svg class="damage-car" viewBox="0 0 360 180" role="img" aria-label="Driver selects the left front door on the vehicle diagram">
+                        <path class="damage-car-body" d="M25 112L31 96Q34 90 68 85L107 47Q114 40 132 40H210Q228 41 249 69L270 88L322 99Q333 103 335 118L333 139H26Z"/>
+                        <path class="damage-car-panel" d="M35 98L90 89L96 108L97 139H31V113Z"/>
+                        <path class="damage-car-door" d="M103 92H169V137H105Z"/><path class="damage-car-panel" d="M175 92H239L251 110V137H175ZM258 96L322 105L330 118L329 138H258Z"/>
+                        <path class="damage-car-panel" d="M103 83L119 51H169V83ZM175 51H208Q220 52 239 83H175Z"/>
+                        <rect class="damage-car-panel" x="91" y="79" width="20" height="13" rx="4"/><rect class="damage-car-panel" x="105" y="142" width="148" height="10" rx="3"/>
+                        <circle class="damage-car-wheel" cx="76" cy="139" r="24"/><circle class="damage-car-wheel" cx="284" cy="139" r="24"/><circle class="damage-car-panel" cx="76" cy="139" r="14"/><circle class="damage-car-panel" cx="284" cy="139" r="14"/>
+                        <circle class="damage-car-tap" cx="136" cy="113" r="12"/>
+                      </svg>
+                      <div class="damage-selection" data-damage-part>Tap a part</div>
+                      <div class="damage-phone-label" data-damage-type-label>DAMAGE TYPE</div>
+                      <div class="damage-choice-row"><span class="damage-type-choice">Scratch<i class="damage-touch"></i></span><span>Dent</span><span>Chipped</span></div>
+                      <div class="damage-phone-label damage-size-label">SIZE</div>
+                      <div class="damage-choice-row damage-size-row"><span>Up to 1 in</span><span>1–3 in</span><span class="damage-size-choice">3–6 in<i class="damage-touch"></i></span></div>
+                      <div class="damage-photo-record">
+                        <svg class="damage-evidence-art" viewBox="0 0 100 80" aria-hidden="true"><defs><linearGradient id="damage-car-paint" x2="1" y2="1"><stop stop-color="#405b7e"/><stop offset=".48" stop-color="#a7bdd7"/><stop offset="1" stop-color="#344b69"/></linearGradient></defs><rect width="100" height="80" fill="url(#damage-car-paint)"/><path d="M5 0L16 80M84 0L90 80" stroke="#253c59" stroke-width="2"/><path d="m30 30 30 13m-30-8 24 10m-19-7 20 11" stroke="#fff" stroke-width="2"/></svg>
+                        <div><b data-damage-photo>Photo added</b><small>Left front door</small></div><code>10-12-3</code>
+                      </div>
+                      <div class="damage-camera-control"><span data-damage-action>Add damage &amp; photo</span><i class="damage-touch"></i></div>
+                    </div>
+                  </div>
+                  <div class="damage-phone-home" aria-hidden="true"></div><div class="damage-photo-flash" aria-hidden="true"></div>
+                </div>
               </div>
-              <p class="damage-paper-footer">Recorded by driver · Codes + photo evidence</p>
+              <p class="damage-example-footer" data-damage-phone-caption>Open Inspection on the driver app</p>
             </div>
-            <div class="damage-picker">
-              <div class="damage-picker-heading"><span class="brand-mark" aria-hidden="true"></span><div><b>Record damage</b><small>DeepTruck Driver</small></div></div>
-              <svg class="damage-car" viewBox="0 0 340 150" role="img" aria-label="Vehicle diagram highlighting the left front door">
-                <path class="damage-car-body" d="M22 96L28 78Q31 74 62 70L99 34Q108 26 124 26H202Q219 28 242 58L260 74L306 83Q319 87 320 105L318 122H23Z"/>
-                <path class="damage-car-window" d="M99 65L114 36H158V65ZM165 36H202Q214 38 232 65H165Z"/>
-                <path class="damage-car-door" d="M99 73H158V119H102Z"/><path class="damage-car-body" d="M165 73H230L242 90V119H165Z"/>
-                <path class="damage-car-body" d="M87 73V117M248 83V117M103 126H244"/>
-                <circle class="damage-car-wheel" cx="67" cy="121" r="23"/><circle class="damage-car-wheel" cx="274" cy="121" r="23"/><circle class="damage-car-window" cx="67" cy="121" r="12"/><circle class="damage-car-window" cx="274" cy="121" r="12"/>
-                <circle class="damage-car-tap" cx="128" cy="97" r="9"/>
-              </svg>
-              <div class="damage-selection" data-damage-part>Select a part</div>
-              <div class="damage-choice-row"><span class="damage-chosen">Scratch</span><span>Over 3–6 in</span></div>
-              <div class="damage-photo-flash" aria-hidden="true"></div>
+            <div class="damage-example damage-example-document">
+              <div class="damage-example-heading"><span>02</span><h3>Written on the gate pass</h3><svg aria-hidden="true"><use href="#icon-doc"/></svg></div>
+              <div class="damage-scene damage-document-scene">
+                <div class="damage-paper">
+                  <img class="damage-gate-pass" src="/gate-pass-demo.png" width="1499" height="1941" alt="Manheim vehicle release with sample dealer and vehicle details" loading="lazy">
+                  <img class="damage-gate-pass damage-note-result" src="/gate-pass-demo-notes.png" width="1499" height="1941" alt="" aria-hidden="true" loading="lazy">
+                  <div class="damage-notes" aria-hidden="true"></div>
+                </div>
+                <div class="damage-code-summary"><svg aria-hidden="true"><use href="#icon-check"/></svg><code>10-12-3</code><span>Damage code + photo QR</span></div>
+              </div>
+              <p class="damage-example-footer" data-damage-document-caption>The original pass. Notes in the space below.</p>
             </div>
-            <div class="damage-evidence">
-              <svg class="damage-evidence-art" viewBox="0 0 100 80" aria-hidden="true"><defs><linearGradient id="damage-car-paint" x2="1" y2="1"><stop stop-color="#405b7e"/><stop offset=".48" stop-color="#a7bdd7"/><stop offset="1" stop-color="#344b69"/></linearGradient></defs><rect width="100" height="80" fill="url(#damage-car-paint)"/><path d="M5 0L16 80M84 0L90 80" stroke="#253c59" stroke-width="2"/><path class="damage-scratch" d="m30 30 30 13m-30-8 24 10m-19-7 20 11"/></svg>
-              <div><b data-damage-photo>Add a damage photo</b><small>Door · Scratch</small></div>
+            <div class="damage-example damage-example-print">
+              <div class="damage-example-heading"><span>03</span><h3>Print &amp; leave a copy</h3><svg aria-hidden="true"><use href="#icon-doc"/></svg></div>
+              <div class="damage-scene damage-print-scene">
+                <div class="damage-printer"><div class="damage-printer-top"><i></i><span>Ready to print</span></div><div class="damage-printer-slot"></div></div>
+                <div class="damage-print-window"><div class="damage-printed-paper"><img src="/gate-pass-demo-notes.png" width="1499" height="1941" alt="Printed sample Manheim gate pass with damage codes and a photo QR" loading="lazy"></div></div>
+                <div class="damage-print-receipt"><svg aria-hidden="true"><use href="#icon-check"/></svg><span>Copy left at guard check</span></div>
+              </div>
+              <p class="damage-example-footer">A pickup record for Manheim guard check</p>
             </div>
           </div>
-          <ol class="damage-steps"><li><i>1</i>Select damage</li><li><i>2</i>Add a photo</li><li><i>3</i>Gate pass ready</li></ol>
-          <figcaption id="damage-demo-caption" class="damage-demo-caption">Illustrated product demo</figcaption>
+          <figcaption id="damage-demo-caption" class="damage-demo-caption">Illustrated workflow · Real gate pass layout with sample data</figcaption>
         </figure>
+        <div class="damage-actions reveal">
+          <a class="btn btn-primary" href="/signup">Start for Free <span aria-hidden="true">↗</span></a>
+          <a class="btn btn-ghost" href="mailto:hello@deeptruck.io?subject=Book%20a%20DeepTruck%20demo">Book a Demo</a>
+        </div>
       </div>
     </section>
 
