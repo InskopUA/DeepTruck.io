@@ -4,7 +4,7 @@
   const closed = load => ['completed','cancelled','declined','expired'].includes(load.status) || Date.parse(load.expiresAt)<=Date.now();
   function render(load) {
     const state=load.pickupDocuments || {documents:[],status:'locked'}, files=state.documents || [];
-    return `<section class="pickup-documents"><div class="pickup-documents-heading"><h3>Pickup documents</h3>${!closed(load)?'<button type="button" class="text-button" data-pickup-add>Add documents</button>':''}</div>${files.length ? `<p class="pickup-document-note">${closed(load)?'Driver access is closed.':state.status==='available'?`Unlocked ${state.unlockMethod==='manual'?'by you':'at pickup'}.`:'Unlocks within 1 mile of the pickup address.'}</p><ul class="pickup-document-list">${files.map(file=>`<li><span class="pickup-file-icon"><svg aria-hidden="true"><use href="#icon-doc"></use></svg></span><div><b>${escape(file.name)}</b><small>${kindName(file.kind)} · ${file.openedAt?'Opened':closed(load)?'Closed':state.status==='available'?'Available':'Locked'}</small></div><button type="button" class="secondary" data-pickup-open="${escape(file.id)}" aria-label="Open ${escape(file.name)}">View</button></li>`).join('')}</ul>${!closed(load) && state.status==='locked'?'<button type="button" class="secondary" data-pickup-unlock>Unlock documents</button>':''}` : '<p class="pickup-document-note">Gate passes and release forms for this pickup.</p>'}</section>`;
+    return `<section class="pickup-documents"><div class="pickup-documents-heading"><h3>Pickup documents</h3>${!closed(load)?'<button type="button" class="text-button" data-pickup-add>Add documents</button>':''}</div>${files.length ? `<p class="pickup-document-note">${closed(load)?'Driver access is closed.':state.status==='available'?`Unlocked ${state.unlockMethod==='manual'?'by you':'at pickup'}.`:'Unlocks within 1 mile of the pickup address.'}</p><ul class="pickup-document-list">${files.map(file=>`<li><span class="pickup-file-icon"><svg aria-hidden="true"><use href="#icon-doc"></use></svg></span><div><b>${escape(file.name)}</b><small>${kindName(file.kind)} · ${file.openedAt?'Opened':closed(load)?'Closed':state.status==='available'?'Available':'Locked'}</small></div>${file.inspection?`<button type="button" class="text-button" data-pickup-inspection="${escape(file.id)}">${file.inspection.status==='completed'?'Damage notes':'Inspection draft'}</button>`:''}<button type="button" class="secondary" data-pickup-open="${escape(file.id)}" aria-label="Open ${escape(file.name)}">View</button></li>`).join('')}</ul>${!closed(load) && state.status==='locked'?'<button type="button" class="secondary" data-pickup-unlock>Unlock documents</button>':''}` : '<p class="pickup-document-note">Gate passes and release forms for this pickup.</p>'}</section>`;
   }
   function editor(root,{load=null,addressInput=null}={}) {
     let files=[],point=load?.pickupLocation ? {...load.pickupLocation} : null,map,marker,circle,searchController,busy=false;
@@ -47,7 +47,7 @@
         if(files.length+existingCount>=20){showMessage('Add no more than 20 pickup documents.');break;}
         if(!file.size || file.size>10485760 || !/\.(pdf|jpe?g|png)$/i.test(file.name)){showMessage('Choose PDF, JPG or PNG files, up to 10 MB each.');continue;}
         if(file.name.length>180){showMessage('Use a file name shorter than 180 characters.');continue;}
-        files.push({file,id:crypto.randomUUID(),kind:/release/i.test(file.name)?'release_form':'gate_pass',uploaded:false});
+        files.push({file,id:crypto.randomUUID(),kind:/release[\s_-]*form/i.test(file.name)?'release_form':'gate_pass',uploaded:false});
       }
       fileInput.value='';renderFiles();
     });
@@ -102,5 +102,20 @@
       finally{saving=false;button.disabled=false;button.textContent='Save documents';}
     });dialog.showModal();
   }
-  window.deepTruckPickupDocuments={render,editor,openEditor};
+  async function openInspection(load,id,api){
+    const dialog=document.createElement('dialog');dialog.className='tracking-dialog inspection-dialog';dialog.setAttribute('aria-labelledby','inspection-title');
+    dialog.innerHTML='<div class="tracking-dialog-heading"><h2 id="inspection-title">Pickup damage notes</h2><button type="button" class="icon-button" data-inspection-close aria-label="Close damage notes">×</button></div><div data-inspection-body><p>Loading inspection…</p></div><p class="inline-message" data-inspection-message role="status"></p>';
+    dialog.querySelector('[data-inspection-close]').addEventListener('click',()=>dialog.close());dialog.addEventListener('close',()=>dialog.remove());document.body.append(dialog);dialog.showModal();
+    try{
+      const {inspection:i}=await api(`/loads/${load.id}/documents/${id}/inspection`);if(!dialog.isConnected)return;
+      if(!i){dialog.querySelector('[data-inspection-body]').textContent='The driver has not started an inspection.';return;}
+      dialog.querySelector('[data-inspection-body]').innerHTML=`<div class="inspection-summary"><div><small>GATE PASS</small><b>${escape(load.pickupDocuments.documents.find(d=>d.id===id)?.name || 'Pickup document')}</b></div><span class="status-badge">${i.status==='completed'?'Recorded':'Driver draft'}</span></div>${i.damages.map(d=>`<article class="inspection-damage"><div class="inspection-damage-heading"><h3>${escape(d.areaLabel)}</h3><code>${escape(d.code)}</code></div><p>${escape(d.typeLabel)} · ${escape(d.sizeLabel)}</p><div class="inspection-photos">${i.photos.filter(p=>p.damageId===d.id).map(p=>`<a href="${escape(p.url)}" target="_blank" rel="noopener noreferrer"><img src="${escape(p.url)}" alt="${escape(d.areaLabel+' — '+d.typeLabel)}" loading="lazy"></a>`).join('')}</div></article>`).join('')}${i.status==='completed'&&!i.damages.length?'<p>No visible damage observed by driver.</p>':''}${i.status==='completed'?`<div class="inspection-actions"><button type="button" class="primary" data-inspection-pdf>Annotated gate pass ↗</button><a class="secondary" href="${escape(i.shareUrl)}" target="_blank" rel="noopener noreferrer">Damage photos ↗</a></div><p class="pickup-document-note">Recorded by driver · ${escape(new Date(i.completedAt).toLocaleString())}</p>`:'<p class="pickup-document-note">The driver is still recording damage notes.</p>'}`;
+      dialog.querySelector('[data-inspection-pdf]')?.addEventListener('click',async event=>{
+        const button=event.currentTarget,preview=window.open('about:blank','_blank');if(preview)preview.opener=null;button.disabled=true;
+        try{const {url}=await api(`/loads/${load.id}/documents/${id}/inspection/open`,{});if(preview)preview.location.replace(url);else window.location.assign(url);}
+        catch(error){preview?.close();dialog.querySelector('[data-inspection-message]').textContent=error.message;}finally{button.disabled=false;}
+      });
+    }catch(error){if(dialog.isConnected)dialog.querySelector('[data-inspection-body]').textContent=error.message;}
+  }
+  window.deepTruckPickupDocuments={render,editor,openEditor,openInspection};
 })();

@@ -3,7 +3,7 @@ import { Alert, AppState, Linking as NativeLinking } from 'react-native';
 import * as Linking from 'expo-linking';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './auth';
-import { ApiError, documentLink, getLoads, loadAction, pauseAll } from './api';
+import { api, ApiError, documentLink, getLoads, loadAction, pauseAll } from './api';
 import { captureIfDue, captureNow, flushQueue, locationAccess, requestLocationPermissions, stopCollecting, syncTracking, trackingHealth } from './tracking';
 import { closed, effectiveLoad, initialAccess, initialHealth, locationReady } from './driver-state';
 import type { Load } from './types';
@@ -131,7 +131,8 @@ export function useDriver() {
   }
   async function openDocument(load: Load, documentId: string) {
     await run(async () => {
-      const {url}=await documentLink(load.id,documentId);
+      const file=load.pickupDocuments?.documents.find(item=>item.id===documentId);
+      const {url}=file?.inspection?.status==='completed' ? await api<{url:string}>(`/driver/loads/${load.id}/documents/${documentId}/inspection/open`,{}) : await documentLink(load.id,documentId);
       await NativeLinking.openURL(url);
     });
   }

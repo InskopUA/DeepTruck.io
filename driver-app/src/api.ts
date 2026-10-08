@@ -8,7 +8,7 @@ export class ApiError extends Error {status:number;constructor(status:number,mes
 export async function api<T>(path:string,data?:unknown):Promise<T> {
   const {data:{session},error} = await supabase.auth.getSession();
   if(error || !session) throw new ApiError(401,'Please sign in again.');
-  const {response,value}=await fetchJson(origin+path,{method:data===undefined?'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:data===undefined?undefined:JSON.stringify(data)});
+  const {response,value}=await fetchJson(origin+path,{method:data===undefined?'GET':'POST',headers:{Authorization:'Bearer '+session.access_token,...(data instanceof FormData?{}:{'Content-Type':'application/json'})},body:data===undefined?undefined:data instanceof FormData?data:JSON.stringify(data)},data instanceof FormData?60000:20000);
   if(!response.ok || value.error) throw new ApiError(response.status,typeof value.error==='string' ? value.error : 'Could not connect. Please try again.');
   if(typeof value.serverNow==='string') {
     const offset=Date.parse(value.serverNow)-Date.now();

@@ -1,6 +1,7 @@
 import { createClient, type User } from 'npm:@supabase/supabase-js@2.117.2';
 import { HttpError, uuid, phone, effectiveStatus, createPayload, locationBatch } from './validation.ts';
 import { decorateDocuments, documentRoutes, documentViewer } from './documents.ts';
+import { inspectionRoutes, inspectionGallery } from './inspections.ts';
 
 const env = (name: string) => Deno.env.get(name) || '';
 const serviceKey = env('SUPABASE_SERVICE_ROLE_KEY') || JSON.parse(env('SUPABASE_SECRET_KEYS') || '{}').default;
@@ -88,7 +89,9 @@ Deno.serve({port:Number(env('PORT') || '8000')},async req => {
     if (req.method === 'GET' && path === '/config') return json({
       iosStoreUrl: env('DRIVER_IOS_STORE_URL'), androidStoreUrl:env('DRIVER_ANDROID_STORE_URL'), appScheme:'deeptruck-driver'
     });
+    const gallery=await inspectionGallery(req,path,documentsContext);if(gallery)return gallery;
     const user = await requireUser(req);
+    const inspection=await inspectionRoutes(req,path,user,documentsContext);if(inspection)return inspection;
     const documentResponse=await documentRoutes(req,path,user,documentsContext);
     if(documentResponse) return documentResponse;
     if (req.method === 'GET' && path === '/loads') {

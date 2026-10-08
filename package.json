@@ -8,11 +8,17 @@
     "test:driver-preview": "node tests/driver-preview.cjs",
     "test:site-theme": "node tests/site-theme.cjs",
     "test:help-center": "node tests/help-center.cjs",
-    "test:tracking-demo": "node tests/tracking-demo.cjs"
+    "test:tracking-demo": "node tests/tracking-demo.cjs",
+    "test:inspection-ui": "node tests/inspection-preview.cjs"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
+    "@types/qrcode": "^1.5.6",
     "deno": "^2.9.6",
-    "playwright": "^1.63.0"
+    "jsqr": "^1.4.0",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.63.0",
+    "qrcode": "^1.5.4",
+    "unpdf": "^1.8.1"
   }
 }

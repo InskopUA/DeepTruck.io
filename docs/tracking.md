@@ -192,7 +192,7 @@ OS/battery restrictions; the UI shows the actual last coordinate time.
 Only one phone should be used for an account during the MVP pilot. A
 multi-device location lease is a follow-up requirement if multiple phones
 per account are allowed. Automatic acceptance for trusted dealers, push
-notifications, ETA and geofenced document unlocking are outside this MVP.
+notifications and ETA are outside this MVP.
 
 Dependency audit on October 5, 2026 still reports transitive Expo/Metro/Xcode
 tooling issues after a compatible `npm audit fix`: `braces`, `node-forge`
@@ -207,3 +207,64 @@ application passed a clean dependency audit.
 Location history currently has no automatic retention cleanup; choose and
 configure a retention period before broader rollout. Store review privacy
 disclosures must describe background location and load-scoped sharing.
+
+## Pickup damage inspection
+
+The bound driver records an inspection from **Record pickup damage** next to an
+unlocked gate pass. Select a vehicle part in Left/Right/Front/Rear/Top, choose
+damage type and extent, then take a photo (or choose an existing photo). Each
+noted damage requires one photo and supports up to three. Review shows codes to
+copy and a PDF preview. Finish records the notes on the same gate pass and makes
+the photo QR link live. There is no dealership approval or official certification
+step. An empty inspection must explicitly say **No visible damage observed**.
+
+The initial PDF template is the Manheim **ONSITE VEHICLE RELEASE** with the
+bottom blank notes area used in the supplied example. A rotated/unrecognized PDF template or insufficient notes space is rejected
+rather than covering release details. JPG/PNG gate passes are embedded intact
+on one PDF page, with notes below. The inspection is linked only to the selected gate pass; it does not add,
+request, match or validate a VIN.
+
+Codes are factual area/type/severity mappings cross-checked against the
+[Stellantis Vehicle Shipping Manual, December 2024, section 5.3](https://gsp.extra.chrysler.com/qlty/vsm/pdf/VSM%20-%20December%202024%20Final.pdf).
+Shared catalog `aiag-common-2024-12-v1` validates part/type compatibility and
+fixed severity for missing/broken parts on the server; it does not implement
+OEM-specific claims or assert that an auction has approved the findings.
+Up to 40 entries fit via compact codes when full descriptions exceed the notes
+area; all descriptions and photos remain available via QR.
+
+The PDF preserves original pages, text, barcode, original QR and existing links.
+The original attachment is immutable. SQLite drafts and private copied photos
+survive app restarts and loss of network. Optimistic revisions stop stale
+writes; retries recover identical writes/photos after a lost response.
+Completed records are immutable. Dealers see **Damage notes** in Tracking, with
+photos, codes and the annotated PDF alongside **View** for the original.
+
+Tables and buckets are private; only server RPCs can read/write them. Annotated
+PDF viewer tickets expire in two minutes and recheck live load access before
+and after downloading the bytes. The separate `/i/:key` printed link uses a
+128-bit random bearer key and exposes completed damage notes/photos only, never
+the gate pass, release barcode, contact information or object paths. Anyone
+with this link can view the photos; the link remains useful after a load closes.
+Photo pages use no-store/noindex and do not expose drafts.
+
+| Route | Purpose |
+| --- | --- |
+| `GET /driver/loads/:load/documents/:doc/inspection` | Read the inspection draft |
+| `POST /driver/loads/:load/documents/:doc/inspection` | Save a validated revision |
+| `POST …/inspection/photos` | Upload a damage photo (stable ID, multipart) |
+| `POST …/inspection/preview` | Create the annotated PDF preview |
+| `POST …/inspection/finish` | Complete the record and activate the photo link |
+| `POST …/inspection/open` | Request a current annotated PDF ticket |
+| `GET /loads/:load/documents/:doc/inspection` | Owner reads damage notes/photos |
+| `POST /loads/:load/documents/:doc/inspection/open` | Owner opens annotated PDF |
+| `GET /inspection/photos/:key[/photo/:id]` | Completed photo gallery / photo |
+
+For this update the iOS binary must be rebuilt, because image picker and SVG
+are new native dependencies. Camera/photo permissions are declared by the Expo
+plugin. `with-minimum-ios-target` aligns resource bundle deployment targets with
+iOS 15.1 to support Xcode 27. Run the existing `DeepTruckDriver.xcworkspace`
+after `pod install`; Metro reload alone cannot add these native modules.
+
+`npm test` also checks code validation, PDF layout, original/new QR decoding,
+photos, retry recovery, immutable completion and access closure.
+`npm run test:inspection-ui` previews all inspection views at 320/390/430px.

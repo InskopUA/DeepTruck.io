@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Linking as NativeLinking, Modal, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DriverController } from './useDriver';
-import type { Load } from './types';
+import type { Load, PickupDocument } from './types';
 import { loadPresentation, locationReady, updateAge } from './driver-state';
 
 const colors = { ink: '#202c3d', muted: '#68788b', blue: '#286bc0', line: '#e4eaf1', soft: '#f5f8fc', green: '#267555', amber: '#936622' };
@@ -23,18 +23,21 @@ function NavIcon({ name, active }: { name: 'loads' | 'history' | 'profile'; acti
 function Route({ load, full = false }: { load: Load; full?: boolean }) {
   return <View style={s.route}><View style={s.routeRail}><View style={s.pickupDot}/><View style={s.routeLine}/><View style={s.deliveryDot}/></View><View style={s.routeCopy}><View><Text style={s.smallLabel}>PICKUP</Text><Text numberOfLines={full ? undefined : 2} style={s.address}>{load.pickupAddress || 'Not specified'}</Text></View><View><Text style={s.smallLabel}>DELIVERY</Text><Text numberOfLines={full ? undefined : 2} style={s.address}>{load.deliveryAddress || 'Not specified'}</Text></View></View></View>;
 }
-function PickupFiles({load,driver:d}: {load:Load;driver:DriverController}) {
+function PickupFiles({load,driver:d,inspect}: {load:Load;driver:DriverController;inspect:(load:Load,file:PickupDocument)=>void}) {
   const state=load.pickupDocuments;
   if(!state?.documents.length)return null;
   const ended=['completed','cancelled','declined','expired'].includes(load.status) || state.status==='closed';
   const available=state.canOpen && !ended;
   return <View style={s.pickupFiles} testID={`pickup-documents-${load.id}`}><View style={s.pickupHeading}><Text style={s.label}>Pickup documents</Text><Text style={[s.pickupStatus,available?s.green:s.muted]}>{ended?'Closed':available?'Ready':'Locked'}</Text></View>
     {!available && !ended && <Text style={s.helper}>{state.status==='available'?'Accept the load to open your documents.':'Available within 1 mile of pickup.'}</Text>}
-    {state.documents.map(file=><Pressable key={file.id} testID={`pickup-document-${file.id}`} accessibilityRole="button" accessibilityLabel={`${available?'Open':'Locked'} ${file.kind==='gate_pass'?'gate pass':'release form'}: ${file.name}`} disabled={!available || d.busy} onPress={()=>void d.openDocument(load,file.id)} style={s.pickupFile}><View style={s.pickupFileIcon}><Text style={s.pickupFileGlyph}>{available?'↗':'•'}</Text></View><View style={s.flex}><Text numberOfLines={2} style={s.pickupFileName}>{file.name}</Text><Text style={s.pickupFileType}>{file.kind==='gate_pass'?'Gate pass':'Release form'}</Text></View><Text style={[s.pickupFileAction,available?s.blue:s.muted]}>{available?'Open':ended?'Closed':'Locked'}</Text></Pressable>)}
+    {state.documents.map(file=><View key={file.id}><Pressable testID={`pickup-document-${file.id}`} accessibilityRole="button" accessibilityLabel={`${available?'Open':'Locked'} ${file.kind==='gate_pass'?'gate pass':'release form'}: ${file.name}`} disabled={!available || d.busy} onPress={()=>void d.openDocument(load,file.id)} style={s.pickupFile}><View style={s.pickupFileIcon}><Text style={s.pickupFileGlyph}>{available?'↗':'•'}</Text></View><View style={s.flex}><Text numberOfLines={2} style={s.pickupFileName}>{file.name}</Text><Text style={s.pickupFileType}>{file.kind==='gate_pass'?'Gate pass':'Release form'}</Text></View><Text style={[s.pickupFileAction,available?s.blue:s.muted]}>{available?'Open':ended?'Closed':'Locked'}</Text></Pressable>{available && file.kind==='gate_pass' && <Pressable accessibilityRole="button" onPress={()=>inspect(load,file)} style={s.pickupRefresh}><Text style={s.textLink}>{file.inspection?.status==='completed'?'Damage notes & photos':file.inspection?'Continue inspection':'Record pickup damage'}</Text></Pressable>}</View>)}
     {!available && !ended && load.status==='active' && <Pressable accessibilityRole="button" disabled={d.busy} onPress={()=>void d.refreshPickupLocation()} style={s.pickupRefresh}><Text style={s.textLink}>{d.busy?'Please wait…':'Update location'}</Text></Pressable>}
   </View>;
 }
 export function DriverScreen({ driver: d }: { driver: DriverController }) {
+  const [inspectionTarget,setInspectionTarget]=useState<{load:Load;document:PickupDocument}|null>(null);
+  const inspect=(load:Load,document:PickupDocument)=>{setDetailId(null);setInspectionTarget({load,document});};
+  const Inspection=inspectionTarget ? require('./InspectionScreen').InspectionScreen : null;
   const [menu, setMenu] = useState<Load | null>(null), [detailId, setDetailId] = useState<string | null>(null);
   const detail=d.session ? d.loads.find(load=>load.id===detailId) || null : null;
   const setDetail=(load:Load|null)=>setDetailId(load?.id || null);
@@ -72,7 +75,7 @@ export function DriverScreen({ driver: d }: { driver: DriverController }) {
             return <View key={load.id} testID={`load-card-${load.id}`} style={[s.card, load.id === d.invite && s.invited]}>
               <View style={s.cardTop}><Text numberOfLines={1} style={s.dealer}>{load.dealerName}</Text><View style={[s.badge, state.tone === 'green' ? s.badgeGreen : state.tone === 'amber' ? s.badgeAmber : state.tone === 'blue' ? s.badgeBlue : null]}><Text style={[s.badgeText, state.tone === 'green' ? s.green : state.tone === 'amber' ? s.amber : state.tone === 'blue' ? s.blue : null]}>{state.label}</Text></View></View>
               <Pressable accessibilityRole="button" accessibilityLabel={`View details for ${load.title}`} onPress={() => setDetail(load)}><Text style={s.loadTitle}>{load.title}</Text><Route load={load}/></Pressable>
-              <PickupFiles load={load} driver={d}/>
+              <PickupFiles load={load} driver={d} inspect={inspect}/>
               <View style={s.cardMeta}><Text style={s.metaText}>{load.status === 'active' && d.health.enabled ? updateAge(d.health.lastUpload, d.now) : `Access until ${date(load.expiresAt)}`}</Text><Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${load.title}`} disabled={d.busy} onPress={() => setMenu(load)} style={s.more}><Text style={s.moreText}>•••</Text></Pressable></View>
               {state.action && <Button testID={`load-primary-${load.id}`} title={d.busy ? 'Please wait…' : state.action} secondary={pausedAction} disabled={d.busy} onPress={() => void (pausedAction ? d.act(load, 'pause') : d.beginStart(load))}/>}
               {['pending', 'accepted'].includes(load.status) && <Text style={s.consent}>Shares location with {load.dealerName} until {date(load.expiresAt)}. Pause anytime.</Text>}
@@ -83,6 +86,7 @@ export function DriverScreen({ driver: d }: { driver: DriverController }) {
       </ScrollView>
       <View style={[s.navigation, { paddingBottom: Math.max(8, insets.bottom) }]}>{(['loads', 'history', 'profile'] as const).map(name => <Pressable testID={`nav-${name}`} key={name} accessibilityRole="tab" accessibilityState={{ selected: d.screen === name }} onPress={() => d.setScreen(name)} style={s.navItem}><NavIcon name={name} active={d.screen === name}/><Text style={[s.navLabel, d.screen === name && s.blue]}>{name === 'loads' ? 'Loads' : name === 'history' ? 'History' : 'Profile'}</Text></Pressable>)}</View>
     </>}
+    {inspectionTarget && d.session && Inspection && <Inspection actor={d.session.user.id} load={inspectionTarget.load} document={inspectionTarget.document} close={()=>setInspectionTarget(null)} onFinished={()=>void d.refresh()}/>}
     <Sheet visible={d.permissionOpen} title={permissionTitle} close={d.closePermission}>
       <Text style={s.sheetCopy}>{!d.access.services ? 'Turn on Location Services, then allow background access for DeepTruck Driver.' : permissionIntro}</Text>
       <View style={s.permissionSteps}>{(!d.access.services ? [[1, 'Privacy & Security → Location Services'], [2, 'Turn on Location Services']] : d.permissionStep === 'settings' ? [[1, Platform.OS === 'ios' ? 'DeepTruck Driver → Location' : 'App permissions → Location'], [2, Platform.OS === 'ios' ? 'Select Always' : 'Select Allow all the time']] : [[1, Platform.OS === 'ios' ? 'Allow While Using the App' : 'Allow location access'], [2, Platform.OS === 'ios' ? 'Then choose Always' : 'Then allow all the time']]).map(([number, label]) => <View key={number} style={s.permissionRow}><View style={s.permissionNumber}><Text style={s.permissionNumberText}>{number}</Text></View><Text style={s.permissionLabel}>{label}</Text></View>)}</View>
@@ -91,7 +95,7 @@ export function DriverScreen({ driver: d }: { driver: DriverController }) {
       <Button testID="permission-continue" title={d.busy ? 'Please wait…' : d.permissionStep === 'settings' || !d.access.services ? 'Open settings' : 'Enable location'} disabled={d.busy} onPress={() => void (d.permissionStep === 'settings' || !d.access.services ? d.openSettings() : d.enableLocation())}/>
     </Sheet>
     <Sheet visible={Boolean(menu)} title={menu?.title || 'Load actions'} close={closeMenu}>{menu && <View style={s.sheetActions}><Button title="View details" secondary onPress={() => { setDetail(menu); setMenu(null); }}/>{menu.status === 'pending' && <><Button testID="accept-later" title="Accept, start later" secondary disabled={d.busy} onPress={() => { void d.act(menu, 'accept'); setMenu(null); }}/><Button title="Decline invitation" secondary danger disabled={d.busy} onPress={() => { void d.act(menu, 'decline'); setMenu(null); }}/></>}</View>}</Sheet>
-    <Sheet visible={Boolean(detail)} title="Load details" close={() => setDetail(null)}>{detail && <ScrollView style={s.detailScroll}><Text style={s.loadTitle}>{detail.title}</Text><Text style={s.detailCarrier}>{detail.carrierName} · USDOT {detail.carrierDot}</Text><Route load={detail} full/><PickupFiles load={detail} driver={d}/>{d.message?<Text accessibilityLiveRegion="polite" style={s.error}>{d.message}</Text>:null}<View style={s.detailsGroup}><Text style={s.label}>Vehicles</Text>{detail.vehicles.length ? detail.vehicles.map((vehicle, index) => <Text key={index} style={s.detailValue}>{vehicle}</Text>) : <Text style={s.detailValue}>Not specified</Text>}</View>{detail.plannedAt && <View style={s.detailsGroup}><Text style={s.label}>Planned pickup</Text><Text style={s.detailValue}>{date(detail.plannedAt)}</Text></View>}<View style={s.detailsGroup}><Text style={s.label}>Location access ends</Text><Text style={s.detailValue}>{date(detail.expiresAt)}</Text></View></ScrollView>}</Sheet>
+    <Sheet visible={Boolean(detail)} title="Load details" close={() => setDetail(null)}>{detail && <ScrollView style={s.detailScroll}><Text style={s.loadTitle}>{detail.title}</Text><Text style={s.detailCarrier}>{detail.carrierName} · USDOT {detail.carrierDot}</Text><Route load={detail} full/><PickupFiles load={detail} driver={d} inspect={inspect}/>{d.message?<Text accessibilityLiveRegion="polite" style={s.error}>{d.message}</Text>:null}<View style={s.detailsGroup}><Text style={s.label}>Vehicles</Text>{detail.vehicles.length ? detail.vehicles.map((vehicle, index) => <Text key={index} style={s.detailValue}>{vehicle}</Text>) : <Text style={s.detailValue}>Not specified</Text>}</View>{detail.plannedAt && <View style={s.detailsGroup}><Text style={s.label}>Planned pickup</Text><Text style={s.detailValue}>{date(detail.plannedAt)}</Text></View>}<View style={s.detailsGroup}><Text style={s.label}>Location access ends</Text><Text style={s.detailValue}>{date(detail.expiresAt)}</Text></View></ScrollView>}</Sheet>
   </SafeAreaView>;
 }
 const s = StyleSheet.create({

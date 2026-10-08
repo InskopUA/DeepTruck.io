@@ -11,6 +11,14 @@
   ],
   "rewrites": [
     {
+      "source": "/i/:key/photo/:photo",
+      "destination": "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/driver-tracking/inspection/photos/:key/photo/:photo"
+    },
+    {
+      "source": "/i/:key",
+      "destination": "https://yqpeebgmqtqoxumzfrsq.supabase.co/functions/v1/driver-tracking/inspection/photos/:key"
+    },
+    {
       "source": "/verify",
       "destination": "/verify.html"
     },

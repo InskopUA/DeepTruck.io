@@ -1,5 +1,7 @@
+import type {DamageRecord} from '../../supabase/functions/_shared/damage-codes';
+export type PickupInspection={id:string;status:'draft'|'completed';revision:number;damages:DamageRecord[];photos:{id:string;damageId:string;mimeType:string;size:number;url:string}[];shareUrl:string|null;completedAt:string|null;createdAt:string;savedAt:string;noDamageObserved:boolean;catalogVersion:string};
 export type LoadStatus = 'pending'|'accepted'|'active'|'paused'|'completed'|'cancelled'|'declined'|'expired';
-export type PickupDocument = {id:string;name:string;kind:'gate_pass'|'release_form';mimeType:string;size:number;openedAt:string|null};
+export type PickupDocument = {id:string;name:string;kind:'gate_pass'|'release_form';mimeType:string;size:number;openedAt:string|null;inspection?:{id:string;status:'draft'|'completed';damageCount:number;completedAt:string|null}|null};
 export type PickupDocuments = {documents:PickupDocument[];status:'locked'|'available'|'closed';canOpen:boolean;unlockedAt:string|null;unlockMethod:'arrival'|'manual'|null};
 export type Load = {
   id:string; title:string; dealerName:string; carrierName:string; carrierDot:string;

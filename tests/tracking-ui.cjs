@@ -31,6 +31,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
  await ctx.route('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',r=>r.fulfill({contentType:'application/javascript',body:`window.supabase={createClient:()=>({auth:{getSession:async()=>({data:{session:${JSON.stringify(session)}}}),onAuthStateChange:()=>({data:{subscription:{unsubscribe(){}}}}),signOut:async()=>({}),updateUser:async()=>({data:{user:${JSON.stringify(user)}}})}})};`}));
  await ctx.route('https://*.tile.openstreetmap.org/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aK1cAAAAASUVORK5CYII=','base64')}));
  await ctx.route('https://photon.komoot.io/api/**',route=>route.fulfill({contentType:'application/json',body:JSON.stringify({features:[{geometry:{type:'Point',coordinates:[-84.388,33.749]},properties:{name:'Auction entrance',housenumber:'100',street:'Auction Road',city:'Atlanta',state:'Georgia',postcode:'30303'}}]})}));
+ await ctx.route('https://documents.test/photo.png',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aCfoAAAAASUVORK5CYII=','base64')}));
  await ctx.route(project+'/**',async route=>{
    const req=route.request(),url=new URL(req.url());
    const respond=(body,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});
@@ -46,6 +47,7 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
    assert.equal(req.headers().authorization,'Bearer test-session');
    const p=url.pathname.split('/driver-tracking')[1];
    documentRequests.push(p);
+   if(p?.includes('/inspection')){if(p.endsWith('/open'))return respond({url:'https://documents.test/annotated.pdf'});return respond({inspection:{id:'inspection',status:'completed',completedAt:new Date().toISOString(),shareUrl:'https://documents.test/photos',damages:[{id:'damage',code:'10-12-3',areaLabel:'Left front door',typeLabel:'Scratch',sizeLabel:'Over 3–6 in'}],photos:[{id:'photo',damageId:'damage',url:'https://documents.test/photo.png'}]}});}
    const docMatch=p?.match(/^\/loads\/([^/]+)\/(pickup|documents(?:\/(unlock)|\/([^/]+)\/(open))?)$/);
    if(docMatch){
      const load=loads.find(v=>v.id===docMatch[1]);if(!load)return respond({error:'Missing load'},404);
@@ -195,6 +197,14 @@ function fixture(status,title,phone='+15551234567') {return {id:randomUUID(),ver
    assert.ok(await panel.evaluate(el=>el.scrollWidth<=el.clientWidth),width+'px pickup editor overflow');
    if(width===390)await panel.screenshot({path:'/private/tmp/deeptruck-pickup-documents-mobile.png'});await page.keyboard.press('Escape');
  }
+ const inspectionLoad=loads.find(v=>v.title==='Protected pickup');inspectionLoad.pickupDocuments.documents[0].inspection={id:'inspection',status:'completed',damageCount:1,completedAt:new Date().toISOString()};
+ await page.locator('#tracking-refresh').click();await page.locator('[data-pickup-inspection]').waitFor();
+ for(const width of [320,390,1440]){
+   await page.setViewportSize({width,height:1000});await page.locator('[data-pickup-inspection]').click();const inspection=page.locator('.inspection-dialog');await inspection.locator('code').waitFor();
+   assert.equal(await inspection.locator('code').textContent(),'10-12-3');assert.equal(await inspection.locator('.inspection-photos img').count(),1);assert.equal(await inspection.locator('[data-inspection-pdf]').count(),1);assert.ok(await inspection.evaluate(el=>el.scrollWidth<=el.clientWidth),width+'px inspection overflow');
+   if(width===390)await inspection.screenshot({path:'/private/tmp/deeptruck-admin-inspection.png'});await page.keyboard.press('Escape');
+ }
+ console.log('PASS owner inspection details, codes, photo thumbnails and annotated PDF controls at 320/390/1440px');
  console.log('PASS pickup pin confirmation, one-mile map, uploads before invitation, safe upload retry, manual unlock and attachments on existing loads');
  await page.goto(origin+'/driver/?invite='+loads[0].id);assert.equal(await page.locator('#open-driver').getAttribute('href'),'deeptruck-driver://loads?invite='+loads[0].id);
  await page.waitForFunction(()=>document.getElementById('install-status').textContent.includes('pilot testing'));

@@ -1,0 +1,10 @@
+import * as SQLite from 'expo-sqlite';
+import {Directory,File,Paths} from 'expo-file-system';
+import type {DamageRecord} from '../../supabase/functions/_shared/damage-codes';
+export type LocalPhoto={id:string;damageId:string;uri:string;mimeType:string;uploaded:boolean;url?:string};
+export type InspectionDraft={id:string;status:'draft'|'completed';damages:DamageRecord[];lastSubmittedDamages?:DamageRecord[];photos:LocalPhoto[];revision:number;sequence:number;syncedSequence:number;shareUrl:string|null;completedAt:string|null};
+let pending:Promise<SQLite.SQLiteDatabase>|null=null;
+async function database(){if(!pending)pending=(async()=>{const db=await SQLite.openDatabaseAsync('deeptruck-inspections.db');await db.execAsync('create table if not exists inspection_drafts(actor text not null,document text not null,sequence integer not null,revision integer not null,data text not null,primary key(actor,document));');return db;})();return pending;}
+export async function loadInspectionDraft(actor:string,document:string):Promise<InspectionDraft|null>{const row=await (await database()).getFirstAsync<{data:string}>('select data from inspection_drafts where actor=? and document=?',actor,document);return row?JSON.parse(row.data):null;}
+export async function saveInspectionDraft(actor:string,document:string,draft:InspectionDraft){await (await database()).runAsync('insert into inspection_drafts(actor,document,sequence,revision,data) values(?,?,?,?,?) on conflict(actor,document) do update set sequence=excluded.sequence,revision=excluded.revision,data=excluded.data where excluded.sequence>inspection_drafts.sequence or (excluded.sequence=inspection_drafts.sequence and excluded.revision>=inspection_drafts.revision)',actor,document,draft.sequence,draft.revision,JSON.stringify(draft));}
+export function retainInspectionPhoto(actor:string,document:string,id:string,uri:string,mimeType:string){const dir=new Directory(Paths.document,'inspections',actor,document);dir.create({idempotent:true,intermediates:true});const destination=new File(dir,id+(mimeType==='image/png'?'.png':'.jpg'));new File(uri).copy(destination);return destination.uri;}

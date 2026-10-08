@@ -151,6 +151,8 @@
     });
     $('tracking-detail').addEventListener('click',async e=>{
       const item=items.find(v=>v.id===selected);
+      const inspection=e.target.closest('[data-pickup-inspection]');
+      if(inspection && item && !actionBusy){void pickup.openInspection(item,inspection.dataset.pickupInspection,api);return;}
       if(e.target.closest('[data-pickup-add]') && item && !actionBusy){pickup.openEditor(item,api,()=>load());return;}
       const openDocument=e.target.closest('[data-pickup-open]'),unlockDocuments=e.target.closest('[data-pickup-unlock]');
       if((openDocument || unlockDocuments) && !actionBusy && item){

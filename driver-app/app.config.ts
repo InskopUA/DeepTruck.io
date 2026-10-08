@@ -12,7 +12,8 @@ const config: ExpoConfig = {
       locationAlwaysAndWhenInUsePermission:'Allow background location so your active loads can be tracked with the screen locked. You can stop sharing at any time.',
       isIosBackgroundLocationEnabled:true, isAndroidBackgroundLocationEnabled:true, isAndroidForegroundServiceEnabled:true
     }],
-    ['expo-secure-store',{configureAndroidBackup:true}], 'expo-sqlite'
+    ['expo-image-picker',{cameraPermission:'Take photos of vehicle damage for your pickup inspection.',photosPermission:'Choose photos of vehicle damage for your pickup inspection.',microphonePermission:false}],
+    ['expo-secure-store',{configureAndroidBackup:true}], 'expo-sqlite', './plugins/with-minimum-ios-target'
   ]
 };
 export default config;

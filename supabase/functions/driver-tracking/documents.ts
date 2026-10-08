@@ -14,7 +14,7 @@ const decode = (value: string) => Uint8Array.from(atob(value.replace(/-/g,'+').r
 async function signingKey(secret: string) {
   return crypto.subtle.importKey('raw',new TextEncoder().encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign','verify']);
 }
-type Ticket = {actor:string;load:string;document:string;driver:boolean;expires:number};
+export type Ticket = {actor:string;load:string;document:string;driver:boolean;expires:number;kind?:'annotated'|'photo';photo?:string;revision?:number};
 async function signTicket(value: Ticket, secret: string) {
   const payload = encode(new TextEncoder().encode(JSON.stringify(value)));
   const signature = await crypto.subtle.sign('HMAC',await signingKey(secret),new TextEncoder().encode(payload));
@@ -28,6 +28,9 @@ async function verifyTicket(raw: string, secret: string): Promise<Ticket> {
     const value = JSON.parse(new TextDecoder().decode(decode(payload)));
     uuid(value.actor); uuid(value.load); uuid(value.document);
     if (typeof value.driver!=='boolean' || !Number.isFinite(value.expires) || value.expires<=Date.now() || value.expires>Date.now()+121000) throw new Error();
+    if(value.kind && !['annotated','photo'].includes(value.kind))throw new Error();
+    if(value.kind==='photo')uuid(value.photo);
+    if(value.kind==='annotated' && (!Number.isInteger(value.revision) || value.revision<1))throw new Error();
     return value;
   } catch { throw new HttpError(403,'Document link expired. Open the document again.'); }
 }
@@ -35,13 +38,28 @@ async function access(ctx: DocumentContext, value: Ticket, opened = false) {
   const {data,error} = await ctx.db.rpc('tracking_document_access',{p_actor:value.actor,p_phone:'',p_load:value.load,p_document:value.document,p_driver:value.driver,p_opened:opened});
   ctx.databaseError(error); return data;
 }
+export async function viewerLink(ticket: Ticket, ctx: DocumentContext) {
+  const origin=Deno.env.get('TRACKING_PUBLIC_API_URL') || Deno.env.get('SUPABASE_URL')+'/functions/v1/driver-tracking';
+  return origin+'/documents/view?ticket='+await signTicket(ticket,ctx.serviceKey);
+}
+async function viewerFile(ticket:Ticket,ctx:DocumentContext,opened=false) {
+  const original=await access(ctx,ticket,opened);
+  if(ticket.kind==='annotated'){
+    const {data,error}=await ctx.db.rpc('pickup_inspection_read',{p_actor:ticket.actor,p_load:ticket.load,p_document:ticket.document,p_driver:ticket.driver});ctx.databaseError(error);
+    if(!data?.annotated_path || data.preview_revision!==ticket.revision || data.revision!==ticket.revision)throw new HttpError(403,'Gate pass changed. Open it again.');
+    return {bucket,object_path:data.annotated_path,mime_type:'application/pdf',file_name:original.file_name.replace(/\.[^.]+$/,'')+' — damage notes.pdf'};
+  }
+  if(ticket.kind==='photo'){
+    const {data,error}=await ctx.db.rpc('pickup_inspection_photo_access',{p_actor:ticket.actor,p_load:ticket.load,p_document:ticket.document,p_photo:ticket.photo,p_driver:ticket.driver});ctx.databaseError(error);
+    return {...data,bucket:'inspection-photos',file_name:'Damage photo.'+(data.mime_type==='image/png'?'png':'jpg')};
+  }
+  return {...original,bucket};
+}
 export async function documentViewer(req: Request, ctx: DocumentContext): Promise<Response> {
-  const ticket = await verifyTicket(new URL(req.url).searchParams.get('ticket') || '',ctx.serviceKey);
-  const file = await access(ctx,ticket);
-  const {data,error} = await ctx.db.storage.from(bucket).download(file.object_path);
-  if (error || !data) throw new HttpError(503,'Unable to open this document. Please try again.');
-  // Recheck after storage retrieval, and record Opened only when serving bytes.
-  await access(ctx,ticket,true);
+  const ticket=await verifyTicket(new URL(req.url).searchParams.get('ticket') || '',ctx.serviceKey),file=await viewerFile(ticket,ctx);
+  const {data,error}=await ctx.db.storage.from(file.bucket).download(file.object_path);
+  if(error || !data)throw new HttpError(503,'Unable to open this document. Please try again.');
+  await viewerFile(ticket,ctx,true);
   return new Response(data,{headers:{
     'Content-Type':file.mime_type,
     'Content-Disposition':`inline; filename="pickup-document.${file.mime_type==='application/pdf'?'pdf':file.mime_type==='image/png'?'png':'jpg'}"; filename*=UTF-8''${encodeURIComponent(file.file_name)}`,
@@ -61,7 +79,7 @@ export async function decorateDocuments(user: User, loads: Record<string, any>[]
     pickupDocuments:states[v.id] || {documents:[],unlockedAt:null,unlockMethod:null,status:'locked',canOpen:false},
   }));
 }
-async function limitedForm(req: Request) {
+export async function limitedForm(req: Request) {
   // Bound the multipart body even when Content-Length is absent or forged.
   if (!req.headers.get('Content-Type')?.startsWith('multipart/form-data;')) throw new HttpError(400,'Choose a PDF, JPG or PNG file.');
   const reader=req.body?.getReader(); if (!reader) throw new HttpError(400,'Choose a document.');
@@ -71,7 +89,7 @@ async function limitedForm(req: Request) {
     return await new Response(new Blob(chunks as BlobPart[]),{headers:{'Content-Type':req.headers.get('Content-Type')!}}).formData();
   } catch (e) {if(e instanceof HttpError)throw e;throw new HttpError(400,'Invalid document upload.');}
 }
-function fileType(bytes: Uint8Array) {
+export function fileType(bytes: Uint8Array) {
   if (bytes.length>=5 && new TextDecoder().decode(bytes.subarray(0,5))==='%PDF-') return {mime:'application/pdf',extension:'pdf'};
   if (bytes.length>=8 && [137,80,78,71,13,10,26,10].every((v,i)=>bytes[i]===v)) return {mime:'image/png',extension:'png'};
   if (bytes.length>=3 && bytes[0]===255 && bytes[1]===216 && bytes[2]===255) return {mime:'image/jpeg',extension:'jpg'};
@@ -123,8 +141,7 @@ export async function documentRoutes(req: Request,path: string,user: User,ctx: D
   if (match[4]==='open') {
     const ticket: Ticket={actor:user.id,load:id,document:uuid(match[3]),driver,expires:Date.now()+120000};
     await access(ctx,ticket);
-    const origin=Deno.env.get('TRACKING_PUBLIC_API_URL') || Deno.env.get('SUPABASE_URL')+'/functions/v1/driver-tracking';
-    return ctx.json({url:origin+'/documents/view?ticket='+await signTicket(ticket,ctx.serviceKey)});
+    return ctx.json({url:await viewerLink(ticket,ctx)});
   }
   return null;
 }
