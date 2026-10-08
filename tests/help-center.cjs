@@ -16,7 +16,7 @@ const root = path.resolve(__dirname,'../public'), origin='https://help.deeptruck
       else if(!path.extname(pathname)) pathname += '.html';
       const file=path.resolve(root,'.'+pathname);
       if(!file.startsWith(root+path.sep) || !fs.existsSync(file)){missing.push(pathname);return route.fulfill({status:404});}
-      const types={'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.jpg':'image/jpeg'};
+      const types={'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.jpg':'image/jpeg','.png':'image/png'};
       return route.fulfill({contentType:types[path.extname(file)]||'application/octet-stream',body:fs.readFileSync(file)});
     });
     const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
@@ -36,13 +36,13 @@ const root = path.resolve(__dirname,'../public'), origin='https://help.deeptruck
         await check(theme+' '+(slug||'home'));
         const invalid=await page.locator('main a[href^="#"],.contents-rail nav a').evaluateAll(links=>links.filter(a=>!document.getElementById(a.hash.slice(1))).map(a=>a.href));assert.deepEqual(invalid,[]);
         if(slug)assert.equal(await page.locator('.nav-group a[aria-current="page"]').count(),1);
-        if(['','location-permissions','create-tracking'].includes(slug))await page.screenshot({path:'/private/tmp/deeptruck-help-'+(slug||'home')+'-'+theme+'.png',fullPage:true});
+        if(['','location-permissions','create-tracking','pickup-documents','record-pickup-damage','review-damage-notes'].includes(slug))await page.screenshot({path:'/private/tmp/deeptruck-help-'+(slug||'home')+'-'+theme+'.png',fullPage:true});
       }
       console.log('PASS '+theme+': all '+articles.length+' articles, text contrast and section links');
     }
     for(const width of [320,390,768,1024]){
       await page.setViewportSize({width,height:844});
-      for(const slug of ['','create-tracking','location-permissions','troubleshooting']){
+      for(const slug of ['','create-tracking','location-permissions','troubleshooting','pickup-documents','driver-pickup-documents','record-pickup-damage','review-damage-notes']){
         await page.goto(origin+'/help'+(slug?'/'+slug:''));
         const theme=page.getByRole('switch',{name:'Light theme'});
         await theme.click();await check(width+' light '+slug);await theme.click();await check(width+' dark '+slug);
@@ -65,6 +65,9 @@ const root = path.resolve(__dirname,'../public'), origin='https://help.deeptruck
     await page.locator('.contents-rail a[href="#iphone"]').click();assert.ok(await page.locator('#iphone').evaluate(h=>h.getBoundingClientRect().top>=70));
     await page.keyboard.press('Control+k');await page.locator('#guide-search').fill('no-matching-topic-xyz');await page.locator('.search-empty').waitFor();assert.equal(await page.locator('#search-results .search-result').count(),0);
     await page.keyboard.press('Escape');assert.equal(await page.locator('#search-dialog').evaluate(d=>d.open),false);
+    for(const [query,slug] of [['unlock pickup','pickup-documents'],['record damage Manheim','record-pickup-damage'],['photos PDF','review-damage-notes'],['gate pass pickup','driver-pickup-documents']]){
+      await page.goto(origin+'/help?q='+encodeURIComponent(query));await page.locator('#search-dialog[open]').waitFor();await page.locator('#search-results a[href="/help/'+slug+'"]').waitFor();await page.keyboard.press('Escape');
+    }
     await page.goto(origin+'/help?q=SMS');await page.locator('#search-dialog[open]').waitFor();await page.locator('.search-result').first().waitFor();
     await page.goto(origin+'/help');failSearch=true;await page.locator('[data-search-open]').first().click();await page.getByRole('button',{name:'Retry search'}).waitFor();failSearch=false;await page.getByRole('button',{name:'Retry search'}).click();await page.locator('.search-result').first().waitFor();await page.keyboard.press('Escape');
     await page.getByRole('switch',{name:'Light theme'}).click();const selected=await page.locator('html').getAttribute('data-theme');await page.goto(origin+'/help/driver-sign-in');assert.equal(await page.locator('html').getAttribute('data-theme'),selected);
